@@ -102,39 +102,55 @@ body{font-family:var(--font-sans);background:var(--color-surface-base);color:var
 .cp-bar-track{flex:1;height:5px;background:var(--color-surface-sunken);border-radius:var(--radius-full);overflow:hidden}
 .cp-bar-fill{height:100%;background:linear-gradient(90deg,var(--color-action),#4D72E0);border-radius:var(--radius-full);transition:width 0.6s ease}
 
-/* ── AI ALERT SECTION ── */
-.ai-alert-section{background:#F0F4FF;border:1px solid #C8D8FA;border-radius:var(--radius-lg);margin-bottom:var(--space-3);overflow:hidden}
-.ai-alert-head{display:flex;align-items:center;gap:10px;padding:11px var(--space-5);cursor:pointer;user-select:none;transition:background var(--transition-fast)}
-.ai-alert-head:hover{background:rgba(26,70,200,.06)}
-.ai-noticed-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--color-action);background:#EBF0FD;border:1px solid #C8D8FA;border-radius:var(--radius-full);padding:3px 9px;letter-spacing:.03em;flex-shrink:0}
-.ai-noticed-badge-star{font-size:11px;line-height:1}
-.ai-alert-title{font-size:13px;font-weight:600;color:var(--color-text-primary);flex:1}
-.ai-alert-chevron{width:16px;height:16px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;transition:transform var(--transition-base);flex-shrink:0}
-.ai-alert-chevron.open{transform:rotate(180deg)}
-.ai-alert-body{border-top:1px solid #C8D8FA;padding:var(--space-3) var(--space-5) var(--space-4);display:flex;flex-direction:column;gap:var(--space-2)}
-.ai-alert-body.collapsed{display:none}
-/* Each item is a card now */
-.ai-alert-item{display:flex;gap:12px;align-items:flex-start;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4)}
-.ai-alert-item.warn{border-left:3px solid var(--warning-border);background:#FFFDF5}
-.ai-alert-item.danger{border-left:3px solid var(--danger-border);background:#FFFAFA}
-.ai-alert-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.ai-alert-dot.warn{background:var(--warning-surface);border:1.5px solid var(--warning-border)}
-.ai-alert-dot.warn svg{width:13px;height:13px;stroke:var(--warning-text);fill:none;stroke-width:2}
-.ai-alert-dot.danger{background:var(--danger-surface);border:1.5px solid var(--danger-border)}
-.ai-alert-dot.danger svg{width:13px;height:13px;stroke:var(--danger-text);fill:none;stroke-width:2}
-.ai-alert-content{flex:1;min-width:0}
-.ai-alert-ref{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--color-text-primary)}
-.ai-alert-msg{font-size:12px;color:var(--color-text-secondary);line-height:1.4}
-.ai-alert-amount{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--color-text-primary);background:var(--color-surface-sunken);padding:1px 6px;border-radius:var(--radius-sm)}
-.ai-alert-actions{display:flex;gap:6px;margin-top:8px}
+/* ── ANOMALI SECTION (new grouped accordion) ── */
+.anom-section{background:#FFFEF0;border:1px solid #E8C870;border-radius:var(--radius-lg);margin-bottom:var(--space-3);overflow:hidden}
+.anom-section.safe{background:var(--success-surface);border-color:var(--success-border)}
+.anom-head{display:flex;align-items:flex-start;gap:12px;padding:14px var(--space-5);cursor:pointer;user-select:none;transition:background var(--transition-fast)}
+.anom-head:hover{background:rgba(122,77,0,.04)}
+.anom-section.safe .anom-head:hover{background:rgba(22,102,56,.04)}
+.anom-head-icon{width:32px;height:32px;border-radius:50%;background:var(--warning-surface);border:1.5px solid var(--warning-border);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.anom-head-icon svg{width:15px;height:15px;fill:var(--warning-text);stroke:none}
+.anom-head-icon.safe{background:var(--success-surface);border-color:var(--success-border)}
+.anom-head-icon.safe svg{stroke:var(--success-text);fill:none;stroke-width:2.5;width:14px;height:14px}
+.anom-head-text{flex:1;min-width:0}
+.anom-head-title{font-size:14px;font-weight:700;color:var(--color-text-primary);line-height:1.3}
+.anom-head-sub{font-size:12px;color:var(--color-text-tertiary);margin-top:3px;line-height:1.4;max-width:600px}
+.anom-chevron{width:16px;height:16px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;transition:transform var(--transition-base);flex-shrink:0;margin-top:8px}
+.anom-chevron.open{transform:rotate(180deg)}
+.anom-body{border-top:1px solid #E8C870;padding:var(--space-4) var(--space-5);display:flex;flex-direction:column;gap:var(--space-3)}
+.anom-body.collapsed{display:none}
+.anom-section.safe .anom-body{border-top-color:var(--success-border)}
+
+/* Child group accordion */
+.anom-group{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);overflow:hidden}
+.anom-group-head{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none;transition:background var(--transition-fast)}
+.anom-group-head:hover{background:var(--color-surface-sunken)}
+.anom-group-icon{width:28px;height:28px;border-radius:var(--radius-sm);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.anom-group-icon svg{width:13px;height:13px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.anom-group-text{flex:1;min-width:0}
+.anom-group-title{font-size:13px;font-weight:700;color:var(--color-text-primary)}
+.anom-group-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.anom-group-badge{min-width:22px;height:22px;border-radius:var(--radius-full);background:#FDF3E0;border:1px solid var(--warning-border);color:var(--warning-text);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 6px;flex-shrink:0}
+.anom-group-chevron{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;transition:transform var(--transition-base);flex-shrink:0}
+.anom-group-chevron.open{transform:rotate(180deg)}
+.anom-group-body{border-top:1px solid var(--color-border-default);padding:var(--space-3) var(--space-4);display:flex;flex-direction:column;gap:var(--space-2)}
+.anom-group-body.collapsed{display:none}
+
+/* Individual anomaly item inside a group */
+.anom-item{background:#F8F9FF;border:1px solid #DDE4FA;border-radius:var(--radius-sm);padding:10px 12px}
+.anom-item-note{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--color-action);background:#EBF0FD;border:1px solid #C8D8FA;border-radius:var(--radius-full);padding:3px 10px;margin-bottom:7px}
+.anom-item-note svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.5}
+.anom-item-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);margin-bottom:8px}
+.anom-item-ref{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--color-text-primary)}
+.anom-item-desc{font-size:12px;color:var(--color-text-secondary)}
+.anom-item-amount{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--color-text-primary);white-space:nowrap}
+.anom-item-actions{display:flex;gap:6px}
+.ai-btn-lihat{font-family:var(--font-sans);font-size:11px;font-weight:600;padding:5px 11px;border-radius:var(--radius-md);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-secondary);cursor:pointer;transition:all var(--transition-fast)}
+.ai-btn-lihat:hover{border-color:#c8c2ba;background:var(--color-surface-sunken)}
 .ai-btn-valid{font-family:var(--font-sans);font-size:11px;font-weight:600;padding:5px 11px;border-radius:var(--radius-md);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-secondary);cursor:pointer;transition:all var(--transition-fast)}
 .ai-btn-valid:hover{border-color:#c8c2ba;background:var(--color-surface-sunken)}
 .ai-btn-reklasifikasi{font-family:var(--font-sans);font-size:11px;font-weight:600;padding:5px 11px;border-radius:var(--radius-md);border:none;background:var(--color-action);color:#fff;cursor:pointer;transition:background var(--transition-fast)}
 .ai-btn-reklasifikasi:hover{background:var(--color-action-hover)}
-.ai-alert-empty{display:flex;align-items:center;gap:10px;padding:var(--space-3) 0}
-.ai-alert-empty-icon{width:28px;height:28px;border-radius:50%;background:var(--success-surface);border:1.5px solid var(--success-border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ai-alert-empty-icon svg{width:13px;height:13px;stroke:var(--success-text);fill:none;stroke-width:2.5}
-.ai-alert-empty-text{font-size:12px;font-weight:600;color:var(--success-text)}
 
 /* ── ANOMALY ROWS ── */
 tbody tr.anomaly-warn{background:#FFFBEE}
@@ -522,18 +538,20 @@ td{padding:10px 14px;vertical-align:middle}
           <div class="cp-bar-track"><div class="cp-bar-fill" style="width:80%"></div></div>
         </div>
 
-        <!-- AI ALERT SECTION -->
-        <div class="ai-alert-section" id="aiAlertSection">
-          <div class="ai-alert-head" onclick="toggleAlertAccordion()">
-            <span class="ai-noticed-badge" id="aiNoticedBadge">
-              <span class="ai-noticed-badge-star">✦</span>
-              AI
-            </span>
-            <span class="ai-alert-title" id="aiAlertTitle">Beberapa transaksi perlu ditinjau sebelum penutupan periode</span>
-            <svg class="ai-alert-chevron open" id="alertChevron" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+        <!-- ANOMALI SECTION -->
+        <div class="anom-section" id="anomSection">
+          <div class="anom-head" onclick="toggleAnomsection()">
+            <div class="anom-head-icon" id="anomHeadIcon">
+              <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="anom-head-text">
+              <div class="anom-head-title" id="anomHeadTitle">Anomali Transaksi Terdeteksi</div>
+              <div class="anom-head-sub" id="anomHeadSub">AI mendeteksi pola transaksi menyimpang. Peninjauan diperlukan untuk memastikan integritas data sebelum proses penutupan periode dilakukan.</div>
+            </div>
+            <svg class="anom-chevron open" id="anomChevron" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
           </div>
-          <div class="ai-alert-body" id="aiAlertBody">
-            <div id="aiAlertList"></div>
+          <div class="anom-body" id="anomBody">
+            <div id="anomGroupList"></div>
           </div>
         </div>
 
@@ -888,55 +906,96 @@ function getDisplayRef(je){
   return je.id; // manual JE
 }
 
-// Flatten JE data into GL rows — 1 row per JE (not per line)
-// Running balance tracks the net effect of all lines
+// Keys that are anomalies — must be defined before buildGLRows is called
+const ANOMALIES_KEYS = {'JE-2025-0001':1,'JE-2025-0005':1,'INV-C002-20250125':1};
+
+// Build GL rows — proper GL per line item
+// Anomaly rows: show only 1 representative row (the primary debit line)
+// Normal rows: all lines shown, exclusive debit/credit, running balance
 function buildGLRows(){
   const sorted=[...JE_DATA].sort((a,b)=>a.date.localeCompare(b.date));
   const rows=[];
-  let runBal=500000000;
+  let runBal=500000000; // opening balance
+
   sorted.forEach(je=>{
     const displayRef=getDisplayRef(je);
-    const totalDebit=je.lines.reduce((s,l)=>s+(l.debit||0),0);
-    const totalCredit=je.lines.reduce((s,l)=>s+(l.credit||0),0);
-    runBal += totalDebit - totalCredit;
-    const primaryLine = je.lines.find(l=>l.debit>0) || je.lines[0];
-    rows.push({
-      id: je.id,
-      jeId: je.id,
-      date: je.date,
-      dateLabel: fmtDate(je.date),
-      ref: displayRef,
-      refRaw: je.id,
-      refType: mapRefType(je.refType),
-      refId: je.refId,
-      acct: primaryLine.acct,
-      acctName: primaryLine.acctName,
-      desc: je.memo,
-      debit: totalDebit,
-      credit: totalCredit,
-      balance: runBal,
-      jeData: je
-    });
+    // JE-2025-0005 is flagged as anomaly — force refType to 'je' regardless of source
+    const forceJE = (je.id==='JE-2025-0005');
+    const refType = forceJE ? 'je' : mapRefType(je.refType);
+    const isAnomaly = !!ANOMALIES_KEYS[je.id];
 
-    // Inject duplicate row for JE-2025-0005 — same values, ref INV-C002-20250125
-    if(je.id==='JE-2025-0005'){
+    if(isAnomaly){
+      // Anomaly JE: show only the primary line (first debit, or first line)
+      const primaryLine = je.lines.find(l=>l.debit>0) || je.lines[0];
+      const debit  = primaryLine.debit  > 0 ? primaryLine.debit  : 0;
+      const credit = primaryLine.credit > 0 ? primaryLine.credit : 0;
+      // Still apply full net effect to running balance for accuracy
+      const netEffect = je.lines.reduce((s,l)=>(s+(l.debit||0)-(l.credit||0)),0);
+      runBal += netEffect;
       rows.push({
-        id: 'INV-C002-20250125',
+        id: je.id+'-L0',
         jeId: je.id,
         date: je.date,
         dateLabel: fmtDate(je.date),
-        ref: 'INV-C002-20250125',
-        refRaw: 'INV-C002-20250125',
-        refType: 'inv',
-        refId: 'INV002',
+        ref: displayRef,
+        refRaw: je.id,
+        refType,
+        refId: je.refId,
         acct: primaryLine.acct,
         acctName: primaryLine.acctName,
         desc: je.memo,
-        debit: totalDebit,
-        credit: totalCredit,
-        balance: runBal, // same balance — duplicate, belum dipost ulang
-        jeData: je,
-        isDuplicate: true
+        debit,
+        credit,
+        balance: runBal,
+        jeData: je
+      });
+
+      // Inject duplicate row for JE-2025-0005
+      if(je.id==='JE-2025-0005'){
+        const dupNet = je.lines.reduce((s,l)=>(s+(l.debit||0)-(l.credit||0)),0);
+        runBal += dupNet;
+        rows.push({
+          id: 'INV-C002-20250125-L0',
+          jeId: 'INV-C002-20250125',
+          date: je.date,
+          dateLabel: fmtDate(je.date),
+          ref: 'INV-C002-20250125',
+          refRaw: 'INV-C002-20250125',
+          refType: 'inv',
+          refId: 'INV002',
+          acct: primaryLine.acct,
+          acctName: primaryLine.acctName,
+          desc: je.memo,
+          debit,
+          credit,
+          balance: runBal,
+          jeData: je,
+          isDuplicate: true
+        });
+      }
+    } else {
+      // Normal JE: all lines, exclusive debit/credit
+      je.lines.forEach((l,idx)=>{
+        const debit  = l.debit  > 0 ? l.debit  : 0;
+        const credit = l.credit > 0 ? l.credit : 0;
+        runBal += debit - credit;
+        rows.push({
+          id: je.id+'-L'+idx,
+          jeId: je.id,
+          date: je.date,
+          dateLabel: fmtDate(je.date),
+          ref: displayRef,
+          refRaw: je.id,
+          refType,
+          refId: je.refId,
+          acct: l.acct,
+          acctName: l.acctName,
+          desc: l.desc || je.memo,
+          debit,
+          credit,
+          balance: runBal,
+          jeData: je
+        });
       });
     }
   });
@@ -999,7 +1058,7 @@ function getFiltered(){
 }
 
 function getSorted(rows){
-  return [...rows].sort((a,b)=>{
+  const sorted=[...rows].sort((a,b)=>{
     let va=a[sortCol]||0, vb=b[sortCol]||0;
     if(sortCol==='date'){va=a.date;vb=b.date;}
     if(sortCol==='ref'){va=a.ref;vb=b.ref;}
@@ -1007,6 +1066,13 @@ function getSorted(rows){
     const cmp = va<vb?-1:va>vb?1:0;
     return sortDir==='asc'?cmp:-cmp;
   });
+  // Recalculate running balance after sort to keep it consistent
+  let bal=500000000;
+  sorted.forEach(r=>{
+    bal += (r.debit||0) - (r.credit||0);
+    r.balance = bal;
+  });
+  return sorted;
 }
 
 function applyFilters(){
@@ -1056,42 +1122,121 @@ const ANOMALIES = {
 let dismissedAnomalies = new Set();
 let expandedRows = new Set();
 
-/* ── RENDER ALERT SECTION ── */
-function renderAlertSection(){
-  const active = Object.entries(ANOMALIES).filter(([id])=>!dismissedAnomalies.has(id));
-  const list = document.getElementById('aiAlertList');
-  const titleEl = document.getElementById('aiAlertTitle');
-  // Badge always stays visible — just update text
-  if(!active.length){
-    titleEl.textContent='Semua transaksi sudah aman';
-    list.innerHTML=`<div class="ai-alert-empty">
-      <div class="ai-alert-empty-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <span class="ai-alert-empty-text">Tidak ada transaksi yang perlu ditinjau</span>
-    </div>`;
-  } else {
-    titleEl.textContent='Beberapa transaksi perlu ditinjau sebelum penutupan periode';
-    list.innerHTML=active.map(([id,a])=>`
-      <div class="ai-alert-item ${a.type}" id="alert-${id}">
-        <div class="ai-alert-dot ${a.type}">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        </div>
-        <div class="ai-alert-content">
-          <div><span class="ai-alert-ref">${id}</span> — <span class="ai-alert-msg">${a.detail.split('.')[0]}</span> <span class="ai-alert-amount">${a.grid[1]?.val||''}</span></div>
-          <div class="ai-alert-actions">
-            <button class="ai-btn-valid" onclick="markValid('${id}')">Tandai sebagai valid</button>
-            <button class="ai-btn-reklasifikasi" onclick="doReklasifikasi('${id}')">Reklasifikasi</button>
-          </div>
-        </div>
-      </div>`).join('');
+/* ── ANOMALI GROUPS ── */
+const ANOM_GROUPS = [
+  {
+    id: 'grp-flukt',
+    title: 'Fluktuasi Nominal Tidak Wajar',
+    sub: '1 transaksi tidak wajar dibanding dengan history serupa',
+    items: [
+      {id:'JE-2025-0001', ref:'JE-2025-0001', desc:'Beban Gaji & Tunjangan', amount:'45.000.000', note:'Nilai beban gaji melebihi rata-rata 3 bulan sebelumnya'}
+    ]
+  },
+  {
+    id: 'grp-duplikat',
+    title: 'Indikasi Transaksi Duplikat',
+    sub: '2 transaksi memiliki detail yang sangat mirip',
+    items: [
+      {id:'JE-2025-0005', ref:'JE-2025-0005', desc:'Piutang Usaha', amount:'9.625.000', note:'Karakteristik sangat mirip dengan INV-C002-20250125 (Input selisih 4 menit)'},
+      {id:'INV-C002-20250125', ref:'INV-C002-20250125', desc:'Piutang Usaha', amount:'9.625.000', note:'Karakteristik sangat mirip dengan JE-2025-0005 (Input selisih 4 menit)'}
+    ]
   }
-}
+];
+let expandedGroups = new Set();
 
-function toggleAlertAccordion(){
-  const body=document.getElementById('aiAlertBody');
-  const chev=document.getElementById('alertChevron');
+function toggleAnomsection(){
+  const body=document.getElementById('anomBody');
+  const chev=document.getElementById('anomChevron');
   body.classList.toggle('collapsed');
   chev.classList.toggle('open');
 }
+
+function toggleGroup(grpId){
+  if(expandedGroups.has(grpId)) expandedGroups.delete(grpId);
+  else expandedGroups.add(grpId);
+  renderAlertSection();
+}
+
+function renderAlertSection(){
+  const activeGroups=ANOM_GROUPS.map(g=>({...g,items:g.items.filter(item=>!dismissedAnomalies.has(item.id))})).filter(g=>g.items.length>0);
+  const section=document.getElementById('anomSection');
+  const headIcon=document.getElementById('anomHeadIcon');
+  const headTitle=document.getElementById('anomHeadTitle');
+  const headSub=document.getElementById('anomHeadSub');
+  const list=document.getElementById('anomGroupList');
+
+  if(!activeGroups.length){
+    section.classList.add('safe');
+    headIcon.classList.add('safe');
+    headIcon.innerHTML=`<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+    headTitle.textContent='Semua item sudah aman';
+    headSub.textContent='Tidak ada anomali yang terdeteksi. Data siap untuk proses penutupan periode.';
+    list.innerHTML='';
+    return;
+  }
+
+  section.classList.remove('safe');
+  headIcon.classList.remove('safe');
+  headIcon.innerHTML=`<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+  headTitle.textContent='Anomali Transaksi Terdeteksi';
+  headSub.textContent='AI mendeteksi pola transaksi menyimpang. Peninjauan diperlukan untuk memastikan integritas data sebelum proses penutupan periode dilakukan.';
+
+  list.innerHTML=activeGroups.map(g=>{
+    const isOpen=expandedGroups.has(g.id);
+    return `
+    <div class="anom-group">
+      <div class="anom-group-head" onclick="toggleGroup('${g.id}')">
+        <div class="anom-group-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="anom-group-text">
+          <div class="anom-group-title">${g.title}</div>
+          <div class="anom-group-sub">${g.sub}</div>
+        </div>
+        <span class="anom-group-badge">${g.items.length}</span>
+        <svg class="anom-group-chevron ${isOpen?'open':''}" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+      </div>
+      <div class="anom-group-body ${isOpen?'':'collapsed'}">
+        ${g.items.map(item=>`
+        <div class="anom-item" id="anom-item-${item.id}">
+          <div class="anom-item-note">
+            <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10"/><circle cx="19" cy="5" r="3" fill="currentColor" stroke="none"/></svg>
+            ${item.note}
+          </div>
+          <div class="anom-item-row">
+            <div><span class="anom-item-ref">${item.ref}</span><span class="anom-item-desc"> — ${item.desc}</span></div>
+            <span class="anom-item-amount">Rp ${item.amount}</span>
+          </div>
+          <div class="anom-item-actions">
+            <button class="ai-btn-lihat" onclick="scrollToRow('${item.id}')">Lihat item</button>
+            <button class="ai-btn-valid" onclick="markValid('${item.id}')">Tandai sebagai valid</button>
+            <button class="ai-btn-reklasifikasi" onclick="doReklasifikasi('${item.id}')">Reklasifikasi</button>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function scrollToRow(jeId){
+  const tryScroll=()=>{
+    const trs=[...document.querySelectorAll('#glBody tr')];
+    const tr=trs.find(r=>(r.getAttribute('onclick')||'').includes(`'${jeId}'`));
+    if(tr){
+      tr.scrollIntoView({behavior:'smooth',block:'center'});
+      tr.style.outline='2px solid var(--color-action)';
+      tr.style.outlineOffset='-2px';
+      setTimeout(()=>{tr.style.outline='';tr.style.outlineOffset='';},2000);
+      return true;
+    }
+    return false;
+  };
+  if(!tryScroll()){
+    const sorted=getSorted(filteredRows);
+    const idx=sorted.findIndex(r=>r.jeId===jeId);
+    if(idx>=0){currentPage=Math.floor(idx/PAGE_SIZE)+1;renderTable();setTimeout(tryScroll,100);}
+  }
+}
+
+function toggleAlertAccordion(){ toggleAnomsection(); }
 
 function markValid(id){
   dismissedAnomalies.add(id);
@@ -1139,14 +1284,20 @@ function renderTable(){
   } else {
     empty.style.display='none';
     const rows=[];
-    pageRows.forEach(r=>{
-      // Lookup anomaly by row id first, then jeId as fallback
-      const anomId = ANOMALIES[r.id] ? r.id : r.jeId;
-      const anom = !dismissedAnomalies.has(anomId) ? ANOMALIES[anomId] : null;
+  const seenJeIds = new Set();
+  pageRows.forEach(r=>{
+      // jeId carries the correct anomaly key (JE id or INV-C002-20250125 for duplicate)
+      const anomKey = r.jeId;
+      const anom = !dismissedAnomalies.has(anomKey) ? ANOMALIES[anomKey] : null;
       const anomClass = anom ? (anom.type==='warn'?'anomaly-warn':'anomaly-danger') : '';
       const isExpanded = expandedRows.has(r.id);
-      const flagHtml = anom ? `<span class="anomaly-flag ${anom.type}">✨ ${anom.flag}</span>` : '';
-      const expandBtn = anom ? `<span onclick="event.stopPropagation();toggleRow('${r.id}')" style="cursor:pointer;margin-left:6px;font-size:10px;color:var(--color-text-tertiary)">${isExpanded?'▲':'▼'}</span>` : '';
+      const isFirstLine = !seenJeIds.has(r.jeId);
+      seenJeIds.add(r.jeId);
+      // isLastLine: next row has different jeId or doesn't exist
+      const nextIdx = pageRows.indexOf(r)+1;
+      const isLastLine = nextIdx>=pageRows.length || pageRows[nextIdx].jeId!==r.jeId;
+      const flagHtml = (anom && isFirstLine) ? `<span class="anomaly-flag ${anom.type}">✨ ${anom.flag}</span>` : '';
+      const expandBtn = (anom && isFirstLine) ? `<span onclick="event.stopPropagation();toggleRow('${r.id}')" style="cursor:pointer;margin-left:6px;font-size:10px;color:var(--color-text-tertiary)">${isExpanded?'▲':'▼'}</span>` : '';
 
       rows.push(`<tr class="${anomClass}" onclick="openDrawer('${r.jeId}')">
         <td class="td-date">${r.dateLabel}</td>
@@ -1158,7 +1309,8 @@ function renderTable(){
         <td class="r"><span class="td-balance" style="font-weight:800">${fmtNum(r.balance)}</span></td>
       </tr>`);
 
-      if(anom && isExpanded){
+      // Show expand detail after last line of each JE group
+      if(anom && isExpanded && isLastLine){
         rows.push(`<tr class="anomaly-expand-row ${anomClass}">
           <td colspan="7">
             <div class="anomaly-expand-inner">
@@ -1167,8 +1319,8 @@ function renderTable(){
                 ${anom.grid.map(g=>`<div class="anomaly-expand-cell"><div class="anomaly-expand-cell-label">${g.label}</div><div class="anomaly-expand-cell-val">${g.val}</div></div>`).join('')}
               </div>
               <div class="anomaly-expand-actions">
-                <button class="ai-btn-valid" onclick="event.stopPropagation();markValid('${anomId}')">Tandai sebagai valid</button>
-                <button class="ai-btn-reklasifikasi" onclick="event.stopPropagation();doReklasifikasi('${anomId}')">Reklasifikasi</button>
+                <button class="ai-btn-valid" onclick="event.stopPropagation();markValid('${anomKey}')">Tandai sebagai valid</button>
+                <button class="ai-btn-reklasifikasi" onclick="event.stopPropagation();doReklasifikasi('${anomKey}')">Reklasifikasi</button>
               </div>
             </div>
           </td>

@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Journal Entry — Klay</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Manrope:wght@300;400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-brand:#B83D08;--color-brand-hover:#A03206;
+  --color-action:#1A46C8;--color-action-hover:#1338A8;
+  --color-text-primary:#080706;--color-text-secondary:#2E2B27;--color-text-tertiary:#8C857C;
+  --color-surface-base:#FBF8F5;--color-surface-raised:#FFFFFF;--color-surface-sunken:#F4F0EB;--color-surface-deep:#080706;
+  --color-border-default:#E2DDD7;
+  --success-text:#166638;--success-border:#A8D9BC;--success-surface:#E8F5EE;
+  --warning-text:#7A4D00;--warning-border:#E8C870;--warning-surface:#FDF3E0;
+  --danger-text:#A02020;--danger-border:#EAB8B8;--danger-surface:#FBF0F0;
+  --ai-surface:#EBF0FD;--ai-border:#C8D8FA;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;--radius-full:9999px;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;
+  --transition-fast:0.1s ease;--transition-base:0.15s ease;--transition-slow:0.2s ease;
+  --font-sans:'Manrope',sans-serif;--font-mono:'Inconsolata',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-surface-base);color:var(--color-text-primary);-webkit-font-smoothing:antialiased;font-size:13px;height:100vh;overflow:hidden}
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sb{width:196px;flex-shrink:0;background:var(--color-surface-raised);border-right:1px solid var(--color-border-default);display:flex;flex-direction:column;overflow-y:auto}
+.sb-top{padding:0 16px;height:52px;display:flex;align-items:center;border-bottom:1px solid var(--color-border-default);gap:8px;flex-shrink:0}
+.sb-logomark{width:26px;height:26px;background:var(--color-brand);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logomark svg{width:12px;height:12px;fill:#fff}
+.sb-brand{font-size:14px;font-weight:700;letter-spacing:-.02em}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-border-default);padding:16px 16px 6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 12px;margin:1px 6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:400;color:var(--color-text-tertiary);text-decoration:none;transition:background var(--transition-fast),color var(--transition-fast)}
+.sb-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.sb-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+.sb-item.active{background:var(--color-surface-sunken);color:var(--color-text-primary);font-weight:600;border-left:2px solid var(--color-brand);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-left:0;padding-left:14px}
+.sb-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--color-surface-sunken)}
+.sb-footer-item{display:flex;align-items:center;gap:8px;padding:6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--color-text-tertiary)}
+.sb-footer-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+.sb-footer-item:hover{background:var(--color-surface-base)}
+
+/* MAIN */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.topbar{height:52px;flex-shrink:0;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 20px;gap:12px;position:relative;z-index:10}
+.tb-search-wrap{position:relative;flex:1;max-width:400px}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 12px;cursor:text;transition:border-color var(--transition-fast),box-shadow var(--transition-fast)}
+.tb-search.focused{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.1);background:var(--color-surface-raised)}
+.tb-search svg{width:13px;height:13px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.tb-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.tb-search input::placeholder{color:var(--color-text-tertiary)}
+.tb-kbd{font-size:10px;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:4px;padding:1px 5px;font-family:var(--font-mono);flex-shrink:0}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-notif{width:30px;height:30px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.tb-notif svg{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--color-brand);border-radius:50%;border:1.5px solid var(--color-surface-raised)}
+.tb-org{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);cursor:pointer;white-space:nowrap}
+.tb-org-name{font-size:12px;font-weight:500;color:var(--color-text-secondary)}
+.tb-av{width:24px;height:24px;border-radius:var(--radius-sm);background:var(--color-action);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tb-caret{width:11px;height:11px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;stroke-linecap:round}
+
+/* CMD DROPDOWN */
+.cmd-dropdown{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);box-shadow:0 8px 32px rgba(8,7,6,.12);z-index:100;overflow:hidden;display:none}
+.cmd-dropdown.open{display:block}
+.cmd-section-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);padding:10px 14px 4px}
+.cmd-item{display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;transition:background var(--transition-fast)}
+.cmd-item:hover{background:var(--color-surface-sunken)}
+.cmd-item-icon{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cmd-item-icon.ai{background:linear-gradient(135deg,#1A46C8,#7C3AED);animation:aiPulse 2s ease-in-out infinite}
+@keyframes aiPulse{0%,100%{box-shadow:0 0 0 0 rgba(26,70,200,.3)}50%{box-shadow:0 0 0 6px rgba(26,70,200,0)}}
+.cmd-item-icon svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:1.5}
+.cmd-item-icon.nav{background:var(--color-surface-sunken)}
+.cmd-item-icon.nav svg{stroke:var(--color-text-secondary)}
+.cmd-item-text{flex:1;min-width:0}
+.cmd-item-title{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.cmd-item-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.cmd-item-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:var(--radius-full);flex-shrink:0;background:linear-gradient(135deg,#EBF0FD,#EDE9FE);color:#1A46C8}
+.cmd-divider{height:1px;background:var(--color-border-default);margin:4px 0}
+
+/* CONTENT ROW */
+.content-row{display:flex;flex:1;min-height:0;overflow:hidden}
+.content-main{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column}
+.scroll-area{flex:1;overflow-y:auto;padding:24px 24px 56px}
+
+/* BUTTONS */
+.btn-primary{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:8px 16px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base)}
+.btn-primary:hover{background:var(--color-action-hover)}
+.btn-primary:disabled{background:var(--color-border-default);cursor:not-allowed}
+.btn-primary svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
+.btn-ghost{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 13px;cursor:pointer;transition:all var(--transition-fast)}
+.btn-ghost svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+.btn-ghost:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.btn-ghost:disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+.btn-secondary{font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px 18px;background:var(--color-surface-raised);color:var(--color-text-secondary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base);display:inline-flex;align-items:center;gap:6px}
+.btn-secondary:hover{background:var(--color-surface-sunken)}
+.btn-secondary svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+.btn-danger{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:600;padding:7px 13px;background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border);border-radius:var(--radius-md);cursor:pointer;transition:all var(--transition-fast)}
+.btn-danger:hover{background:#f5e0e0}
+.btn-danger svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5}
+.btn-warn{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:600;padding:7px 13px;background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border);border-radius:var(--radius-md);cursor:pointer;transition:all var(--transition-fast)}
+.btn-warn:hover{background:#f7e8c8}
+
+/* PAGE HEAD */
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.page-title{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.head-right{display:flex;gap:8px;align-items:center;position:relative}
+.exp-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);box-shadow:0 4px 20px rgba(8,7,6,.1);padding:6px;min-width:180px;display:none;z-index:50}
+.exp-menu.open{display:block}
+.exp-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:500;color:var(--color-text-secondary);transition:background var(--transition-fast)}
+.exp-item:hover{background:var(--color-surface-sunken)}
+.exp-item svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+
+/* TODAY SECTION */
+.today-section{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:16px}
+.today-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.today-head-icon{width:28px;height:28px;border-radius:var(--radius-sm);background:linear-gradient(135deg,#1A46C8,#7C3AED);display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:aiPulse 3s ease-in-out infinite}
+.today-head-icon svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:1.5}
+.today-head-text .title{font-size:13px;font-weight:700}
+.today-head-text .sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.today-all-done{display:none;align-items:center;gap:8px;padding:10px 14px;background:var(--success-surface);border:1px solid var(--success-border);border-radius:var(--radius-md);font-size:12px;color:var(--success-text);font-weight:500}
+.today-all-done svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.today-items{display:flex;flex-direction:column;gap:6px}
+.today-item{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;transition:all var(--transition-fast)}
+.today-item:hover{border-color:var(--color-action);background:#EBF0FD}
+.today-item.done{background:var(--success-surface);border-color:var(--success-border);cursor:default}
+.today-item.done:hover{background:var(--success-surface);border-color:var(--success-border)}
+.ti-num{width:22px;height:22px;border-radius:50%;background:var(--color-border-default);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--color-text-tertiary);flex-shrink:0;transition:all var(--transition-fast)}
+.today-item:hover .ti-num{background:var(--color-action);color:#fff}
+.today-item.done .ti-num{background:var(--success-surface);border:1.5px solid var(--success-border)}
+.today-item.done .ti-num svg{width:10px;height:10px;stroke:var(--success-text);fill:none;stroke-width:2.5}
+.ti-body{flex:1;min-width:0}
+.ti-title{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.today-item.done .ti-title{color:var(--success-text)}
+.ti-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.ti-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--radius-full);flex-shrink:0}
+.ti-badge.warn{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.ti-badge.danger{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.ti-badge.action{background:var(--ai-surface);color:var(--color-action);border:1px solid var(--ai-border)}
+
+/* SUMMARY CARDS */
+.summary-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px}
+.scard{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);padding:16px 20px;display:flex;flex-direction:column;transition:box-shadow var(--transition-base)}
+.scard:hover{box-shadow:0 2px 12px rgba(8,7,6,.07)}
+.scard-label{font-size:11px;font-weight:600;color:var(--color-text-tertiary);letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px}
+.scard-value{font-family:var(--font-mono);font-size:22px;font-weight:600;letter-spacing:-.02em;line-height:1}
+.scard-value.debit{color:var(--danger-text)}
+.scard-value.credit{color:var(--success-text)}
+.scard-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:8px}
+/* Balance card */
+.scard-balance{background:linear-gradient(135deg,var(--color-surface-raised) 0%,#F0F4FF 100%);border-color:var(--ai-border)}
+.scard-balance.anomali{background:linear-gradient(135deg,var(--color-surface-raised) 0%,#FFF8F0 100%);border-color:var(--warning-border)}
+.scard-toggle-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.scard-toggle-lbl{font-size:11px;color:var(--color-text-tertiary)}
+.toggle-sw{width:32px;height:18px;border-radius:9px;background:var(--color-border-default);border:none;cursor:pointer;position:relative;transition:background var(--transition-base);flex-shrink:0;padding:0}
+.toggle-sw.on{background:var(--color-action)}
+.toggle-sw::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform var(--transition-base)}
+.toggle-sw.on::after{transform:translateX(14px)}
+.scard-balance-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(26,70,200,.12)}
+.scard-insight-text{font-size:11px;color:var(--color-text-secondary);line-height:1.5;flex:1}
+.scard-ai-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--color-action);background:linear-gradient(135deg,#EBF0FD,#EDE9FE);border:1px solid var(--ai-border);border-radius:var(--radius-full);padding:4px 11px;cursor:pointer;white-space:nowrap;transition:all var(--transition-fast);flex-shrink:0}
+.scard-ai-btn:hover{background:linear-gradient(135deg,#d8e4fc,#ddd6fe);box-shadow:0 0 0 3px rgba(26,70,200,.1)}
+.scard-detect-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--warning-text);background:var(--warning-surface);border:1px solid var(--warning-border);border-radius:var(--radius-full);padding:4px 11px;cursor:pointer;white-space:nowrap;transition:all var(--transition-fast);flex-shrink:0;margin-top:6px}
+.scard-detect-btn:hover{background:#f7e8c8}
+.scard-detect-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+/* Inline detect loading */
+.detect-loading{display:none;align-items:center;gap:8px;padding:8px 0;margin-top:8px}
+.detect-loading.show{display:flex}
+.dl-spinner{width:14px;height:14px;border:2px solid var(--warning-border);border-top-color:var(--warning-text);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.dl-text{font-size:11px;color:var(--warning-text);font-weight:500}
+
+/* ANOMALI TRANSAKSI SECTION */
+.anomaly-tx-section{background:var(--color-surface-raised);border:1px solid var(--warning-border);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden;border-left:4px solid #E8A020}
+.atx-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 18px 12px;border-bottom:1px solid var(--warning-border);background:linear-gradient(135deg,#FDF3E0,#FFF8F0)}
+.atx-header-left{display:flex;align-items:flex-start;gap:12px;flex:1;min-width:0}
+.atx-icon{width:32px;height:32px;border-radius:50%;background:#E8C870;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.atx-icon svg{width:16px;height:16px;stroke:#7A4D00;fill:none;stroke-width:2}
+.atx-title{font-size:13px;font-weight:700;color:#7A4D00;margin-bottom:4px}
+.atx-sub{font-size:12px;color:#7A4D00;opacity:.8;line-height:1.5}
+.atx-dismiss{width:24px;height:24px;border-radius:var(--radius-sm);border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#7A4D00;opacity:.5;flex-shrink:0;transition:all var(--transition-fast)}
+.atx-dismiss:hover{background:rgba(122,77,0,.12);opacity:1}
+.atx-dismiss svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
+.atx-items{padding:12px 18px;display:flex;flex-direction:column;gap:8px}
+.atx-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--radius-md);border:1px solid var(--warning-border);background:var(--warning-surface)}
+.atx-item.flagged{border-color:var(--danger-border);background:var(--danger-surface)}
+.atx-item.resolved{border-color:var(--success-border);background:var(--success-surface);opacity:.7}
+.atx-num{width:20px;height:20px;border-radius:50%;background:#E8C870;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#7A4D00;flex-shrink:0;margin-top:1px}
+.atx-item.flagged .atx-num{background:var(--danger-border);color:var(--danger-text)}
+.atx-item.resolved .atx-num{background:var(--success-border);color:var(--success-text)}
+.atx-body{flex:1;min-width:0}
+.atx-label{font-size:11px;font-weight:700;color:#7A4D00;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.atx-item.flagged .atx-label{color:var(--danger-text)}
+.atx-item.resolved .atx-label{color:var(--success-text)}
+.atx-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.atx-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.atx-btn{font-family:var(--font-sans);font-size:11px;font-weight:600;padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;transition:all var(--transition-fast);border:1px solid;white-space:nowrap}
+.atx-btn.view{background:transparent;color:#7A4D00;border-color:#E8C870}
+.atx-btn.view:hover{background:#E8C870}
+.atx-btn.validate{background:var(--success-surface);color:var(--success-text);border-color:var(--success-border)}
+.atx-btn.validate:hover{background:#d4eddf}
+.atx-btn.reclassify{background:var(--ai-surface);color:var(--color-action);border-color:var(--ai-border)}
+.atx-btn.reclassify:hover{background:#d8e4fc}
+.atx-resolved-label{font-size:11px;font-weight:600;color:var(--success-text);margin-top:6px;display:flex;align-items:center;gap:4px}
+
+/* STATUS BADGES - add pending + reversal */
+.status-badge.pending{background:#EDE9FE;color:#6D28D9;border:1px solid #C4B5FD}
+.status-badge.reversal{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default);font-style:italic}
+.chip.pending-chip.on{background:#6D28D9;border-color:#6D28D9}
+
+/* ROW STYLES for pending/reversal */
+tbody tr.row-pending{background:linear-gradient(135deg,rgba(237,233,254,.5),rgba(221,214,254,.2))}
+tbody tr.row-pending:hover{background:rgba(237,233,254,.8)}
+tbody tr.row-reversal{opacity:.55}
+
+/* IMPACT ANALYSIS BOX */
+.impact-box{background:var(--ai-surface);border:1px solid var(--ai-border);border-radius:var(--radius-md);border-left:3px solid var(--color-action);padding:10px 13px;margin-bottom:14px}
+.impact-box-title{font-size:10px;font-weight:700;color:var(--color-action);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.impact-box-text{font-size:12px;color:var(--color-text-secondary);line-height:1.55}
+
+/* COA FLAG in drawer */
+.coa-flag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--danger-text);background:var(--danger-surface);border:1px solid var(--danger-border);border-radius:var(--radius-full);padding:2px 7px;margin-left:6px}
+.coa-flag svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* TABLE numeric - bold, no Rp symbol */
+.td-num{font-family:var(--font-mono);font-size:12px;font-weight:700;text-align:right;color:var(--color-text-primary)}
+
+/* STICKY STATUS BAR */
+.table-wrap{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);overflow:hidden;display:flex;flex-direction:column;margin-bottom:8px}
+.status-bar{background:var(--color-surface-deep);border-top:1px solid rgba(255,255,255,.08);padding:9px 14px;display:flex;align-items:center;gap:20px;position:fixed;bottom:0;left:196px;right:0;z-index:20}
+
+/* FILTER BAR - time chips inline */
+.filter-bar{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:8px 12px;margin-bottom:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+
+/* EXPORT DROPDOWN */
+.exp-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);box-shadow:0 4px 20px rgba(8,7,6,.1);padding:10px;min-width:240px;display:none;z-index:50}
+.exp-menu.open{display:block}
+.exp-menu-label{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:6px}
+.exp-scope-row{display:flex;gap:4px;margin-bottom:10px}
+.exp-scope-btn{flex:1;font-family:var(--font-sans);font-size:11px;font-weight:500;padding:5px;border-radius:var(--radius-sm);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-tertiary);cursor:pointer;transition:all var(--transition-fast);text-align:center}
+.exp-scope-btn.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.exp-divider{height:1px;background:var(--color-border-default);margin:8px 0}
+.exp-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:500;color:var(--color-text-secondary);transition:background var(--transition-fast)}
+.exp-item:hover{background:var(--color-surface-sunken)}
+.exp-item svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+.exp-dl-btn{width:100%;margin-top:8px;font-family:var(--font-sans);font-size:12px;font-weight:600;padding:8px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;transition:background var(--transition-fast)}
+.exp-dl-btn:hover{background:var(--color-action-hover)}
+
+/* ANOMALY INVESTIGATION DRAWER */
+.anomaly-drawer-overlay{position:fixed;inset:0;background:rgba(8,7,6,.35);z-index:48;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.anomaly-drawer-overlay.open{opacity:1;pointer-events:all}
+.anomaly-drawer{position:fixed;top:0;right:0;height:100vh;width:380px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:49;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow);box-shadow:-4px 0 24px rgba(8,7,6,.1)}
+.anomaly-drawer.open{transform:translateX(0)}
+.ad-head{padding:16px 20px;background:#FDF3E0;border-bottom:1px solid #E8C870;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.ad-head-icon{width:32px;height:32px;border-radius:50%;background:#E8C870;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ad-head-icon svg{width:16px;height:16px;stroke:#7A4D00;fill:none;stroke-width:2}
+.ad-head-text{flex:1}
+.ad-head-title{font-size:14px;font-weight:700;color:#7A4D00}
+.ad-head-sub{font-size:11px;color:#7A4D00;opacity:.7;margin-top:1px}
+.ad-head-close{width:26px;height:26px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#7A4D00;opacity:.6;transition:all var(--transition-fast)}
+.ad-head-close:hover{background:rgba(122,77,0,.1);opacity:1}
+.ad-head-close svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
+.ad-body{flex:1;overflow-y:auto;padding:20px}
+.ad-section{margin-bottom:20px}
+.ad-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:12px}
+/* Mini bar chart */
+.ad-chart{display:flex;align-items:flex-end;gap:10px;height:100px;padding:0 4px;margin-bottom:4px}
+.ad-bar-wrap{display:flex;flex-direction:column;align-items:center;flex:1;gap:4px;position:relative}
+.ad-bar-label-top{font-size:10px;font-weight:700;color:var(--danger-text);text-align:center;white-space:nowrap;min-height:14px}
+.ad-bar{width:100%;border-radius:4px 4px 0 0;transition:opacity var(--transition-fast)}
+.ad-bar:hover{opacity:.8}
+.ad-bar-month{font-size:10px;font-weight:600;color:var(--color-text-tertiary);text-align:center}
+.ad-bar-val{font-size:10px;color:var(--color-text-tertiary);font-family:var(--font-mono);text-align:center}
+/* Entry cards */
+.ad-entry-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-md);border:1px solid;margin-bottom:6px;cursor:pointer;transition:opacity var(--transition-fast)}
+.ad-entry-card:hover{opacity:.85}
+.ad-entry-card.danger{background:var(--danger-surface);border-color:var(--danger-border)}
+.ad-entry-card.warn{background:var(--warning-surface);border-color:var(--warning-border)}
+.ad-entry-ref{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--color-text-primary);flex-shrink:0}
+.ad-entry-desc{flex:1;font-size:11px;color:var(--color-text-secondary);line-height:1.4}
+.ad-entry-arrow{font-size:14px;color:var(--color-text-tertiary);flex-shrink:0}
+/* AI rec card */
+.ad-ai-card{background:var(--ai-surface);border:1px solid var(--ai-border);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:16px}
+.ad-ai-card-title{font-size:12px;font-weight:700;color:var(--color-action);margin-bottom:6px}
+.ad-ai-card-text{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+/* CTA button */
+.ad-cta{width:100%;font-family:var(--font-sans);font-size:13px;font-weight:700;padding:11px;background:#080706;color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:opacity var(--transition-fast)}
+.ad-cta:hover{opacity:.85}
+
+/* TODAY SECTION ACCORDION */
+.today-section{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden}
+.today-head{display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;user-select:none}
+.today-head:hover{background:var(--color-surface-sunken)}
+.today-head-icon{width:28px;height:28px;border-radius:var(--radius-sm);background:linear-gradient(135deg,#1A46C8,#7C3AED);display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:aiPulse 3s ease-in-out infinite}
+.today-head-icon svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:1.5}
+.today-head-text{flex:1}
+.today-head-text .title{font-size:13px;font-weight:700}
+.today-head-text .sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.today-head-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--radius-full);background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border);flex-shrink:0}
+.today-head-chevron{width:16px;height:16px;flex-shrink:0;transition:transform .2s ease}
+.today-head-chevron svg{width:16px;height:16px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2}
+.today-head.collapsed .today-head-chevron{transform:rotate(-180deg)}
+.today-body{padding:0 18px 14px}
+.today-body.hidden{display:none}
+.today-all-done{display:none;align-items:center;gap:8px;padding:10px 14px;background:var(--success-surface);border:1px solid var(--success-border);border-radius:var(--radius-md);font-size:12px;color:var(--success-text);font-weight:500}
+.today-all-done svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.today-items{display:flex;flex-direction:column;gap:6px}
+.today-item{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;transition:all var(--transition-fast)}
+.today-item:hover{border-color:var(--color-action);background:#EBF0FD}
+.today-item.done{background:var(--success-surface);border-color:var(--success-border);cursor:default}
+.today-item.done:hover{background:var(--success-surface);border-color:var(--success-border)}
+.ti-num{width:22px;height:22px;border-radius:50%;background:var(--color-border-default);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--color-text-tertiary);flex-shrink:0;transition:all var(--transition-fast)}
+.today-item:hover .ti-num{background:var(--color-action);color:#fff}
+.today-item.done .ti-num{background:var(--success-surface);border:1.5px solid var(--success-border)}
+.today-item.done .ti-num svg{width:10px;height:10px;stroke:var(--success-text);fill:none;stroke-width:2.5}
+.ti-body{flex:1;min-width:0}
+.ti-title{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.today-item.done .ti-title{color:var(--success-text)}
+.ti-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.ti-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--radius-full);flex-shrink:0}
+.ti-badge.warn{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.ti-badge.danger{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.ti-badge.action{background:var(--ai-surface);color:var(--color-action);border:1px solid var(--ai-border)}
+
+/* DRAWER AI CARD (detail tab) */
+.d-ai-card{background:var(--ai-surface);border:1px solid var(--ai-border);border-radius:var(--radius-md);border-left:4px solid var(--color-action);padding:12px 14px;margin-bottom:16px}
+.d-ai-card-title{font-size:12px;font-weight:700;color:var(--color-action);margin-bottom:6px}
+.d-ai-card-text{font-size:12px;color:var(--color-text-secondary);line-height:1.5;margin-bottom:10px}
+.d-ai-acct-list{display:flex;flex-direction:column;gap:5px}
+.d-ai-acct-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.d-ai-acct-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:var(--radius-full);background:var(--color-surface-raised);border:1px solid var(--ai-border);font-size:11px}
+.d-ai-acct-code{font-family:var(--font-mono);color:var(--color-text-tertiary);font-size:10px}
+.d-ai-acct-name{color:var(--color-text-primary);font-weight:500}
+.d-ai-conf{font-size:10px;font-weight:700;color:var(--color-action);background:var(--color-surface-raised);border:1px solid var(--ai-border);border-radius:var(--radius-full);padding:2px 8px;white-space:nowrap;flex-shrink:0}
+
+/* DRAWER ATTACHMENT SECTION */
+.d-attach-wrap{background:var(--color-surface-sunken);border-radius:var(--radius-md);padding:12px;margin-bottom:4px}
+.d-attach-file{display:flex;align-items:center;gap:8px;padding:7px 0;margin-bottom:4px}
+.d-attach-icon{width:28px;height:28px;background:var(--ai-surface);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.d-attach-icon svg{width:13px;height:13px;stroke:var(--color-action);fill:none;stroke-width:1.5}
+.d-attach-meta{flex:1;min-width:0}
+.d-attach-name{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.d-attach-size{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.d-attach-del{font-size:11px;font-weight:600;color:var(--danger-text);background:none;border:none;cursor:pointer;padding:0;flex-shrink:0}
+.d-attach-del:hover{text-decoration:underline}
+.d-attach-add{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px;border:1.5px dashed var(--ai-border);border-radius:var(--radius-sm);cursor:pointer;transition:all var(--transition-fast)}
+.d-attach-add:hover{background:var(--ai-surface);border-color:var(--color-action)}
+.d-attach-add-label{font-size:12px;font-weight:600;color:var(--color-action)}
+.d-attach-add-sub{font-size:10px;color:var(--color-text-tertiary)}
+
+/* VOID MODAL REVERSAL PREVIEW */
+.modal-reversal-preview{background:var(--success-surface);border:1px solid var(--success-border);border-radius:var(--radius-md);padding:10px 14px;margin-bottom:14px}
+.modal-reversal-title{font-size:12px;font-weight:700;color:var(--success-text);margin-bottom:3px}
+.modal-reversal-detail{font-size:11px;color:var(--color-text-tertiary);line-height:1.5}
+
+/* FILTER BAR */
+.filter-bar{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:8px 12px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.f-search{display:flex;align-items:center;gap:7px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:6px 10px;width:200px;flex-shrink:0;transition:all var(--transition-fast)}
+.f-search:focus-within{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.f-search svg{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.f-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.f-search input::placeholder{color:var(--color-text-tertiary)}
+.fsep{width:1px;height:18px;background:var(--color-border-default);flex-shrink:0;margin:0 2px}
+.chip-grp{display:flex;gap:3px}
+.chip{font-family:var(--font-sans);font-size:11px;font-weight:500;padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-tertiary);cursor:pointer;transition:all var(--transition-fast);white-space:nowrap}
+.chip:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.chip.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.chip.draft-chip.on{background:var(--warning-text);border-color:var(--warning-text)}
+.chip.void-chip.on{background:var(--color-text-tertiary);border-color:var(--color-text-tertiary)}
+.f-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.f-filter-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:6px 11px;cursor:pointer;transition:all var(--transition-fast)}
+.f-filter-btn:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.f-filter-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5}
+.f-filter-btn .badge{background:var(--color-action);color:#fff;border-radius:var(--radius-full);font-size:9px;font-weight:700;padding:1px 5px;margin-left:2px}
+
+/* TABLE */
+/* TABLE */
+.tbl-scroll{overflow-y:auto;flex:1}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--color-surface-sunken);border-bottom:1px solid var(--color-border-default)}
+thead th{font-size:11px;font-weight:700;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;text-align:left;white-space:nowrap;user-select:none}
+thead th.sortable{cursor:pointer;transition:color var(--transition-fast)}
+thead th.sortable:hover{color:var(--color-text-primary)}
+thead th.sort-asc .sa::after{content:'↑';margin-left:4px;color:var(--color-action);font-size:10px}
+thead th.sort-desc .sa::after{content:'↓';margin-left:4px;color:var(--color-action);font-size:10px}
+thead th .sa::after{content:'↕';margin-left:4px;color:var(--color-border-default);font-size:9px}
+thead th.r,.r{text-align:right}
+tbody tr{border-bottom:1px solid var(--color-surface-sunken);transition:background var(--transition-fast);cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#FAFAF9}
+tbody tr.active-row{background:#EBF0FD}
+tbody tr.row-draft{background:var(--warning-surface)}
+tbody tr.row-draft:hover{background:#f7e8c8}
+tbody tr.row-overdue{background:rgba(160,32,32,.04)}
+tbody tr.row-overdue:hover{background:rgba(160,32,32,.08)}
+tbody tr.row-ai{background:linear-gradient(135deg,rgba(235,240,253,.6) 0%,rgba(237,233,254,.3) 100%)}
+tbody tr.row-ai:hover{background:rgba(235,240,253,.85)}
+tbody tr.row-void{opacity:.6}
+td{padding:10px 14px;vertical-align:middle}
+.td-ref{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.td-date{font-size:12px;color:var(--color-text-tertiary);white-space:nowrap}
+.td-memo{font-size:12px;color:var(--color-text-secondary)}
+.td-memo-text{max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline}
+.td-num{font-family:var(--font-mono);font-size:12px;font-weight:600;text-align:right;color:var(--color-text-primary)}
+.td-lines{font-size:11px;color:var(--color-text-tertiary);text-align:right}
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:var(--radius-full);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.status-badge.posted{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.status-badge.draft{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.status-badge.void{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+.ai-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:var(--radius-full);font-size:9px;font-weight:700;background:linear-gradient(135deg,#EBF0FD,#EDE9FE);color:var(--color-action);border:1px solid var(--ai-border);margin-left:5px;letter-spacing:.02em}
+.overdue-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:var(--radius-full);font-size:9px;font-weight:700;background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border);margin-left:5px}
+.src-badge{display:inline-flex;align-items:center;padding:1px 6px;border-radius:var(--radius-full);font-size:9px;font-weight:700;margin-right:5px;white-space:nowrap}
+.src-badge.inv{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.src-badge.bill{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+
+/* STATUS BAR */
+.sb-stat{display:flex;align-items:center;gap:6px}
+.sb-stat-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.sb-stat-val{font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(255,255,255,.85)}
+.sb-stat-val.debit{color:#F59A9A}
+.sb-stat-val.credit{color:#86D4A4}
+.sb-sep{width:1px;height:14px;background:rgba(255,255,255,.12)}
+.sb-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+
+/* FILTER DRAWER */
+.filter-overlay{position:fixed;inset:0;background:rgba(8,7,6,.35);z-index:38;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.filter-overlay.open{opacity:1;pointer-events:all}
+.filter-drawer{position:fixed;top:0;right:0;height:100vh;width:320px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow);box-shadow:-4px 0 24px rgba(8,7,6,.08)}
+.filter-drawer.open{transform:translateX(0)}
+.fd-head{padding:16px 20px;border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.fd-title{font-size:14px;font-weight:700}
+.fd-body{flex:1;overflow-y:auto;padding:16px 20px}
+.fd-section{margin-bottom:20px}
+.fd-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:10px}
+.fd-shortcuts{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.fd-sc{font-size:11px;font-weight:500;padding:4px 10px;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-tertiary);cursor:pointer;transition:all var(--transition-fast)}
+.fd-sc:hover{border-color:var(--color-action);color:var(--color-action)}
+.fd-sc.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.fd-date-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fd-input{font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:7px 10px;width:100%;outline:none;transition:border-color var(--transition-fast)}
+.fd-input:focus{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.fd-select{font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:7px 10px;width:100%;outline:none}
+.fd-foot{padding:16px 20px;border-top:1px solid var(--color-border-default);display:flex;gap:8px;flex-shrink:0}
+.fd-btn-apply{flex:1;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer}
+.fd-btn-reset{font-family:var(--font-sans);font-size:13px;font-weight:500;padding:9px 16px;background:transparent;color:var(--color-text-tertiary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer}
+
+/* DETAIL DRAWER */
+.drawer-overlay{position:fixed;inset:0;background:rgba(8,7,6,.35);z-index:40;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:420px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow);box-shadow:-4px 0 24px rgba(8,7,6,.1)}
+.drawer.open{transform:translateX(0)}
+.drawer-head{padding:16px 20px;border-bottom:1px solid var(--color-border-default);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-shrink:0}
+.d-ref{font-family:var(--font-mono);font-size:14px;font-weight:600}
+.d-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-full);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:4px}
+.d-badge.posted{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.d-badge.draft{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.d-badge.void{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+.d-close{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-tertiary);transition:background var(--transition-fast);flex-shrink:0}
+.d-close:hover{background:var(--color-surface-sunken);color:var(--color-text-primary)}
+.d-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.d-tabs{display:flex;padding:0 20px;border-bottom:1px solid var(--color-border-default);flex-shrink:0;gap:0}
+.d-tab{padding:10px 0;margin-right:20px;font-size:12px;font-weight:500;color:var(--color-text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--transition-fast);white-space:nowrap}
+.d-tab:hover{color:var(--color-text-secondary)}
+.d-tab.on{color:var(--color-action);border-bottom-color:var(--color-action);font-weight:600}
+.d-body{flex:1;overflow-y:auto;padding:16px 20px}
+.d-pane{display:none}
+.d-pane.on{display:block}
+/* CTA area in drawer */
+.d-cta-area{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:12px 20px;border-top:1px solid var(--color-border-default);flex-shrink:0;background:var(--color-surface-base)}
+.d-cta-info{grid-column:1/-1;font-size:11px;color:var(--color-text-tertiary);margin-bottom:2px}
+.d-cta-full{grid-column:1/-1}
+.d-cta-area .btn-primary,.d-cta-area .btn-ghost,.d-cta-area .btn-danger,.d-cta-area .btn-warn{display:flex;justify-content:center;align-items:center;align-self:start;width:100%;box-sizing:border-box}
+/* Info rows */
+.dsec{margin-bottom:20px}
+.dlbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:10px}
+.info-row{display:flex;align-items:flex-start;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--color-surface-sunken);gap:12px}
+.info-row:last-child{border-bottom:none}
+.info-row label{font-size:11px;color:var(--color-text-tertiary);flex-shrink:0}
+.info-row span{font-size:12px;font-weight:500;color:var(--color-text-primary);text-align:right}
+.info-row a{font-size:12px;font-weight:600;color:var(--color-action);text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.info-row a:hover{text-decoration:underline}
+.info-row a svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2}
+.d-open-link{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--color-action);padding:7px 12px;border:1px solid var(--ai-border);border-radius:var(--radius-md);background:var(--ai-surface);margin-bottom:16px;text-decoration:none;cursor:pointer;transition:background var(--transition-fast)}
+.d-open-link:hover{background:#d8e4fc}
+.d-open-link svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+/* Line items table */
+.d-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.d-tbl thead tr{background:var(--color-surface-sunken)}
+.d-tbl thead th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-tertiary);padding:7px 10px;text-align:left;border-bottom:1px solid var(--color-border-default)}
+.d-tbl thead th.r{text-align:right}
+.d-tbl tbody td{padding:7px 10px;border-bottom:1px solid var(--color-surface-sunken);color:var(--color-text-secondary)}
+.d-tbl tbody tr:last-child td{border-bottom:none}
+.d-tbl tfoot td{padding:7px 10px;font-weight:700;color:var(--color-text-primary);border-top:1px solid var(--color-border-default);font-family:var(--font-mono);font-size:12px}
+.d-tbl .r{text-align:right;font-family:var(--font-mono)}
+.li-sub{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.dpill{display:inline-flex;padding:2px 8px;border-radius:var(--radius-full);font-size:11px;font-weight:600}
+.dp-dept{background:var(--ai-surface);color:var(--color-action)}
+.dp-proj{background:var(--success-surface);color:var(--success-text)}
+/* Audit trail */
+.audit-list{display:flex;flex-direction:column;gap:0}
+.audit-item{display:flex;gap:10px;padding:8px 0;position:relative}
+.audit-item:not(:last-child)::after{content:'';position:absolute;left:11px;top:30px;bottom:-8px;width:1px;background:var(--color-border-default)}
+.audit-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.audit-dot.posted{background:var(--success-surface);border:1.5px solid var(--success-border)}
+.audit-dot.posted svg{width:10px;height:10px;stroke:var(--success-text);fill:none;stroke-width:2.5}
+.audit-dot.created{background:var(--color-surface-sunken);border:1.5px solid var(--color-border-default)}
+.audit-dot.created svg{width:8px;height:8px;stroke:var(--color-text-tertiary);fill:currentColor}
+.audit-dot.void{background:var(--danger-surface);border:1.5px solid var(--danger-border)}
+.audit-dot.void svg{width:10px;height:10px;stroke:var(--danger-text);fill:none;stroke-width:2}
+.audit-action{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.audit-meta{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.audit-reason{font-size:11px;color:var(--danger-text);margin-top:3px;font-style:italic}
+
+/* AI PANEL */
+.ai-panel{width:0;flex-shrink:0;transition:width .2s ease;overflow:hidden;position:relative}
+.ai-panel.open{width:340px}
+.ai-panel-inner{width:340px;height:100%;display:flex;flex-direction:column;background:var(--color-surface-raised);border-left:2px solid var(--color-action);position:relative}
+.ai-panel-inner::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(26,70,200,.03) 0%,transparent 60%);pointer-events:none;z-index:0}
+.ai-head{padding:14px 16px;border-bottom:1px solid rgba(26,70,200,.15);display:flex;align-items:center;gap:10px;flex-shrink:0;position:relative;z-index:1;background:linear-gradient(135deg,#EBF0FD,#F0ECFF)}
+.ai-head-icon{width:28px;height:28px;border-radius:var(--radius-sm);background:linear-gradient(135deg,#1A46C8,#7C3AED);display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:aiPulse 3s ease-in-out infinite}
+.ai-head-icon svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:1.5}
+.ai-head-text{flex:1;min-width:0}
+.ai-head-title{font-size:13px;font-weight:700;color:var(--color-text-primary)}
+.ai-head-sub{font-size:10px;color:var(--color-action);font-weight:600;letter-spacing:.04em}
+.ai-head-close{width:24px;height:24px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-tertiary);transition:background var(--transition-fast);flex-shrink:0}
+.ai-head-close:hover{background:rgba(26,70,200,.12);color:var(--color-action)}
+.ai-head-close svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.ai-tabs{display:flex;padding:0 16px;border-bottom:1px solid rgba(26,70,200,.1);flex-shrink:0;background:var(--color-surface-raised)}
+.ai-tab{padding:8px 0;margin-right:16px;font-size:11px;font-weight:600;color:var(--color-text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--transition-fast)}
+.ai-tab.on{color:var(--color-action);border-bottom-color:var(--color-action)}
+/* Session title */
+.ai-session-title-wrap{padding:10px 16px 0;flex-shrink:0;position:relative;z-index:1}
+.ai-session-title{font-size:12px;font-weight:700;color:var(--color-text-primary);cursor:pointer;display:inline-flex;align-items:center;gap:4px;border-radius:4px;padding:2px 4px;transition:background var(--transition-fast)}
+.ai-session-title:hover{background:var(--color-surface-sunken)}
+.ai-session-title svg{width:11px;height:11px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;flex-shrink:0}
+.ai-session-title-input{font-size:12px;font-weight:700;color:var(--color-text-primary);border:1px solid var(--color-action);border-radius:4px;padding:2px 6px;outline:none;width:100%;font-family:var(--font-sans);background:var(--color-surface-raised);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.ai-msgs{flex:1;min-height:0;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
+.ai-msgs.hidden{display:none}
+.ai-hist-list{flex:1;min-height:0;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px}
+.ai-hist-list.hidden{display:none}
+.ai-hist-item{padding:10px 12px;border-radius:var(--radius-md);border:1px solid var(--color-border-default);cursor:pointer;transition:background var(--transition-fast);position:relative}
+.ai-hist-item:hover{background:var(--color-surface-sunken)}
+.ai-hist-title{font-size:12px;font-weight:600;color:var(--color-text-primary);display:flex;align-items:center;gap:4px}
+.ai-hist-title-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ai-hist-edit-btn{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-tertiary);transition:all var(--transition-fast);flex-shrink:0;opacity:0;background:transparent;border:none}
+.ai-hist-item:hover .ai-hist-edit-btn{opacity:1}
+.ai-hist-edit-btn:hover{background:var(--color-border-default);color:var(--color-text-primary)}
+.ai-hist-edit-btn svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2}
+.ai-hist-preview{font-size:11px;color:var(--color-text-tertiary);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ai-hist-title-input{width:100%;font-size:12px;font-weight:600;color:var(--color-text-primary);border:1px solid var(--color-action);border-radius:4px;padding:1px 5px;outline:none;font-family:var(--font-sans);background:var(--color-surface-raised)}
+.ai-bubble{max-width:90%;border-radius:var(--radius-lg);padding:10px 13px;font-size:12px;line-height:1.5}
+.ai-bubble.user{align-self:flex-end;background:var(--color-action);color:#fff;border-radius:var(--radius-lg) var(--radius-lg) 4px var(--radius-lg)}
+.ai-bubble.ai{align-self:flex-start;background:var(--color-surface-sunken);color:var(--color-text-primary);border-radius:var(--radius-lg) var(--radius-lg) var(--radius-lg) 4px;border:1px solid var(--color-border-default)}
+.ai-bubble.ai .ai-bubble-label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-action);margin-bottom:4px}
+.ai-typing{display:flex;align-items:center;gap:4px;padding:10px 13px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-lg) var(--radius-lg) var(--radius-lg) 4px;align-self:flex-start}
+.ai-typing span{width:6px;height:6px;border-radius:50%;background:var(--color-action);animation:typingBounce 1.2s ease-in-out infinite}
+.ai-typing span:nth-child(2){animation-delay:.2s}
+.ai-typing span:nth-child(3){animation-delay:.4s}
+@keyframes typingBounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.ai-suggestion-chips{display:flex;flex-wrap:wrap;gap:5px;padding:0 16px 10px;flex-shrink:0}
+.ai-sc{font-size:10px;font-weight:500;padding:4px 9px;border-radius:var(--radius-full);border:1px solid rgba(26,70,200,.2);background:var(--color-surface-raised);color:var(--color-action);cursor:pointer;transition:all var(--transition-fast)}
+.ai-sc:hover{background:var(--ai-surface)}
+.ai-chat-box{flex-shrink:0;border-top:1px solid rgba(26,70,200,.12);background:var(--color-surface-raised);padding:10px 12px;z-index:2;position:relative}
+.ai-chat-box-inner{display:flex;align-items:flex-end;gap:8px;background:var(--color-surface-sunken);border:1.5px solid rgba(26,70,200,.2);border-radius:var(--radius-lg);padding:8px 10px;transition:all var(--transition-fast)}
+.ai-chat-box-inner:focus-within{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.ai-chat-textarea{flex:1;border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;resize:none;line-height:1.5;max-height:80px;overflow-y:auto;min-height:20px}
+.ai-chat-textarea::placeholder{color:var(--color-text-tertiary)}
+.ai-chat-send{width:30px;height:30px;border-radius:var(--radius-sm);background:var(--color-action);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background var(--transition-fast);flex-shrink:0}
+.ai-chat-send:hover{background:var(--color-action-hover)}
+.ai-chat-send svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ai-chat-hint{font-size:10px;color:var(--color-text-tertiary);margin-top:5px;padding:0 2px}
+
+/* CONFIRMATION MODAL */
+.modal-backdrop{position:fixed;inset:0;background:rgba(8,7,6,.5);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--color-surface-raised);border-radius:var(--radius-xl);padding:28px;width:400px;max-width:90vw;box-shadow:0 20px 60px rgba(8,7,6,.2)}
+.modal-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.modal-icon.danger{background:var(--danger-surface);border:1.5px solid var(--danger-border)}
+.modal-icon.warn{background:var(--warning-surface);border:1.5px solid var(--warning-border)}
+.modal-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2}
+.modal-icon.danger svg{stroke:var(--danger-text)}
+.modal-icon.warn svg{stroke:var(--warning-text)}
+.modal-title{font-size:16px;font-weight:700;text-align:center;margin-bottom:8px}
+.modal-desc{font-size:12px;color:var(--color-text-tertiary);text-align:center;line-height:1.6;margin-bottom:16px}
+.modal-field{margin-bottom:16px}
+.modal-field label{font-size:11px;font-weight:600;color:var(--color-text-tertiary);display:block;margin-bottom:6px}
+.modal-field textarea{width:100%;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:8px 10px;outline:none;resize:none;min-height:72px;transition:border-color var(--transition-fast)}
+.modal-field textarea:focus{border-color:var(--color-action)}
+.modal-actions{display:flex;gap:8px}
+.modal-cancel{flex:1;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:10px;background:transparent;color:var(--color-text-secondary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer}
+.modal-cancel:hover{background:var(--color-surface-sunken)}
+.modal-confirm{flex:1;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:10px;border:none;border-radius:var(--radius-md);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all var(--transition-fast)}
+.modal-confirm.danger{background:var(--danger-text);color:#fff}
+.modal-confirm.danger:hover{background:#7a1818}
+.modal-confirm.warn{background:var(--warning-text);color:#fff}
+.modal-confirm.warn:hover{background:#5a3800}
+.modal-confirm svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2}
+
+/* ADD JE PAGE */
+.add-je-page{position:fixed;inset:0;background:var(--color-surface-base);z-index:200;display:none;flex-direction:column;overflow:hidden}
+.add-je-page.open{display:flex}
+.aje-topbar{height:52px;flex-shrink:0;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 24px;gap:12px}
+.aje-title{font-size:15px;font-weight:700;flex:1}
+.aje-scroll{flex:1;overflow-y:auto;padding:28px 32px}
+.aje-inner{max-width:820px;margin:0 auto}
+.aje-section{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:16px}
+.aje-section-title{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:14px}
+.aje-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.aje-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.aje-grid-1{display:grid;grid-template-columns:1fr;gap:12px}
+.aje-field{display:flex;flex-direction:column;gap:5px}
+.aje-field label{font-size:11px;font-weight:600;color:var(--color-text-tertiary);display:flex;align-items:center;gap:5px}
+.aje-field input,.aje-field select,.aje-field textarea{font-family:var(--font-sans);font-size:13px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:8px 10px;outline:none;transition:border-color var(--transition-fast)}
+.aje-field input:focus,.aje-field select:focus,.aje-field textarea:focus{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.aje-field textarea{resize:vertical;min-height:60px}
+.ai-filled{background:linear-gradient(135deg,#EBF0FD,#EDE9FE)!important;border-color:var(--ai-border)!important}
+.ai-field-indicator{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;color:var(--color-action);background:linear-gradient(135deg,#EBF0FD,#EDE9FE);border:1px solid var(--ai-border);border-radius:var(--radius-full);padding:1px 6px;margin-left:2px}
+.help-btn{width:16px;height:16px;border-radius:50%;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all var(--transition-fast);padding:0}
+.help-btn:hover{border-color:var(--color-action);background:var(--ai-surface)}
+.help-btn svg{width:8px;height:8px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2.5}
+.help-btn:hover svg{stroke:var(--color-action)}
+/* Lines table */
+.lines-tbl{border:1px solid var(--color-border-default);border-radius:var(--radius-md);overflow:hidden;margin-bottom:10px}
+.lines-tbl table{width:100%;border-collapse:collapse}
+.lines-tbl thead tr{background:var(--color-surface-sunken)}
+.lines-tbl thead th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-tertiary);padding:8px 10px;text-align:left}
+.lines-tbl thead th.r{text-align:right}
+.lines-tbl tbody td{padding:5px 6px;border-top:1px solid var(--color-surface-sunken);vertical-align:middle}
+.acct-trigger{display:flex;align-items:center;gap:6px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:5px 8px;cursor:pointer;font-size:12px;color:var(--color-text-primary);min-width:160px;transition:all var(--transition-fast)}
+.acct-trigger:hover,.acct-trigger.open{border-color:var(--color-action);background:var(--color-surface-raised)}
+.acct-trigger svg{width:10px;height:10px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;margin-left:auto}
+.amt-cell{background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:5px 8px;display:flex;align-items:center;transition:all var(--transition-fast)}
+.amt-cell:focus-within{border-color:var(--color-action);background:var(--color-surface-raised);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.amt-input{font-family:var(--font-mono);font-size:12px;font-weight:600;background:transparent;border:none;outline:none;width:100%;text-align:right}
+.amt-input::placeholder{color:var(--color-text-tertiary);font-weight:400;font-family:var(--font-sans)}
+.btn-add-line{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--color-action);background:transparent;border:1px dashed var(--ai-border);border-radius:var(--radius-sm);padding:6px 12px;cursor:pointer;transition:all var(--transition-fast)}
+.btn-add-line:hover{background:var(--ai-surface);border-style:solid}
+.btn-add-line svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.btn-del-row{width:26px;height:26px;border-radius:var(--radius-sm);border:1px solid transparent;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--transition-fast);flex-shrink:0;padding:0}
+.btn-del-row:hover{background:var(--danger-surface);border-color:var(--danger-border)}
+.btn-del-row svg{width:11px;height:11px;stroke:var(--color-border-default);fill:none;stroke-width:1.5;stroke-linecap:round}
+.btn-del-row:hover svg{stroke:var(--danger-text)}
+.btn-del-row:disabled{opacity:.2;cursor:not-allowed}
+/* Balance bar */
+.bb-wrap{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);overflow:hidden}
+.bb-head{display:flex;align-items:center;padding:10px 14px;gap:8px;border-bottom:1px solid var(--color-surface-sunken)}
+.bb-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-left:auto;border:1px solid}
+.bb-status.empty{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border-color:var(--color-border-default)}
+.bb-status.balanced{background:var(--success-surface);color:var(--success-text);border-color:var(--success-border)}
+.bb-status.unbalanced{background:var(--danger-surface);color:var(--danger-text);border-color:var(--danger-border)}
+.bb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.bb-cols{display:grid;grid-template-columns:1fr 1fr 1fr}
+.bb-col{padding:10px 14px;display:flex;flex-direction:column;gap:3px}
+.bb-col+.bb-col{border-left:1px solid var(--color-surface-sunken)}
+.bb-lbl{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary)}
+.bb-val{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--color-text-primary)}
+.bb-val.zero{color:var(--success-text)}.bb-val.nonzero{color:var(--danger-text)}.bb-val.empty{color:var(--color-text-tertiary)}
+.bb-track{height:3px;background:var(--color-surface-sunken);border-radius:2px;margin-top:4px;overflow:hidden}
+.bb-fill-dr{height:100%;background:var(--color-action);border-radius:2px;transition:width .3s ease}
+.bb-fill-cr{height:100%;background:var(--color-brand);border-radius:2px;transition:width .3s ease}
+.aje-footer{padding:14px 32px;border-top:1px solid var(--color-border-default);flex-shrink:0;background:var(--color-surface-raised);display:flex;align-items:center;gap:10px}
+.footer-hint{flex:1;font-size:11px;color:var(--color-text-tertiary);text-align:center}
+.footer-hint.ok{color:var(--success-text)}.footer-hint.err{color:var(--danger-text)}
+/* Acct dropdown */
+.acct-drop{position:fixed;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);box-shadow:0 8px 28px rgba(8,7,6,.15);z-index:9999;width:300px;overflow:hidden}
+.acct-drop-search{padding:8px;border-bottom:1px solid var(--color-border-default)}
+.acct-drop-search input{width:100%;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:5px 8px;outline:none}
+.acct-drop-list{max-height:220px;overflow-y:auto}
+.acct-group-hd{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-tertiary);padding:8px 10px 3px;background:var(--color-surface-sunken)}
+.acct-opt{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;transition:background var(--transition-fast)}
+.acct-opt:hover{background:var(--color-surface-sunken)}
+.ao-code{font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary);flex-shrink:0;width:52px}
+.ao-name{font-size:12px;color:var(--color-text-primary);flex:1}
+/* Journal type drawer */
+.jtype-overlay{position:fixed;inset:0;background:rgba(8,7,6,.35);z-index:300;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.jtype-overlay.open{opacity:1;pointer-events:all}
+.jtype-drawer{position:fixed;top:0;right:0;height:100vh;width:380px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:310;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow)}
+.jtype-drawer.open{transform:translateX(0)}
+.jtype-head{padding:16px 20px;border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:space-between}
+.jtype-title{font-size:14px;font-weight:700}
+.jtype-body{flex:1;overflow-y:auto;padding:20px}
+.jtype-card{background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:10px}
+.jtype-card-name{font-size:13px;font-weight:700;color:var(--color-text-primary);margin-bottom:4px}
+.jtype-card-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.5;margin-bottom:6px}
+.jtype-card-example{font-size:11px;color:var(--color-text-tertiary);font-style:italic}
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--color-surface-deep);color:#fff;font-size:12px;font-weight:600;padding:10px 18px;border-radius:var(--radius-md);opacity:0;pointer-events:none;transition:all .2s;z-index:9999;white-space:nowrap;border:1px solid rgba(255,255,255,.08)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* Empty */
+.empty-state{padding:48px 24px;text-align:center}
+.empty-state svg{width:32px;height:32px;stroke:var(--color-border-default);fill:none;stroke-width:1;margin:0 auto 12px;display:block}
+.empty-title{font-size:14px;font-weight:600;color:var(--color-text-secondary);margin-bottom:4px}
+.empty-sub{font-size:12px;color:var(--color-text-tertiary)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sb">
+  <div class="sb-top"><div class="sb-logomark"><svg viewBox="0 0 16 16"><path d="M8 1L1 5v6l7 4 7-4V5L8 1z"/></svg></div><span class="sb-brand">Klay</span></div>
+  <div class="sb-section">Transactions</div>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>General Ledger</a>
+  <a class="sb-item active" href="#"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Journal Entry</a>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>Reconciliation</a>
+  <div class="sb-section">Accounts Receivable</div>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Invoices</a>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Customers</a>
+  <div class="sb-section">Accounts Payable</div>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>Bills</a>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>Vendors</a>
+  <div class="sb-section">Reports</div>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Financial Reports</a>
+  <div class="sb-section">Settings</div>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>Chart of Accounts</a>
+  <div class="sb-footer"><div class="sb-footer-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Help & Support</div></div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-search-wrap">
+      <div class="tb-search" id="tbSearch">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="tbSearchInput" placeholder="Cari atau ketik perintah…" autocomplete="off">
+        <span class="tb-kbd">⌘K</span>
+      </div>
+      <div class="cmd-dropdown" id="cmdDropdown">
+        <div class="cmd-section-label">Tanya AI</div>
+        <div class="cmd-item" id="cmdAskAI">
+          <div class="cmd-item-icon ai"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><circle cx="19" cy="5" r="3" fill="white" stroke="none"/></svg></div>
+          <div class="cmd-item-text"><div class="cmd-item-title" id="cmdAITitle">✦ Tanya AI tentang ini</div><div class="cmd-item-sub">Buka percakapan dengan TradeOS AI</div></div>
+          <span class="cmd-item-tag">AI</span>
+        </div>
+        <div class="cmd-divider"></div>
+        <div class="cmd-section-label">Navigasi Cepat</div>
+        <div class="cmd-item" onclick="setStatusFilter('draft');closeCmdDrop()"><div class="cmd-item-icon nav"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/></svg></div><div class="cmd-item-text"><div class="cmd-item-title">Lihat semua Draft</div><div class="cmd-item-sub">Filter status Draft</div></div></div>
+        <div class="cmd-item" onclick="setStatusFilter('posted');closeCmdDrop()"><div class="cmd-item-icon nav"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="cmd-item-text"><div class="cmd-item-title">Lihat yang sudah Posted</div><div class="cmd-item-sub">Filter status Posted</div></div></div>
+        <div id="cmdResults"></div>
+      </div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-notif"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><div class="notif-dot"></div></div>
+      <div class="tb-org"><div class="tb-av">SW</div><span class="tb-org-name">Sarah Wijaya · Finance Mgr</span><svg class="tb-caret" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+    </div>
+  </div>
+
+  <div class="content-row">
+    <div class="content-main">
+      <div class="scroll-area" id="scrollArea">
+
+        <!-- PAGE HEAD -->
+        <div class="page-head">
+          <div><div class="page-title">Journal Entry</div><div style="font-size:12px;color:var(--color-text-tertiary);margin-top:2px">PT Sejahtera Makmur · Jan–Apr 2025</div></div>
+          <div class="head-right">
+            <div style="position:relative">
+              <button class="btn-ghost" onclick="toggleExp(event)"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export<svg viewBox="0 0 24 24" style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="6 9 12 15 18 9"/></svg></button>
+              <div class="exp-menu" id="expMenu">
+                <div class="exp-menu-label">Scope</div>
+                <div class="exp-scope-row">
+                  <button class="exp-scope-btn on" id="expScopeVisible" onclick="setExpScope('visible',this)">Yang Terlihat</button>
+                  <button class="exp-scope-btn" id="expScopeAll" onclick="setExpScope('all',this)">Semua Data</button>
+                </div>
+                <div class="exp-divider"></div>
+                <div class="exp-menu-label">Format</div>
+                <div class="exp-item" onclick="doExport('xlsx')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Excel (.xlsx)</div>
+                <div class="exp-item" onclick="doExport('csv')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>CSV (.csv)</div>
+              </div>
+            </div>
+            <button class="btn-primary" onclick="openAddJE()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Buat Jurnal Baru</button>
+          </div>
+        </div>
+
+        <!-- ANOMALI TRANSAKSI TERDETEKSI -->
+        <div class="anomaly-tx-section" id="anomalyTxSection">
+          <div class="atx-header" id="atxHeader" onclick="toggleAtx()" style="cursor:pointer;user-select:none">
+            <div class="atx-header-left">
+              <div class="atx-icon" id="atxHeaderIcon"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+              <div>
+                <div class="atx-title" id="atxHeaderTitle">Anomali Transaksi Terdeteksi</div>
+                <div class="atx-sub" id="atxHeaderSub">AI mendeteksi pola transaksi menyimpang. Peninjauan diperlukan untuk memastikan integritas data sebelum proses penutupan periode dilakukan.</div>
+              </div>
+            </div>
+            <svg id="atxChevron" viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--warning-text);fill:none;stroke-width:2;flex-shrink:0;transition:transform .2s ease"><polyline points="18 15 12 9 6 15"/></svg>
+          </div>
+          <div class="atx-items" id="atxItems"></div>
+        </div>
+
+        <!-- FILTER BAR -->
+        <div class="filter-bar">
+          <div class="f-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="localSearch" placeholder="Cari no. jurnal, memo…" oninput="applyFilters()"></div>
+          <div class="fsep"></div>
+          <div class="chip-grp" id="statusChips">
+            <div class="chip on" data-v="">Semua</div>
+            <div class="chip pending-chip" data-v="pending">Pending</div>
+            <div class="chip draft-chip" data-v="draft">Draft</div>
+            <div class="chip" data-v="posted">Posted</div>
+            <div class="chip void-chip" data-v="void">Void</div>
+          </div>
+          <div class="fsep"></div>
+          <div class="chip-grp" id="timeChips">
+            <div class="chip" data-r="today" onclick="setTimeChip(this)">Hari Ini</div>
+            <div class="chip" data-r="month" onclick="setTimeChip(this)">Bulan Ini</div>
+            <div class="chip" data-r="q1" onclick="setTimeChip(this)">Q1</div>
+          </div>
+          <div class="f-right">
+            <button class="f-filter-btn" onclick="openFilterDrawer()"><svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="12" y1="18" x2="12" y2="18"/></svg>Filter<span class="badge" id="filterBadge" style="display:none">0</span></button>
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-wrap">
+          <div class="tbl-scroll">
+            <table id="jeTable">
+              <thead><tr>
+                <th class="sortable" data-col="date">Tanggal<span class="sa"></span></th>
+                <th class="sortable" data-col="ref">No. Referensi<span class="sa"></span></th>
+                <th class="sortable" data-col="memo">Keterangan<span class="sa"></span></th>
+                <th class="r">Baris</th>
+                <th class="sortable r" data-col="debit">Debit (Rp)<span class="sa"></span></th>
+                <th class="sortable r" data-col="credit">Kredit (Rp)<span class="sa"></span></th>
+                <th>Status</th>
+              </tr></thead>
+              <tbody id="jeBody"></tbody>
+            </table>
+            <div id="emptyState" class="empty-state" style="display:none"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg><div class="empty-title">Tidak ada data</div><div class="empty-sub">Coba ubah filter atau pencarian</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- STATUS BAR — fixed bottom -->
+    <div class="status-bar" id="statusBar">
+      <div class="sb-stat"><span class="sb-stat-label">Total</span><span class="sb-stat-val" id="statTotal">—</span></div>
+      <div class="sb-sep"></div>
+      <div class="sb-stat"><span class="sb-stat-label">Tampil</span><span class="sb-stat-val" id="statShowing">—</span></div>
+      <div class="sb-sep"></div>
+      <div class="sb-stat"><span class="sb-stat-label">Debit</span><span class="sb-stat-val debit" id="statDebit">—</span></div>
+      <div class="sb-sep"></div>
+      <div class="sb-stat"><span class="sb-stat-label">Kredit</span><span class="sb-stat-val credit" id="statCredit">—</span></div>
+      <div class="sb-right">
+        <div class="sb-stat" style="gap:5px"><span class="sb-stat-label">Per hal.</span>
+          <select id="pageSizeSelect" onchange="changePageSize(+this.value)" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:4px;color:rgba(255,255,255,.85);font-family:var(--font-mono);font-size:11px;padding:2px 5px;cursor:pointer;outline:none">
+            <option value="20" selected>20</option><option value="50">50</option><option value="100">100</option>
+          </select>
+        </div>
+        <div class="sb-sep"></div>
+        <div class="sb-stat" style="gap:4px">
+          <button onclick="prevPage()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:4px;color:rgba(255,255,255,.6);width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;padding:0">‹</button>
+          <span class="sb-stat-val" id="statPage" style="min-width:32px;text-align:center">1/1</span>
+          <button onclick="nextPage()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:4px;color:rgba(255,255,255,.6);width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;padding:0">›</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI PANEL -->
+    <div class="ai-panel" id="aiPanel">
+      <div class="ai-panel-inner">
+        <div class="ai-head">
+          <div class="ai-head-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><circle cx="19" cy="5" r="3" fill="white" stroke="none"/></svg></div>
+          <div class="ai-head-text"><div class="ai-head-title">Asisten AI Klay</div><div class="ai-head-sub">● AKTIF · Journal Entry</div></div>
+          <div class="ai-head-close" onclick="closeAI()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+        </div>
+        <div class="ai-tabs">
+          <div class="ai-tab on" onclick="switchAITab(0)">Percakapan</div>
+          <div class="ai-tab" onclick="switchAITab(1)">Riwayat</div>
+        </div>
+        <!-- Session title (conversation tab) -->
+        <div class="ai-session-title-wrap" id="aiSessionTitleWrap">
+          <div class="ai-session-title" id="aiSessionTitleDisp" onclick="editSessionTitle()">
+            <span id="aiSessionTitleText">Percakapan Baru</span>
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <input class="ai-session-title-input" id="aiSessionTitleInput" style="display:none" onblur="saveSessionTitle()" onkeydown="if(event.key==='Enter')saveSessionTitle()">
+        </div>
+        <div class="ai-msgs" id="aiMsgs"></div>
+        <div class="ai-hist-list hidden" id="aiHistList"></div>
+        <div class="ai-suggestion-chips">
+          <span class="ai-sc" onclick="sendAISug(this)">Ringkasan periode</span>
+          <span class="ai-sc" onclick="sendAISug(this)">Cek anomali</span>
+          <span class="ai-sc" onclick="sendAISug(this)">Draft pending review</span>
+          <span class="ai-sc" onclick="sendAISug(this)">Approval yang tertunda</span>
+        </div>
+        <div class="ai-chat-box">
+          <div class="ai-chat-box-inner">
+            <textarea class="ai-chat-textarea" id="aiInput" placeholder="Tanya tentang jurnal ini…" rows="1" onkeydown="aiKey(event)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+            <button class="ai-chat-send" onclick="sendAIMsg()"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+          </div>
+          <div class="ai-chat-hint">Enter untuk kirim · Shift+Enter baris baru</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ANOMALY INVESTIGATION DRAWER -->
+<div class="anomaly-drawer-overlay" id="anomalyDrawerOverlay" onclick="closeAnomalyDrawer()"></div>
+<div class="anomaly-drawer" id="anomalyDrawer">
+  <div class="ad-head">
+    <div class="ad-head-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+    <div class="ad-head-text"><div class="ad-head-title">Anomali Balance</div><div class="ad-head-sub">Running balance Apr 2025</div></div>
+    <div class="ad-head-close" onclick="closeAnomalyDrawer()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+  </div>
+  <div class="ad-body">
+    <div class="ad-section">
+      <div class="ad-label">Tren Running Balance</div>
+      <div style="position:relative">
+        <div class="ad-chart">
+          <div class="ad-bar-wrap">
+            <div class="ad-bar-label-top"></div>
+            <div class="ad-bar" style="height:72px;background:#A8D9BC"></div>
+            <div class="ad-bar-month">Jan</div>
+            <div class="ad-bar-val">450jt</div>
+          </div>
+          <div class="ad-bar-wrap">
+            <div class="ad-bar-label-top"></div>
+            <div class="ad-bar" style="height:80px;background:#A8D9BC"></div>
+            <div class="ad-bar-month">Feb</div>
+            <div class="ad-bar-val">480jt</div>
+          </div>
+          <div class="ad-bar-wrap">
+            <div class="ad-bar-label-top"></div>
+            <div class="ad-bar" style="height:68px;background:#A8D9BC"></div>
+            <div class="ad-bar-month">Mar</div>
+            <div class="ad-bar-val">412jt</div>
+          </div>
+          <div class="ad-bar-wrap">
+            <div class="ad-bar-label-top" style="color:var(--danger-text)">-77% vs tren</div>
+            <div class="ad-bar" style="height:20px;background:#EAB8B8;border:1.5px solid #A02020;border-bottom:none"></div>
+            <div class="ad-bar-month" style="color:var(--danger-text);font-weight:700">Apr</div>
+            <div class="ad-bar-val" style="color:var(--danger-text)">96jt</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ad-section">
+      <div class="ad-label">Entri yang Perlu Ditinjau</div>
+      <div class="ad-entry-card danger" onclick="closeAnomalyDrawer();openDrawer('JE-2025-012')">
+        <div style="flex:1"><div class="ad-entry-ref">JE-2025-012</div><div class="ad-entry-desc">Draft koreksi beban operasional tertunda >48 jam, belum dikonfirmasi</div></div>
+        <div class="ad-entry-arrow">→</div>
+      </div>
+      <div class="ad-entry-card warn" onclick="closeAnomalyDrawer();openDrawer('JE-2025-011')">
+        <div style="flex:1"><div class="ad-entry-ref">JE-2025-011</div><div class="ad-entry-desc">Draft reimbursement perjalanan dinas menunggu approval Finance Manager</div></div>
+        <div class="ad-entry-arrow">→</div>
+      </div>
+      <div class="ad-entry-card warn" onclick="closeAnomalyDrawer();openDrawer('JE-2025-009')">
+        <div style="flex:1"><div class="ad-entry-ref">JE-2025-009</div><div class="ad-entry-desc">Draft akrual gaji April (AI-generated, 91%) belum di-post</div></div>
+        <div class="ad-entry-arrow">→</div>
+      </div>
+    </div>
+    <div class="ad-ai-card">
+      <div class="ad-ai-card-title">✦ Rekomendasi AI</div>
+      <div class="ad-ai-card-text">Segera review dan post ketiga draft di atas. Running balance akan kembali normal setelah akrual gaji dan operasional bulan April dicatat dengan benar.</div>
+    </div>
+    <button class="ad-cta" onclick="investigateAll()">Tinjau Semua Entri Ini</button>
+  </div>
+</div>
+
+<!-- FILTER DRAWER -->
+<div class="filter-overlay" id="filterOverlay" onclick="closeFilterDrawer()"></div>
+<div class="filter-drawer" id="filterDrawer">
+  <div class="fd-head"><span class="fd-title">Filter Lainnya</span><div class="d-close" onclick="closeFilterDrawer()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div></div>
+  <div class="fd-body">
+    <div class="fd-section">
+      <div class="fd-label">Rentang Tanggal</div>
+      <div class="fd-shortcuts">
+        <div class="fd-sc" data-r="today" onclick="setDSC(this)">Hari ini</div>
+        <div class="fd-sc" data-r="week" onclick="setDSC(this)">7 hari</div>
+        <div class="fd-sc" data-r="month" onclick="setDSC(this)">Bulan ini</div>
+        <div class="fd-sc" data-r="q1" onclick="setDSC(this)">Q1 2025</div>
+        <div class="fd-sc" data-r="all" onclick="setDSC(this)">Semua</div>
+      </div>
+      <div class="fd-date-row">
+        <div><div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:4px">Dari</div><input type="date" class="fd-input" id="fdFrom" onchange="applyFilters()"></div>
+        <div><div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:4px">Sampai</div><input type="date" class="fd-input" id="fdTo" onchange="applyFilters()"></div>
+      </div>
+    </div>
+    <div class="fd-section">
+      <div class="fd-label">Sumber</div>
+      <select class="fd-select" id="fdSource" onchange="applyFilters()"><option value="">Semua Sumber</option><option value="je">Journal Entry (Manual)</option><option value="invoice">Invoice</option><option value="bill">Bill</option></select>
+    </div>
+    <div class="fd-section">
+      <div class="fd-label">Tipe Jurnal (Manual)</div>
+      <select class="fd-select" id="fdType" onchange="applyFilters()"><option value="">Semua Tipe</option><option value="manual">Manual</option><option value="adj">Penyesuaian</option><option value="reversal">Pembalik</option><option value="closing">Penutup</option></select>
+    </div>
+  </div>
+  <div class="fd-foot"><button class="fd-btn-reset" onclick="resetFilters()">Reset</button><button class="fd-btn-apply" onclick="closeFilterDrawer()">Terapkan</button></div>
+</div>
+
+<!-- DETAIL DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div><div class="d-ref" id="dRef">—</div><div class="d-badge posted" id="dBadge">Posted</div></div>
+    <div class="d-close" onclick="closeDrawer()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+  </div>
+  <div class="d-tabs">
+    <div class="d-tab on" onclick="switchDTab(0,this)">Detail</div>
+    <div class="d-tab" onclick="switchDTab(1,this)">Line Items</div>
+    <div class="d-tab" onclick="switchDTab(2,this)">Audit Trail</div>
+  </div>
+  <div class="d-body">
+    <div class="d-pane on" id="dPane0"></div>
+    <div class="d-pane" id="dPane1"></div>
+    <div class="d-pane" id="dPane2"></div>
+  </div>
+  <div class="d-cta-area" id="dCtaArea"></div>
+</div>
+
+<!-- CONFIRMATION MODAL -->
+<div class="modal-backdrop" id="modalBd">
+  <div class="modal">
+    <div class="modal-icon" id="modalIcon"><svg id="modalIconSvg" viewBox="0 0 24 24"></svg></div>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-desc" id="modalDesc"></div>
+    <div class="modal-reversal-preview" id="modalReversalPreview" style="display:none">
+      <div class="modal-reversal-title">✓ Jurnal pembalik akan dibuat otomatis</div>
+      <div class="modal-reversal-detail" id="modalReversalDetail">—</div>
+    </div>
+    <div class="modal-field" id="modalFieldWrap">
+      <label id="modalFieldLabel">Alasan</label>
+      <textarea id="modalReason" placeholder="" maxlength="200" oninput="g('modalChar').textContent=this.value.length+'/200';onModalInput()"></textarea>
+      <div style="font-size:10px;color:var(--color-text-tertiary);text-align:right;margin-top:3px" id="modalChar">0/200</div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">Batal</button>
+      <button class="modal-confirm danger" id="modalConfirmBtn" onclick="confirmModal()">
+        <svg id="modalConfirmIcon" viewBox="0 0 24 24"></svg>
+        <span id="modalConfirmLabel">Konfirmasi</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- JOURNAL TYPE DRAWER -->
+<div class="jtype-overlay" id="jtypeOverlay" onclick="closeJtype()"></div>
+<div class="jtype-drawer" id="jtypeDrawer">
+  <div class="jtype-head"><span class="jtype-title">Panduan Tipe Jurnal</span><div class="d-close" onclick="closeJtype()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div></div>
+  <div class="jtype-body">
+    <div class="jtype-card"><div class="jtype-card-name">Manual</div><div class="jtype-card-desc">Jurnal yang dibuat langsung oleh akuntan untuk mencatat transaksi yang tidak berasal dari modul lain.</div><div class="jtype-card-example">Contoh: Pembayaran gaji, koreksi, pencatatan aset</div></div>
+    <div class="jtype-card"><div class="jtype-card-name">Penyesuaian (Adjusting)</div><div class="jtype-card-desc">Dibuat di akhir periode untuk menyesuaikan saldo agar mencerminkan kondisi sesungguhnya.</div><div class="jtype-card-example">Contoh: Akrual beban, prepaid, penyusutan</div></div>
+    <div class="jtype-card"><div class="jtype-card-name">Pembalik (Reversing)</div><div class="jtype-card-desc">Membalik entri penyesuaian di awal periode berikutnya untuk menghindari pencatatan ganda.</div><div class="jtype-card-example">Contoh: Membalik akrual gaji bulan lalu</div></div>
+    <div class="jtype-card"><div class="jtype-card-name">Penutup (Closing)</div><div class="jtype-card-desc">Menutup akun pendapatan & beban di akhir fiskal, memindahkan saldo ke laba ditahan.</div><div class="jtype-card-example">Contoh: Penutupan akun pendapatan akhir tahun</div></div>
+  </div>
+</div>
+
+<!-- ADD JE PAGE -->
+<div class="add-je-page" id="addJEPage">
+  <div class="aje-topbar">
+    <button class="btn-ghost" onclick="closeAddJE()" style="padding:6px 10px;gap:5px"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Kembali</button>
+    <span class="aje-title">Buat Jurnal Baru</span>
+    <span style="font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)">Draft</span>
+    <button class="btn-secondary" onclick="showToast('Draft disimpan · JE-2025-0023')"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/></svg>Simpan Draft</button>
+    <button class="btn-ghost" id="btnKirimApproval" disabled onclick="sendForApproval()" style="border-color:var(--color-action);color:var(--color-action)"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>Kirim Approval</button>
+    <button class="btn-primary" id="btnPostJE" disabled onclick="showToast('JE-2025-0023 berhasil di-post ✓');closeAddJE()"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Post Jurnal</button>
+  </div>
+  <div class="aje-scroll"><div class="aje-inner">
+    <div class="aje-section">
+      <div class="aje-section-title">Detail Jurnal</div>
+      <div class="aje-grid-3">
+        <div class="aje-field"><label>Tanggal<span class="ai-field-indicator">✦ AI · 98%</span></label><input type="date" id="jeDate" value="2025-04-19" class="ai-filled" onchange="ajeRecalc()"></div>
+        <div class="aje-field"><label>Tipe Jurnal<button class="help-btn" onclick="openJtype()" title="Panduan"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></button></label><select id="jeType"><option value="manual">Manual</option><option value="adj">Penyesuaian</option><option value="reversal">Pembalik</option><option value="closing">Penutup</option></select></div>
+        <div class="aje-field"><label>Mata Uang</label><select id="jeCurrency"><option value="IDR">IDR — Rupiah</option><option value="USD">USD</option></select></div>
+      </div>
+      <div class="aje-grid-2" style="margin-top:10px">
+        <div class="aje-field"><label>Referensi Eksternal</label><input type="text" placeholder="No. faktur, kontrak…" id="jeRef"></div>
+        <div class="aje-field"><label>Periode Akuntansi<span class="ai-field-indicator">✦ AI · 97%</span></label><select id="jePeriod" class="ai-filled"><option>April 2025</option><option>Maret 2025</option><option>Februari 2025</option><option>Januari 2025</option></select></div>
+      </div>
+      <div class="aje-grid-1" style="margin-top:10px"><div class="aje-field"><label>Memo / Keterangan</label><textarea placeholder="Deskripsi singkat tujuan jurnal ini…" id="jeMemo" oninput="ajeUpdateImpact()"></textarea></div></div>
+    </div>
+    <div class="aje-section">
+      <div class="aje-section-title">Baris Jurnal</div>
+      <div class="lines-tbl"><table><colgroup><col style="width:28px"><col style="width:auto"><col style="width:130px"><col style="width:130px"><col style="width:32px"></colgroup><thead><tr><th>#</th><th>Akun</th><th class="r">Debit (IDR)</th><th class="r">Kredit (IDR)</th><th></th></tr></thead><tbody id="ajeLinesTbody"></tbody></table></div>
+      <button class="btn-add-line" onclick="ajeAddLine()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Tambah Baris</button>
+    </div>
+    <div class="aje-section">
+      <div class="aje-section-title">Balance Check</div>
+      <div class="bb-wrap">
+        <div class="bb-head"><span style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary)">Debit = Kredit</span><span class="bb-status empty" id="ajeBBSt"><span class="bb-dot" id="ajeBBDot"></span><span id="ajeBBTxt">Belum ada nominal</span></span></div>
+        <div class="bb-cols">
+          <div class="bb-col"><span class="bb-lbl">Total Debit</span><span class="bb-val empty" id="ajeBBDr">—</span><div class="bb-track"><div class="bb-fill-dr" id="ajeBBDrBar" style="width:0%"></div></div></div>
+          <div class="bb-col"><span class="bb-lbl">Total Kredit</span><span class="bb-val empty" id="ajeBBCr">—</span><div class="bb-track"><div class="bb-fill-cr" id="ajeBBCrBar" style="width:0%"></div></div></div>
+          <div class="bb-col"><span class="bb-lbl">Selisih</span><span class="bb-val empty" id="ajeBBDiff">—</span></div>
+        </div>
+      </div>
+      <!-- Impact Analysis Box (real-time) -->
+      <div class="impact-box" id="ajeImpactBox" style="margin-top:12px">
+        <div class="impact-box-title"><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:var(--color-action);fill:none;stroke-width:2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Kemana item ini akan berimpact?</div>
+        <div class="impact-box-text" id="ajeImpactText">Pilih akun dan isi nominal untuk melihat analisis dampak secara real-time.</div>
+      </div>
+    </div>
+
+    <div class="aje-section">
+      <div class="aje-section-title">Lampiran</div>
+      <div id="ajeAttachList"></div>
+      <div class="d-attach-wrap" style="background:transparent;padding:0">
+        <div class="d-attach-add" id="ajeAttachAdd" onclick="ajeAddAttach()">
+          <span class="d-attach-add-label">+ Tambah lampiran</span>
+          <span class="d-attach-add-sub">PDF, JPG, PNG — maks 10MB per file</span>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const g = id => document.getElementById(id);
+const MON = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+const fmtDate = iso => { const d=new Date(iso+'T00:00:00'); return `${d.getDate()} ${MON[d.getMonth()]} ${d.getFullYear()}`; };
+const fmtRp = n => n != null ? 'Rp '+Math.abs(n).toLocaleString('id-ID') : '–';
+const TODAY = '2025-04-19';
+
+// ── DATA ──
+const JE_DATA = [
+  // Posted — from invoices (ref: INV-)
+  {id:'INV-2025-001',date:'2025-01-18',src:'invoice',srcRef:'INV001',srcLabel:'Invoice INV001',memo:'Pencatatan penjualan ke PT Ritel Utama Indonesia',status:'posted',type:null,isAI:false,createdBy:'Sarah Wijaya',createdDate:'2025-01-18',postedBy:'Andi Prasetyo',postedDate:'2025-02-12',voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},lines:[{acct:'1-1200',acctName:'Piutang Usaha',debit:33000000,credit:0,desc:'Piutang penjualan INV001'},{acct:'4-1010',acctName:'Penjualan Produk - Divisi A',debit:0,credit:30000000,desc:'Pendapatan penjualan'},{acct:'2-1200',acctName:'Utang Pajak',debit:0,credit:3000000,desc:'PPN keluaran'}],totalDebit:33000000,totalCredit:33000000},
+  {id:'INV-2025-002',date:'2025-01-25',src:'invoice',srcRef:'INV002',srcLabel:'Invoice INV002',memo:'Pencatatan penjualan produk Divisi B ke CV Distributor',status:'posted',type:null,isAI:false,createdBy:'Rina Kusuma',createdDate:'2025-01-25',postedBy:'Sarah Wijaya',postedDate:'2025-03-09',voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},lines:[{acct:'1-1200',acctName:'Piutang Usaha',debit:9625000,credit:0,desc:'Piutang penjualan'},{acct:'4-1020',acctName:'Penjualan Produk - Divisi B',debit:0,credit:8750000,desc:'Pendapatan penjualan'},{acct:'2-1200',acctName:'Utang Pajak',debit:0,credit:875000,desc:'PPN keluaran'}],totalDebit:9625000,totalCredit:9625000},
+  {id:'INV-2025-003',date:'2025-02-10',src:'invoice',srcRef:'INV003',srcLabel:'Invoice INV003',memo:'Pencatatan penjualan produk Divisi A + jasa setup ke PT Ritel',status:'posted',type:null,isAI:false,createdBy:'Sarah Wijaya',createdDate:'2025-02-10',postedBy:'Andi Prasetyo',postedDate:'2025-03-10',voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:'Project Alpha'},lines:[{acct:'1-1200',acctName:'Piutang Usaha',debit:24200000,credit:0,desc:'Piutang penjualan'},{acct:'4-1010',acctName:'Penjualan Produk - Divisi A',debit:0,credit:20000000,desc:'Pendapatan penjualan'},{acct:'4-1030',acctName:'Penjualan Jasa Tambahan',debit:0,credit:2000000,desc:'Jasa setup'},{acct:'2-1200',acctName:'Utang Pajak',debit:0,credit:2200000,desc:'PPN keluaran'}],totalDebit:24200000,totalCredit:24200000},
+  {id:'INV-2025-004',date:'2025-02-20',src:'invoice',srcRef:'INV004',srcLabel:'Invoice INV004',memo:'Pencatatan penjualan produk Divisi B ke Toko Modern Bandung',status:'posted',type:null,isAI:false,createdBy:'Andi Prasetyo',createdDate:'2025-02-20',postedBy:'Sarah Wijaya',postedDate:'2025-03-11',voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},lines:[{acct:'1-1200',acctName:'Piutang Usaha',debit:18562500,credit:0,desc:'Piutang penjualan'},{acct:'4-1020',acctName:'Penjualan Produk - Divisi B',debit:0,credit:16875000,desc:'Pendapatan'},{acct:'2-1200',acctName:'Utang Pajak',debit:0,credit:1687500,desc:'PPN keluaran'}],totalDebit:18562500,totalCredit:18562500},
+  {id:'INV-2025-005',date:'2025-03-15',src:'invoice',srcRef:'INV005',srcLabel:'Invoice INV005',memo:'Pencatatan penjualan produk Divisi A ke Hypermarket Medan',status:'posted',type:null,isAI:false,createdBy:'Sarah Wijaya',createdDate:'2025-03-15',postedBy:'Budi Santoso',postedDate:'2025-03-16',voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:'Project Beta'},lines:[{acct:'1-1200',acctName:'Piutang Usaha',debit:48400000,credit:0,desc:'Piutang penjualan'},{acct:'4-1010',acctName:'Penjualan Produk - Divisi A',debit:0,credit:44000000,desc:'Pendapatan penjualan'},{acct:'2-1200',acctName:'Utang Pajak',debit:0,credit:4400000,desc:'PPN keluaran'}],totalDebit:48400000,totalCredit:48400000},
+  // Posted — from bills (ref: BILL-)
+  {id:'BILL-2025-001',date:'2025-01-15',src:'bill',srcRef:'BILL001',srcLabel:'Bill BILL001',memo:'Pencatatan utang pembelian komponen elektronik dari PT Supplier',status:'posted',type:null,isAI:false,createdBy:'Sarah Wijaya',createdDate:'2025-01-15',postedBy:'Budi Santoso',postedDate:'2025-01-20',voidedBy:null,voidReason:null,dims:{dept:'Operations',proj:''},lines:[{acct:'6-1000',acctName:'Biaya Pokok Penjualan',debit:75000000,credit:0,desc:'Pembelian komponen'},{acct:'5-2200',acctName:'Beban PPN Masukan',debit:7500000,credit:0,desc:'PPN masukan'},{acct:'2-1100',acctName:'Utang Usaha',debit:0,credit:82500000,desc:'Utang supplier'}],totalDebit:82500000,totalCredit:82500000},
+  {id:'BILL-2025-002',date:'2025-01-20',src:'bill',srcRef:'BILL002',srcLabel:'Bill BILL002',memo:'Pencatatan pembelian peralatan kantor - meja dan kursi',status:'posted',type:null,isAI:false,createdBy:'Andi Prasetyo',createdDate:'2025-01-20',postedBy:'Budi Santoso',postedDate:'2025-02-05',voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},lines:[{acct:'1-2100',acctName:'Peralatan Kantor',debit:19200000,credit:0,desc:'Peralatan kantor'},{acct:'5-2200',acctName:'Beban PPN Masukan',debit:1920000,credit:0,desc:'PPN masukan'},{acct:'2-1100',acctName:'Utang Usaha',debit:0,credit:21120000,desc:'Utang pembelian'}],totalDebit:21120000,totalCredit:21120000},
+  {id:'BILL-2025-003',date:'2025-02-08',src:'bill',srcRef:'BILL003',srcLabel:'Bill BILL003',memo:'Pencatatan biaya pengiriman & jasa logistik Februari',status:'posted',type:null,isAI:false,createdBy:'Rina Kusuma',createdDate:'2025-02-08',postedBy:'Andi Prasetyo',postedDate:'2025-02-10',voidedBy:null,voidReason:null,dims:{dept:'Operations',proj:''},lines:[{acct:'5-1000',acctName:'Beban Operasional',debit:12500000,credit:0,desc:'Jasa logistik'},{acct:'5-2200',acctName:'Beban PPN Masukan',debit:1250000,credit:0,desc:'PPN masukan'},{acct:'2-1100',acctName:'Utang Usaha',debit:0,credit:13750000,desc:'Utang logistik'}],totalDebit:13750000,totalCredit:13750000},
+  {id:'BILL-2025-004',date:'2025-03-15',src:'bill',srcRef:'BILL004',srcLabel:'Bill BILL004',memo:'Pencatatan biaya konsultasi audit internal',status:'posted',type:null,isAI:false,createdBy:'Budi Santoso',createdDate:'2025-03-15',postedBy:'Sarah Wijaya',postedDate:'2025-03-20',voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},lines:[{acct:'5-1070',acctName:'Biaya Konsultan & Profesional',debit:25000000,credit:0,desc:'Jasa konsultasi'},{acct:'5-2200',acctName:'Beban PPN Masukan',debit:2500000,credit:0,desc:'PPN masukan'},{acct:'2-1100',acctName:'Utang Usaha',debit:0,credit:27500000,desc:'Utang konsultasi'}],totalDebit:27500000,totalCredit:27500000},
+  {id:'BILL-2025-005',date:'2025-03-15',src:'bill',srcRef:'BILL005',srcLabel:'Bill BILL005',memo:'Pencatatan pembelian bahan baku jagung dari koperasi tani',status:'posted',type:null,isAI:false,createdBy:'Sarah Wijaya',createdDate:'2025-03-15',postedBy:'Andi Prasetyo',postedDate:'2025-03-18',voidedBy:null,voidReason:null,dims:{dept:'Operations',proj:'Project Beta'},lines:[{acct:'6-1000',acctName:'Biaya Pokok Penjualan',debit:12500000,credit:0,desc:'Bahan baku jagung'},{acct:'5-2200',acctName:'Beban PPN Masukan',debit:1250000,credit:0,desc:'PPN masukan'},{acct:'2-1100',acctName:'Utang Usaha',debit:0,credit:13750000,desc:'Utang bahan baku'}],totalDebit:13750000,totalCredit:13750000},
+  // Posted — manual JE (ref: JE-)
+  {id:'JE-2025-001',date:'2025-02-10',src:'je',srcRef:null,srcLabel:null,memo:'Pembayaran utang pembelian komponen elektronik ke PT Supplier',status:'posted',type:'manual',isAI:false,createdBy:'Andi Prasetyo',createdDate:'2025-02-10',postedBy:'Sarah Wijaya',postedDate:'2025-02-10',voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},lines:[{acct:'2-1100',acctName:'Utang Usaha',debit:82500000,credit:0,desc:'Bayar utang supplier'},{acct:'1-1100',acctName:'Kas & Bank',debit:0,credit:82500000,desc:'Kas keluar'}],totalDebit:82500000,totalCredit:82500000},
+  {id:'JE-2025-002',date:'2025-02-05',src:'je',srcRef:null,srcLabel:null,memo:'Pembayaran utang peralatan kantor ke CV Toko Bangunan Jaya',status:'posted',type:'manual',isAI:false,createdBy:'Andi Prasetyo',createdDate:'2025-02-05',postedBy:'Sarah Wijaya',postedDate:'2025-02-05',voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},lines:[{acct:'2-1100',acctName:'Utang Usaha',debit:21120000,credit:0,desc:'Bayar utang'},{acct:'1-1100',acctName:'Kas & Bank',debit:0,credit:21120000,desc:'Kas keluar'}],totalDebit:21120000,totalCredit:21120000},
+  {id:'JE-2025-003',date:'2025-02-16',src:'je',srcRef:null,srcLabel:null,memo:'Pembayaran biaya logistik ke PT Jasa Logistik Cepat',status:'posted',type:'manual',isAI:false,createdBy:'Andi Prasetyo',createdDate:'2025-02-16',postedBy:'Sarah Wijaya',postedDate:'2025-02-16',voidedBy:null,voidReason:null,dims:{dept:'Operations',proj:''},lines:[{acct:'2-1100',acctName:'Utang Usaha',debit:13750000,credit:0,desc:'Bayar utang logistik'},{acct:'1-1100',acctName:'Kas & Bank',debit:0,credit:13750000,desc:'Kas keluar'}],totalDebit:13750000,totalCredit:13750000},
+  {id:'JE-2025-004',date:'2025-03-09',src:'je',srcRef:null,srcLabel:null,memo:'Penerimaan pembayaran piutang dari CV Distributor Produk Rumahan',status:'posted',type:'manual',isAI:false,createdBy:'Rina Kusuma',createdDate:'2025-03-09',postedBy:'Andi Prasetyo',postedDate:'2025-03-09',voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},lines:[{acct:'1-1100',acctName:'Kas & Bank',debit:9625000,credit:0,desc:'Terima kas'},{acct:'1-1200',acctName:'Piutang Usaha',debit:0,credit:9625000,desc:'Pelunasan piutang'}],totalDebit:9625000,totalCredit:9625000},
+  {id:'JE-2025-005',date:'2025-03-10',src:'je',srcRef:null,srcLabel:null,memo:'Penerimaan pembayaran piutang dari PT Ritel Utama Indonesia',status:'posted',type:'manual',isAI:false,createdBy:'Sarah Wijaya',createdDate:'2025-03-10',postedBy:'Budi Santoso',postedDate:'2025-03-10',voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},lines:[{acct:'1-1100',acctName:'Kas & Bank',debit:24200000,credit:0,desc:'Terima kas'},{acct:'1-1200',acctName:'Piutang Usaha',debit:0,credit:24200000,desc:'Pelunasan piutang'}],totalDebit:24200000,totalCredit:24200000},
+  {id:'JE-2025-006',date:'2025-03-11',src:'je',srcRef:null,srcLabel:null,memo:'Penerimaan pembayaran piutang dari Toko Modern Bandung',status:'posted',type:'manual',isAI:false,createdBy:'Andi Prasetyo',createdDate:'2025-03-11',postedBy:'Sarah Wijaya',postedDate:'2025-03-11',voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},lines:[{acct:'1-1100',acctName:'Kas & Bank',debit:18562500,credit:0,desc:'Terima kas'},{acct:'1-1200',acctName:'Piutang Usaha',debit:0,credit:18562500,desc:'Pelunasan piutang'}],totalDebit:18562500,totalCredit:18562500},
+  {id:'JE-2025-007',date:'2025-04-10',src:'je',srcRef:null,srcLabel:null,memo:'Pembayaran biaya konsultasi ke PT Penyedia Layanan Konsultasi',status:'posted',type:'manual',isAI:false,createdBy:'Sarah Wijaya',createdDate:'2025-04-10',postedBy:'Andi Prasetyo',postedDate:'2025-04-10',voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},lines:[{acct:'2-1100',acctName:'Utang Usaha',debit:27500000,credit:0,desc:'Bayar utang konsultasi'},{acct:'1-1100',acctName:'Kas & Bank',debit:0,credit:27500000,desc:'Kas keluar'}],totalDebit:27500000,totalCredit:27500000},
+  // Void — manual JE
+  {id:'JE-2025-008',date:'2025-02-12',src:'je',srcRef:null,srcLabel:null,memo:'Penerimaan piutang PT Ritel Utama — duplikat, sudah dicatat di JE-2025-005',status:'void',type:'manual',isAI:false,createdBy:'Sarah Wijaya',createdDate:'2025-02-12',postedBy:'Andi Prasetyo',postedDate:'2025-02-12',voidedBy:'Sarah Wijaya',voidReason:'Duplikat — transaksi sudah tercatat di JE-2025-005',dims:{dept:'Finance',proj:''},lines:[{acct:'1-1100',acctName:'Kas & Bank',debit:33000000,credit:0,desc:'Terima kas (duplikat)'},{acct:'1-1200',acctName:'Piutang Usaha',debit:0,credit:33000000,desc:'Pelunasan piutang (duplikat)'}],totalDebit:33000000,totalCredit:33000000},
+  // Draft — AI generated (pending approval)
+  {id:'JE-2025-009',date:'2025-04-15',src:'je',srcRef:null,srcLabel:null,memo:'Penyesuaian akrual beban gaji April 2025',status:'draft',type:'adj',isAI:true,aiAcc:91,createdBy:'Sistem AI',createdDate:'2025-04-15',postedBy:null,postedDate:null,voidedBy:null,voidReason:null,dims:{dept:'HRD',proj:''},lines:[{acct:'5-1010',acctName:'Beban Gaji',debit:45000000,credit:0,desc:'Akrual gaji April'},{acct:'2-1300',acctName:'Utang Gaji',debit:0,credit:45000000,desc:'Akrual utang gaji'}],totalDebit:45000000,totalCredit:45000000},
+  {id:'JE-2025-010',date:'2025-04-16',src:'je',srcRef:null,srcLabel:null,memo:'Pencatatan penyusutan aset tetap April 2025',status:'draft',type:'adj',isAI:true,aiAcc:88,createdBy:'Sistem AI',createdDate:'2025-04-16',postedBy:null,postedDate:null,voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},lines:[{acct:'5-1040',acctName:'Beban Penyusutan',debit:8500000,credit:0,desc:'Penyusutan peralatan kantor'},{acct:'1-2110',acctName:'Akum. Penyusutan Peralatan',debit:0,credit:8500000,desc:'Akumulasi penyusutan'}],totalDebit:8500000,totalCredit:8500000},
+  // Draft — manual (pending approval from manager)
+  {id:'JE-2025-011',date:'2025-04-17',src:'je',srcRef:null,srcLabel:null,memo:'Reimbursement biaya perjalanan dinas tim Sales April',status:'draft',type:'manual',isAI:false,createdBy:'Budi Santoso',createdDate:'2025-04-17',postedBy:null,postedDate:null,voidedBy:null,voidReason:null,dims:{dept:'Marketing',proj:'Project Alpha'},lines:[{acct:'5-1060',acctName:'Beban Perjalanan Dinas',debit:3750000,credit:0,desc:'Transport & akomodasi'},{acct:'1-1100',acctName:'Kas & Bank',debit:0,credit:3750000,desc:'Kas keluar reimburse'}],totalDebit:3750000,totalCredit:3750000},
+  // Draft — overdue (created 2025-04-14, >48h ago from today 2025-04-19)
+  {id:'JE-2025-012',date:'2025-04-14',src:'je',srcRef:null,srcLabel:null,memo:'Koreksi pencatatan beban operasional Maret 2025 — perlu konfirmasi departemen',status:'draft',type:'manual',isAI:false,createdBy:'Rina Kusuma',createdDate:'2025-04-14',postedBy:null,postedDate:null,voidedBy:null,voidReason:null,dims:{dept:'Operations',proj:''},coaFlag:false,lines:[{acct:'5-1000',acctName:'Beban Operasional',debit:5200000,credit:0,desc:'Koreksi beban'},{acct:'1-1100',acctName:'Kas & Bank',debit:0,credit:5200000,desc:'Kas keluar'}],totalDebit:5200000,totalCredit:5200000},
+  // Pending — awaiting approval (manual, CoA flagged as anomali)
+  {id:'JE-2025-013',date:'2025-04-17',src:'je',srcRef:null,srcLabel:null,memo:'Perbaikan peralatan kantor — biaya dibebankan ke pendapatan diterima dimuka',status:'pending',type:'manual',isAI:false,createdBy:'Budi Santoso',createdDate:'2025-04-17',postedBy:null,postedDate:null,voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},coaFlag:true,lines:[{acct:'5-1080',acctName:'Biaya Perbaikan',debit:3200000,credit:0,desc:'Perbaikan AC kantor'},{acct:'2-1400',acctName:'Pendapatan Diterima Dimuka',debit:0,credit:3200000,desc:'Offset tidak lazim'}],totalDebit:3200000,totalCredit:3200000},
+  // Pending — AI generated, needs approval
+  {id:'JE-2025-014',date:'2025-04-18',src:'je',srcRef:null,srcLabel:null,memo:'Penyesuaian penyusutan aset tetap — High-Value asset category',status:'pending',type:'adj',isAI:true,aiAcc:88,createdBy:'Sistem AI',createdDate:'2025-04-18',postedBy:null,postedDate:null,voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},coaFlag:false,lines:[{acct:'5-1040',acctName:'Beban Penyusutan',debit:8500000,credit:0,desc:'Penyusutan aset High-Value'},{acct:'1-2110',acctName:'Akum. Penyusutan Peralatan',debit:0,credit:8500000,desc:'Akumulasi penyusutan'}],totalDebit:8500000,totalCredit:8500000},
+  // Reversal — auto-created jurnal pembalik
+  {id:'JE-2025-008-R',date:'2025-02-13',src:'je',srcRef:'JE-2025-008',srcLabel:null,memo:'[Pembalik] Penerimaan piutang PT Ritel Utama — jurnal pembalik otomatis',status:'reversal',type:'reversal',isAI:false,createdBy:'Sistem',createdDate:'2025-02-13',postedBy:'Sarah Wijaya',postedDate:'2025-02-13',voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},coaFlag:false,lines:[{acct:'1-1200',acctName:'Piutang Usaha',debit:33000000,credit:0,desc:'Pembalik: pelunasan piutang'},{acct:'1-1100',acctName:'Kas & Bank',debit:0,credit:33000000,desc:'Pembalik: kas masuk'}],totalDebit:33000000,totalCredit:33000000},
+];
+
+// Running balance (opening Kas = 500jt, simple net per JE)
+const OPENING_BAL = 500000000;
+function getRunningBalance(includeIds) {
+  let bal = OPENING_BAL;
+  JE_DATA.filter(r => r.status==='posted' && includeIds.includes(r.id)).forEach(r => { bal += r.totalDebit - r.totalCredit; });
+  return bal;
+}
+
+// ── FILTER STATE ──
+let fStatus='', fSearch='', fFrom='', fTo='', fSource='', fType='';
+let sortCol='date', sortDir='desc';
+let curPage=1, PAGE_SIZE=20;
+let activeId=null;
+let anomalyMode=false;
+
+const TODAY_D = new Date(TODAY+'T00:00:00');
+
+function srcOf(r){ if(r.src==='invoice') return 'invoice'; if(r.src==='bill') return 'bill'; return 'je'; }
+function isOverdue(r){ if(r.status!=='draft') return false; const c=new Date(r.createdDate+'T00:00:00'); return (TODAY_D-c)>=48*3600000; }
+
+function getFiltered(){
+  return JE_DATA.filter(r=>{
+    if(anomalyMode){ const u=r.totalDebit!==r.totalCredit; if(!u&&r.status!=='draft') return false; }
+    if(fStatus && r.status!==fStatus) return false;
+    if(fSearch && !(r.id+r.memo).toLowerCase().includes(fSearch)) return false;
+    if(fFrom && r.date<fFrom) return false;
+    if(fTo && r.date>fTo) return false;
+    if(fSource && srcOf(r)!==fSource) return false;
+    if(fType && r.type!==fType) return false;
+    return true;
+  });
+}
+const STATUS_ORDER = {pending:0, draft:1, posted:2, void:3, reversal:4};
+function getSorted(rows){
+  // Default sort: pending first, draft second, then by date desc
+  if(sortCol==='date'&&sortDir==='desc'){
+    return [...rows].sort((a,b)=>{
+      const so=(STATUS_ORDER[a.status]??5)-(STATUS_ORDER[b.status]??5);
+      if(so!==0) return so;
+      return b.date.localeCompare(a.date);
+    });
+  }
+  return[...rows].sort((a,b)=>{
+    let va=a[sortCol]||'',vb=b[sortCol]||'';
+    if(sortCol==='debit'){va=a.totalDebit;vb=b.totalDebit;}
+    if(sortCol==='credit'){va=a.totalCredit;vb=b.totalCredit;}
+    const c=va<vb?-1:va>vb?1:0; return sortDir==='asc'?c:-c;
+  });
+}
+function applyFilters(){ fSearch=g('localSearch').value.toLowerCase(); fFrom=g('fdFrom').value; fTo=g('fdTo').value; fSource=g('fdSource').value; fType=g('fdType').value; curPage=1; updateFilterBadge(); renderTable(); }
+function updateFilterBadge(){ let c=0;if(fFrom||fTo)c++;if(fSource)c++;if(fType)c++;const b=g('filterBadge');b.style.display=c?'inline-flex':'none';b.textContent=c; }
+function setStatusFilter(v){ fStatus=v; g('statusChips').querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.v===v));applyFilters(); }
+function resetFilters(){ fFrom='';fTo='';fSource='';fType='';g('fdFrom').value='';g('fdTo').value='';g('fdSource').value='';g('fdType').value='';document.querySelectorAll('.fd-sc').forEach(s=>s.classList.remove('on'));applyFilters(); }
+function setDSC(el){ document.querySelectorAll('.fd-sc').forEach(s=>s.classList.remove('on'));el.classList.add('on');const r=el.dataset.r;const t=TODAY;if(r==='today'){g('fdFrom').value=t;g('fdTo').value=t;}else if(r==='week'){const d=new Date(TODAY_D);d.setDate(d.getDate()-7);g('fdFrom').value=d.toISOString().slice(0,10);g('fdTo').value=t;}else if(r==='month'){g('fdFrom').value='2025-04-01';g('fdTo').value=t;}else if(r==='q1'){g('fdFrom').value='2025-01-01';g('fdTo').value='2025-03-31';}else{g('fdFrom').value='';g('fdTo').value='';}applyFilters(); }
+
+// ── RENDER TABLE ──
+function renderTable(){
+  const filtered=getFiltered(), sorted=getSorted(filtered);
+  const total=sorted.length, pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+  if(curPage>pages) curPage=pages;
+  const start=(curPage-1)*PAGE_SIZE, pageRows=sorted.slice(start,start+PAGE_SIZE);
+  const tbody=g('jeBody'), empty=g('emptyState');
+  if(!total){ tbody.innerHTML=''; empty.style.display='block'; }
+  else {
+    empty.style.display='none';
+    tbody.innerHTML=pageRows.map(r=>{
+      const ov=isOverdue(r);
+      let rowCls='';
+      if(r.status==='void') rowCls='row-void';
+      else if(r.status==='reversal') rowCls='row-reversal';
+      else if(r.status==='pending') rowCls='row-pending';
+      else if(r.status==='draft'){ rowCls=ov?'row-overdue':'row-draft'; }
+      if(r.isAI && (r.status==='draft'||r.status==='pending')) rowCls='row-ai';
+      if(r.id===activeId) rowCls='active-row';
+      if(r.coaFlag) rowCls+=' row-coa-flag';
+      const srcBadge=r.src==='invoice'?`<span class="src-badge inv">Invoice</span>`:r.src==='bill'?`<span class="src-badge bill">Bill</span>`:'';
+      const aiBadge=r.isAI?`<span class="ai-badge">✦ AI ${r.aiAcc}%</span>`:'';
+      const ovBadge=ov&&r.status==='draft'?`<span class="overdue-badge">⏰ >48 jam</span>`:'';
+      const coaBadge=r.coaFlag?`<span class="coa-flag"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>CoA Flag</span>`:'';
+      const statusLabel={posted:'Posted',draft:'Draft',void:'Void',pending:'Pending',reversal:'Reversal'}[r.status]||r.status;
+      const statusBadge=`<span class="status-badge ${r.status}">${statusLabel}</span>`;
+      // Numbers without Rp prefix, bold via td-num class
+      const fmtNum = n => n ? Math.abs(n).toLocaleString('id-ID') : '–';
+      return `<tr class="${rowCls.trim()}" onclick="openDrawer('${r.id}')">
+        <td class="td-date">${fmtDate(r.date)}</td>
+        <td><span class="td-ref">${r.id}</span></td>
+        <td class="td-memo">${srcBadge}<span class="td-memo-text">${r.memo}</span>${aiBadge}${ovBadge}${coaBadge}</td>
+        <td class="td-lines">${r.lines.length}</td>
+        <td class="td-num">${fmtNum(r.totalDebit)}</td>
+        <td class="td-num">${fmtNum(r.totalCredit)}</td>
+        <td>${statusBadge}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Status bar
+  const allD=filtered.reduce((s,r)=>s+r.totalDebit,0), allC=filtered.reduce((s,r)=>s+r.totalCredit,0);
+  g('statTotal').textContent=total+' item';
+  g('statShowing').textContent=pageRows.length+' dari '+total;
+  g('statDebit').textContent=fmtRp(allD);
+  g('statCredit').textContent=fmtRp(allC);
+  g('statPage').textContent=curPage+'/'+pages;
+  updateSortHeaders();
+}
+
+// ── SORT ──
+document.querySelectorAll('thead th.sortable').forEach(th=>{
+  th.addEventListener('click',()=>{ const col=th.dataset.col; if(sortCol===col)sortDir=sortDir==='asc'?'desc':'asc';else{sortCol=col;sortDir='asc';} renderTable(); });
+});
+function updateSortHeaders(){ document.querySelectorAll('thead th.sortable').forEach(th=>{ th.classList.remove('sort-asc','sort-desc'); if(th.dataset.col===sortCol)th.classList.add('sort-'+sortDir); }); }
+
+// ── STATUS CHIPS ──
+g('statusChips').addEventListener('click',e=>{ const c=e.target.closest('.chip');if(!c)return; fStatus=c.dataset.v; g('statusChips').querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===c)); anomalyMode=false; curPage=1;renderTable(); });
+
+// ── PAGINATION ──
+function setTimeChip(el){
+  const wasOn=el.classList.contains('on');
+  document.querySelectorAll('#timeChips .chip').forEach(c=>c.classList.remove('on'));
+  if(!wasOn){ el.classList.add('on'); setDSC({dataset:{r:el.dataset.r}}); }
+  else { fFrom='';fTo='';g('fdFrom').value='';g('fdTo').value='';applyFilters(); }
+}
+
+// ── ANOMALY TX SECTION ──
+const ATX_FLAGS = {
+  coa:    { resolved:false },
+  pending:{ resolved:false },
+  draft:  { resolved:false }
+};
+let atxOpen=true;
+
+// Per-section item lists (resolved tracked per item)
+const ATX_ITEMS = {
+  coa: [
+    { ref:'JE-2025-013', desc:'Perbaikan peralatan kantor', amt:'3.200.000', bgCls:'background:rgba(160,32,32,.04);border-color:var(--danger-border)', ctaValidate:true, ctaReclassify:true, resolved:false }
+  ],
+  pending: [
+    { ref:'JE-2025-014', desc:'Penyesuaian penyusutan aset tetap April 2025', amt:'8.500.000', aiAcc:88, bgCls:'background:rgba(122,77,0,.04);border-color:var(--warning-border)', ctaValidate:false, ctaReclassify:false, resolved:false },
+    { ref:'JE-2025-013', desc:'Perbaikan peralatan kantor — CoA tidak wajar', amt:'3.200.000', bgCls:'background:rgba(122,77,0,.04);border-color:var(--warning-border)', ctaValidate:false, ctaReclassify:false, resolved:false }
+  ],
+  draft: [
+    { ref:'JE-2025-012', desc:'Koreksi beban operasional Maret 2025 — perlu konfirmasi departemen', amt:'5.200.000', bgCls:'background:rgba(122,77,0,.04);border-color:var(--warning-border)', ctaValidate:false, ctaReclassify:false, resolved:false },
+    { ref:'JE-2025-010', desc:'Pencatatan penyusutan aset tetap April 2025', amt:'8.500.000', bgCls:'background:rgba(122,77,0,.04);border-color:var(--warning-border)', ctaValidate:false, ctaReclassify:false, resolved:false },
+    { ref:'JE-2025-009', desc:'Penyesuaian akrual beban gaji April 2025', amt:'45.000.000', bgCls:'background:rgba(122,77,0,.04);border-color:var(--warning-border)', ctaValidate:false, ctaReclassify:false, resolved:false }
+  ]
+};
+
+const ATX_SECTIONS = [
+  { key:'coa',     label:'CoA Tidak Wajar',           subFn: (n)=>`${n} transaksi terdeteksi terdapat akun CoA yang tidak wajar` },
+  { key:'pending', label:'Item dengan Status Pending', subFn: (n)=>`${n} item pending menunggu persetujuan Anda` },
+  { key:'draft',   label:'Item Draft',                 subFn: (n)=>`${n} draft belum diposting atau belum dikirim untuk approval` }
+];
+
+function toggleAtx(){
+  atxOpen=!atxOpen;
+  g('atxItems').style.display=atxOpen?'block':'none';
+  const chev=g('atxChevron'); if(chev) chev.style.transform=atxOpen?'':'rotate(180deg)';
+}
+
+function renderAnomalyTxSection(){
+  const sec=g('anomalyTxSection');
+  const allResolved=ATX_SECTIONS.every(s=>ATX_ITEMS[s.key].every(it=>it.resolved));
+
+  if(allResolved){
+    // All-safe state — success green, matches screenshot
+    sec.style.background='#F0FAF4';
+    sec.style.borderColor='#A8D9BC';
+    sec.style.borderLeft='4px solid #A8D9BC';
+    const icon=g('atxHeaderIcon');
+    if(icon){ icon.style.background='var(--success-surface)'; icon.style.border='1.5px solid var(--success-border)'; icon.innerHTML='<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--success-text);fill:none;stroke-width:2.5"><polyline points="20 6 9 17 4 12"/></svg>'; }
+    const title=g('atxHeaderTitle'); if(title){ title.textContent='Semua item sudah aman'; title.style.color='var(--success-text)'; title.style.fontWeight='700'; }
+    const sub=g('atxHeaderSub'); if(sub){ sub.textContent='Tidak ada anomali yang terdeteksi. Data siap untuk proses penutupan periode.'; sub.style.display=''; sub.style.color='var(--success-text)'; sub.style.opacity='.75'; }
+    const chev=g('atxChevron'); if(chev) chev.style.stroke='var(--success-text)';
+    g('atxItems').innerHTML='<div style="padding:0 18px 12px;font-size:12px;color:var(--success-text);opacity:.7">Tidak ada transaksi yang perlu ditinjau.</div>';
+    g('atxItems').style.display=atxOpen?'block':'none';
+    return;
+  }
+
+  // Reset header to warning state
+  sec.style.background='';sec.style.borderColor='';sec.style.borderLeft='';
+  const icon=g('atxHeaderIcon');
+  if(icon){ icon.style.background='';icon.style.border='';icon.innerHTML='<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'; }
+  const title=g('atxHeaderTitle'); if(title){title.textContent='Anomali Transaksi Terdeteksi';title.style.color='';title.style.fontWeight='';}
+  const sub=g('atxHeaderSub'); if(sub){sub.textContent='AI mendeteksi pola transaksi menyimpang. Peninjauan diperlukan untuk memastikan integritas data sebelum proses penutupan periode dilakukan.';sub.style.display='';sub.style.color='';sub.style.opacity='';}
+  const chev=g('atxChevron'); if(chev) chev.style.stroke='';
+
+  g('atxItems').style.display=atxOpen?'block':'none';
+
+  const sections=ATX_SECTIONS.filter(s=>!ATX_ITEMS[s.key].every(it=>it.resolved));
+
+  g('atxItems').innerHTML=`<div style="padding:0 18px 14px;display:flex;flex-direction:column;gap:8px">${sections.map(s=>{
+    const activeItems=ATX_ITEMS[s.key].filter(it=>!it.resolved);
+    const count=activeItems.length;
+    const canPost=(s.key==='pending'||s.key==='draft');
+    return `<div class="atx-item-card" style="background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);overflow:hidden">
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none" onclick="toggleAtxSection(this)">
+        <div style="width:28px;height:28px;background:var(--color-surface-sunken);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;color:var(--color-text-primary)">${s.label}</div>
+          <div style="font-size:12px;color:var(--color-text-tertiary);margin-top:2px">${s.subFn(count)}</div>
+        </div>
+        <span style="font-size:11px;font-weight:700;min-width:22px;height:22px;background:#E8C870;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;color:#7A4D00;padding:0 6px;flex-shrink:0">${count}</span>
+        <svg class="atx-sec-chevron" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;flex-shrink:0;transition:transform .2s ease;transform:rotate(180deg)"><polyline points="18 15 12 9 6 15"/></svg>
+      </div>
+      <div class="atx-sec-body" style="border-top:1px solid var(--color-border-default);padding:10px 14px;display:none;flex-direction:column;gap:7px">
+        ${activeItems.map(it=>{
+          const aiBadge=it.aiAcc?`<span class="ai-badge" style="margin-right:5px">✦ AI ${it.aiAcc}%</span>`:'';
+          return `<div style="padding:9px 11px;border-radius:var(--radius-sm);border:1px solid;${it.bgCls}">
+            <div style="font-size:12px;color:var(--color-text-primary);margin-bottom:7px;display:flex;align-items:center;flex-wrap:wrap;gap:4px">${aiBadge}<span style="font-family:var(--font-mono);font-weight:700">${it.ref}</span> <span style="color:var(--color-text-secondary)">— ${it.desc}</span> <span style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary);margin-left:auto">Rp ${it.amt}</span></div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+              <button class="atx-btn view" onclick="focusRow('${it.ref}')">Lihat item</button>
+              ${canPost?`<button style="font-family:var(--font-sans);font-size:11px;font-weight:700;padding:4px 12px;border-radius:var(--radius-sm);cursor:pointer;background:var(--color-action);color:#fff;border:none;transition:background var(--transition-fast)" onmouseover="this.style.background='var(--color-action-hover)'" onmouseout="this.style.background='var(--color-action)'" onclick="atxPostItem('${s.key}','${it.ref}')"><svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.5;vertical-align:middle;margin-right:3px"><polyline points="20 6 9 17 4 12"/></svg>Post Jurnal</button>`:''}
+              ${it.ctaValidate?`<button class="atx-btn validate" onclick="atxMarkItemValid('${s.key}','${it.ref}')">Tandai sebagai valid</button>`:''}
+              ${it.ctaReclassify?`<button class="atx-btn reclassify" onclick="atxReclassifyItem('${s.key}','${it.ref}')">Reklasifikasi</button>`:''}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function atxPostItem(sKey, ref){
+  // Post the journal entry
+  const je=JE_DATA.find(j=>j.id===ref);
+  if(je){ je.status='posted'; je.postedBy='Sarah Wijaya'; je.postedDate=TODAY; }
+  // Resolve in ALL sections that contain this ref
+  Object.keys(ATX_ITEMS).forEach(key=>{
+    ATX_ITEMS[key].forEach(it=>{ if(it.ref===ref) it.resolved=true; });
+  });
+  showToast(ref+' berhasil di-post ✓');
+  renderAnomalyTxSection(); renderTable();
+}
+
+function toggleAtxSection(hdr){
+  const body=hdr.nextElementSibling;
+  const chev=hdr.querySelector('.atx-sec-chevron');
+  const open=body.style.display==='flex';
+  body.style.display=open?'none':'flex';
+  if(chev) chev.style.transform=open?'rotate(180deg)':'';
+}
+
+function atxMarkItemValid(sKey, ref){
+  const item=ATX_ITEMS[sKey].find(it=>it.ref===ref);
+  if(item) item.resolved=true;
+  const je=JE_DATA.find(j=>j.id===ref);
+  if(je) je.coaFlag=false;
+  showToast('Ditandai valid · '+ref);
+  renderAnomalyTxSection(); renderTable();
+}
+
+function atxReclassifyItem(sKey, ref){
+  const item=ATX_ITEMS[sKey].find(it=>it.ref===ref);
+  if(item) item.resolved=true;
+  showToast('Jurnal koreksi dibuat untuk '+ref);
+  renderAnomalyTxSection(); renderTable();
+}
+
+// Keep old signatures for backward compat
+function atxMarkValid(key,id){ atxMarkItemValid(key,id); }
+function atxReclassify(key,id){ atxReclassifyItem(key,id); }
+function dismissAnomalyTx(){ /* no-op, replaced by accordion */ }
+
+function focusRow(id){
+  fStatus=''; g('statusChips').querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.v===''));
+  fSearch=''; g('localSearch').value=''; applyFilters();
+  setTimeout(()=>{
+    activeId=id; renderTable();
+    const el=g('jeBody').querySelector('tr.active-row');
+    if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+  },100);
+}
+
+// ── EXPORT SCOPE ──
+let expScope='visible';
+function setExpScope(v,el){ expScope=v; document.querySelectorAll('.exp-scope-btn').forEach(b=>b.classList.remove('on')); el.classList.add('on'); }
+function openAnomalyDrawer(){ g('anomalyDrawer').classList.add('open');g('anomalyDrawerOverlay').classList.add('open'); }
+function closeAnomalyDrawer(){ g('anomalyDrawer').classList.remove('open');g('anomalyDrawerOverlay').classList.remove('open'); }
+function investigateAll(){
+  closeAnomalyDrawer();
+  // Filter table to show only the 3 flagged entries
+  const flaggedIds=['JE-2025-012','JE-2025-011','JE-2025-009'];
+  fStatus='draft';
+  g('statusChips').querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.v==='draft'));
+  fSearch=''; g('localSearch').value='';
+  curPage=1; renderTable();
+}
+
+// ── PAGINATION ──
+function changePageSize(v){ PAGE_SIZE=v; curPage=1; renderTable(); }
+function prevPage(){ if(curPage>1){curPage--;renderTable();} }
+function nextPage(){ const p=Math.max(1,Math.ceil(getFiltered().length/PAGE_SIZE)); if(curPage<p){curPage++;renderTable();} }
+
+// ── FILTER DRAWER ──
+function openFilterDrawer(){ g('filterDrawer').classList.add('open');g('filterOverlay').classList.add('open'); }
+function closeFilterDrawer(){ g('filterDrawer').classList.remove('open');g('filterOverlay').classList.remove('open'); }
+
+// ── DETAIL DRAWER ──
+function openDrawer(id){
+  const je=JE_DATA.find(j=>j.id===id); if(!je) return;
+  activeId=id;
+  g('dRef').textContent=je.id;
+  const badge=g('dBadge');
+  const statusLabels={posted:'Posted',draft:'Draft',void:'Void',pending:'Pending',reversal:'Reversal'};
+  badge.className='d-badge '+(je.status==='reversal'?'void':je.status);
+  badge.textContent=statusLabels[je.status]||je.status;
+
+  const tD=je.lines.reduce((s,l)=>s+(l.debit||0),0);
+  const tC=je.lines.reduce((s,l)=>s+(l.credit||0),0);
+
+  // TAB 0 — DETAIL
+  const src=srcOf(je);
+  const openLink=(je.srcRef&&src!=='je')?`<div class="d-open-link" onclick="showToast('Membuka ${je.srcRef} di halaman ${src==='invoice'?'Invoices':'Bills'}…')"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Buka ${je.srcRef}</div>`:'';
+  const typeRow=(src==='je'&&je.type&&je.type!=='reversal')?`<div class="info-row"><label>Tipe Jurnal</label><span>${{manual:'Manual',adj:'Penyesuaian',reversal:'Pembalik',closing:'Penutup'}[je.type]}</span></div>`:'';
+  const aiRow=je.isAI?`<div class="info-row"><label>Generate by AI</label><span style="color:var(--color-action)">✦ Ya · Akurasi ${je.aiAcc}%</span></div>`:'';
+  const voidRow=je.voidedBy?`<div class="info-row"><label>Di-void oleh</label><span>${je.voidedBy}</span></div><div class="info-row"><label>Alasan void</label><span style="color:var(--danger-text);text-align:right">${je.voidReason}</span></div>`:'';
+  const overdueBannerHtml=isOverdue(je)?`<div style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--danger-surface);border:1px solid var(--danger-border);border-radius:var(--radius-sm);margin-bottom:12px;font-size:11px;color:var(--danger-text);font-weight:600"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Draft ini sudah tertunda lebih dari 48 jam</div>`:'';
+  const dimHtml=(je.dims&&(je.dims.dept||je.dims.proj))?`<div class="dsec"><div class="dlbl">Dimensi</div><div style="display:flex;flex-wrap:wrap;gap:6px">${je.dims.dept?`<span class="dpill dp-dept">Dept: ${je.dims.dept}</span>`:''} ${je.dims.proj?`<span class="dpill dp-proj">Proj: ${je.dims.proj}</span>`:''}</div></div>`:'';
+
+  // CoA flag banner
+  const coaBannerHtml=je.coaFlag?`<div style="display:flex;align-items:center;gap:7px;padding:8px 12px;background:var(--danger-surface);border:1px solid var(--danger-border);border-radius:var(--radius-sm);margin-bottom:12px;font-size:11px;color:var(--danger-text)"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg><span><strong>⚠ CoA Flag:</strong> Akun [Biaya Perbaikan] dipasangkan dengan [Pendapatan Diterima Dimuka] — pola tidak lazim.</span></div>`:'';
+
+  // AI reason card
+  const AI_REASONS={'JE-2025-009':'Sistem mendeteksi pola akrual gaji April berdasarkan histori bulan sebelumnya (Jan–Mar 2025). Nominal Rp 45.000.000 dihitung dari rata-rata 3 bulan terakhir.','JE-2025-010':'Penyusutan dihitung otomatis berdasarkan daftar aset tetap aktif. Metode garis lurus diterapkan pada Peralatan Kantor.','JE-2025-014':'Sistem mendeteksi penambahan aset kategori High-Value pada bulan ini. Penyusutan perlu validasi manual.'};
+  const aiCardHtml=je.isAI?`<div class="d-ai-card"><div class="d-ai-card-title">✦ Mengapa AI membuat jurnal ini?</div><div class="d-ai-card-text">${AI_REASONS[je.id]||'AI mendeteksi pola transaksi berulang dan membuat jurnal ini secara otomatis.'}</div><div style="font-size:10px;font-weight:700;color:var(--color-text-tertiary);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Akun yang dipilih</div><div class="d-ai-acct-list">${je.lines.map(l=>`<div class="d-ai-acct-row"><span class="d-ai-acct-pill"><span class="d-ai-acct-code">${l.acct}</span><span class="d-ai-acct-name">${l.acctName}</span></span><span class="d-ai-conf">${je.aiAcc}% yakin</span></div>`).join('')}</div></div>`:'';
+
+  // Impact analysis box
+  const impactText=je.lines.some(l=>l.acct.startsWith('5')||l.acct.startsWith('6'))?
+    `Entri ini akan meningkatkan saldo <strong>[${je.lines.find(l=>l.debit>0)?.acctName||'Beban'}]</strong> pada Laba Rugi dan menurunkan saldo <strong>[${je.lines.find(l=>l.credit>0)?.acctName||'Kas/Bank'}]</strong> pada Neraca. Rasio likuiditas jangka pendek akan terkoreksi sebesar -0.5%.`:
+    `Entri ini akan mempengaruhi saldo <strong>[${je.lines.find(l=>l.debit>0)?.acctName||'—'}]</strong> dan <strong>[${je.lines.find(l=>l.credit>0)?.acctName||'—'}]</strong>. Tidak ada dampak langsung pada rasio likuiditas.`;
+  const impactHtml=`<div class="impact-box"><div class="impact-box-title"><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:var(--color-action);fill:none;stroke-width:2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Item ini berimpact kemana?</div><div class="impact-box-text">${impactText}</div></div>`;
+
+  // Attachments — READ ONLY (no add/delete)
+  const attachFileHtml=je.isAI?`<div class="d-attach-file"><div class="d-attach-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="d-attach-meta"><div class="d-attach-name">Slip_Gaji_Mar2025.pdf</div><div class="d-attach-size">218 KB</div></div></div>`:
+    je.id==='JE-2025-013'?`<div class="d-attach-file"><div class="d-attach-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="d-attach-meta"><div class="d-attach-name">Nota_Perbaikan.pdf</div><div class="d-attach-size">134 KB</div></div></div>`:'';
+  const attachHtml=`<div class="dsec"><div class="dlbl">Lampiran</div><div class="d-attach-wrap">${attachFileHtml||'<div style="font-size:12px;color:var(--color-text-tertiary);padding:8px 0">Tidak ada lampiran</div>'}</div></div>`;
+
+  g('dPane0').innerHTML=`${overdueBannerHtml}${coaBannerHtml}${openLink}<div class="dsec"><div class="dlbl">Informasi Transaksi</div>
+    <div class="info-row"><label>No. Referensi</label><span>${je.id}</span></div>
+    ${typeRow}
+    <div class="info-row"><label>Tanggal</label><span>${fmtDate(je.date)}</span></div>
+    <div class="info-row"><label>Status</label><span>${statusLabels[je.status]||je.status}</span></div>
+    <div class="info-row"><label>Keterangan</label><span style="text-align:right;max-width:200px">${je.memo}</span></div>
+    <div class="info-row"><label>Dibuat oleh</label><span>${je.createdBy}</span></div>
+    <div class="info-row"><label>Tgl. dibuat</label><span>${fmtDate(je.createdDate)}</span></div>
+    ${je.postedBy?`<div class="info-row"><label>Posted oleh</label><span>${je.postedBy}</span></div>`:''}
+    ${aiRow}${voidRow}
+  </div>${dimHtml}${impactHtml}${aiCardHtml}${attachHtml}`;
+
+  // TAB 1 — LINE ITEMS
+  g('dPane1').innerHTML=`<div class="dsec"><div class="dlbl">Line Items</div>
+    <table class="d-tbl">
+      <thead><tr><th>Akun</th><th class="r">Debit (Rp)</th><th class="r">Kredit (Rp)</th></tr></thead>
+      <tbody>${je.lines.map(l=>`<tr>
+        <td><div style="font-weight:600;color:var(--color-text-primary)">${l.acctName}${je.coaFlag&&l.acct==='2-1400'?`<span class="coa-flag" style="margin-left:6px"><svg viewBox="0 0 24 24" style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>Flag</span>`:''}</div><div class="li-sub">${l.acct}${l.desc?' · '+l.desc:''}</div></td>
+        <td class="r" style="color:${l.debit?'#A02020':'var(--color-text-tertiary)'}">${l.debit?fmtRp(l.debit):'–'}</td>
+        <td class="r" style="color:${l.credit?'#166638':'var(--color-text-tertiary)'}">${l.credit?fmtRp(l.credit):'–'}</td>
+      </tr>`).join('')}</tbody>
+      <tfoot><tr><td>Total</td><td class="r">${fmtRp(tD)}</td><td class="r">${fmtRp(tC)}</td></tr>
+      ${tD===tC?'<tr><td colspan="3" style="font-size:10px;color:var(--success-text);text-align:center;background:var(--success-surface);border-radius:4px;padding:4px">✓ Seimbang</td></tr>':''}
+      </tfoot>
+    </table></div>`;
+
+  // TAB 2 — AUDIT TRAIL
+  const auditItems=[];
+  if(je.voidedBy) auditItems.push({type:'void',action:'Di-void',by:je.voidedBy,when:fmtDate(je.createdDate),reason:je.voidReason});
+  if(je.postedBy) auditItems.push({type:'posted',action:'Di-post',by:je.postedBy,when:je.postedDate?fmtDate(je.postedDate):'—'});
+  auditItems.push({type:'created',action:je.isAI?'Di-generate AI':'Dibuat',by:je.createdBy,when:fmtDate(je.createdDate)});
+  g('dPane2').innerHTML=`<div class="dsec"><div class="dlbl">Audit Trail</div><div class="audit-list">
+    ${auditItems.map(a=>`<div class="audit-item">
+      <div class="audit-dot ${a.type}">${a.type==='posted'?'<svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/></svg>':a.type==='void'?'<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>':'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>'}</div>
+      <div class="audit-content"><div class="audit-action">${a.action}</div><div class="audit-meta">oleh <strong>${a.by}</strong> · ${a.when}</div>${a.reason?`<div class="audit-reason">"${a.reason}"</div>`:''}</div>
+    </div>`).join('')}
+  </div></div>`;
+
+  // CTA AREA — per spec gambar
+  const ctaArea=g('dCtaArea');
+  ctaArea.innerHTML=''; ctaArea.style.display='grid';
+
+  if(je.status==='reversal'){
+    // Read-only — no buttons
+    ctaArea.style.display='flex';
+    ctaArea.innerHTML=`<span class="d-cta-info" style="grid-column:1/-1;text-align:center;padding:6px;font-style:italic;color:var(--color-text-tertiary)">read-only — jurnal pembalik tidak dapat diubah</span>`;
+  } else if(je.status==='void'){
+    ctaArea.style.display='none';
+  } else if(je.status==='posted'){
+    if(src==='invoice'){
+      ctaArea.innerHTML=`<span class="d-cta-info">Jurnal dari Invoice</span><button class="btn-primary" onclick="showToast('Membuka ${je.srcRef} di halaman Invoices…')"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Buka di Invoices</button><button class="btn-danger" onclick="openVoidModal('${je.id}')">Void Jurnal</button>`;
+    } else if(src==='bill'){
+      ctaArea.innerHTML=`<span class="d-cta-info">Jurnal dari Bill</span><button class="btn-primary" onclick="showToast('Membuka ${je.srcRef} di halaman Bills…')"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Buka di Bills</button><button class="btn-danger" onclick="openVoidModal('${je.id}')">Void Jurnal</button>`;
+    } else {
+      // Posted manual — single "Balik Jurnal" button (dark red), full width
+      ctaArea.innerHTML=`<button class="d-cta-full" style="background:#7A1F1F;color:#fff;border:none;border-radius:var(--radius-md);padding:11px;font-family:var(--font-sans);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;transition:background var(--transition-fast)" onmouseover="this.style.background='#921F1F'" onmouseout="this.style.background='#7A1F1F'" onclick="openReversalFlow('${je.id}')"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.39"/></svg>Balik Jurnal</button>`;
+    }
+  } else if(je.status==='pending'){
+    // Pending: Tolak (pink/left) | Post Jurnal (blue/right)
+    ctaArea.innerHTML=`<button style="background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border);border-radius:var(--radius-md);padding:10px;font-family:var(--font-sans);font-size:13px;font-weight:600;cursor:pointer;width:100%;transition:all var(--transition-fast)" onmouseover="this.style.background='#f5e0e0'" onmouseout="this.style.background='var(--danger-surface)'" onclick="openRejectModal('${je.id}')">Tolak</button><button class="btn-primary" onclick="approveAndPost('${je.id}')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Post Jurnal</button>`;
+  } else if(je.status==='draft'){
+    // Draft: Edit (white/left) | Post Jurnal (blue/right)
+    ctaArea.innerHTML=`<button style="background:var(--color-surface-raised);color:var(--color-text-primary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:10px;font-family:var(--font-sans);font-size:13px;font-weight:600;cursor:pointer;width:100%;transition:background var(--transition-fast)" onmouseover="this.style.background='var(--color-surface-sunken)'" onmouseout="this.style.background='var(--color-surface-raised)'" onclick="openAddJE('${je.id}')">Edit</button><button class="btn-primary" onclick="approveAndPost('${je.id}')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Post Jurnal</button>`;
+  }
+
+  switchDTab(0, document.querySelector('.d-tab'));
+  g('drawer').classList.add('open');
+  g('drawerOverlay').classList.add('open');
+  renderTable();
+}
+
+function closeDrawer(){ activeId=null; g('drawer').classList.remove('open');g('drawerOverlay').classList.remove('open');renderTable(); }
+function switchDTab(idx){ document.querySelectorAll('.d-tab').forEach((t,i)=>t.classList.toggle('on',i===idx)); document.querySelectorAll('.d-pane').forEach((p,i)=>p.classList.toggle('on',i===idx)); }
+
+// ── MODAL ──
+let modalCb=null;
+function openVoidModal(id){
+  const je=JE_DATA.find(j=>j.id===id); if(!je) return;
+  g('modalIcon').className='modal-icon danger';
+  g('modalIconSvg').setAttribute('viewBox','0 0 24 24');
+  g('modalIconSvg').innerHTML='<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+  g('modalTitle').textContent='Void Jurnal '+je.id;
+  g('modalDesc').textContent='Jurnal yang di-void tidak dapat diproses kembali. Tindakan ini akan tercatat di audit trail.';
+  // Reversal preview
+  const revRef=je.id+'-R';
+  const firstDr=je.lines.find(l=>l.debit>0), firstCr=je.lines.find(l=>l.credit>0);
+  const revDetail=firstDr&&firstCr?`${revRef} · Dr. ${firstCr.acctName} / Cr. ${firstDr.acctName} · ${fmtRp(je.totalDebit)}`:`${revRef} · Jurnal pembalik`;
+  g('modalReversalPreview').style.display='block';
+  g('modalReversalDetail').textContent=revDetail;
+  g('modalFieldWrap').style.display='block';
+  g('modalFieldLabel').textContent='Alasan Void *';
+  g('modalReason').placeholder='Jelaskan alasan void jurnal ini…';
+  g('modalReason').value=''; g('modalChar').textContent='0/200';
+  g('modalConfirmBtn').className='modal-confirm danger';
+  g('modalConfirmBtn').disabled=true;
+  g('modalConfirmIcon').innerHTML='<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+  g('modalConfirmLabel').textContent='Void & Buat Pembalik';
+  modalCb=()=>{ je.status='void'; je.voidedBy='Sarah Wijaya'; je.voidReason=g('modalReason').value; closeModal(); closeDrawer(); showToast('Jurnal '+je.id+' di-void · '+revRef+' dibuat'); renderTable(); };
+  g('modalBd').classList.add('open');
+}
+function openRejectModal(id){
+  const je=JE_DATA.find(j=>j.id===id); if(!je) return;
+  g('modalReversalPreview').style.display='none';
+  g('modalIcon').className='modal-icon warn';
+  g('modalIconSvg').setAttribute('viewBox','0 0 24 24');
+  g('modalIconSvg').innerHTML='<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+  g('modalTitle').textContent='Tolak Draft AI';
+  g('modalDesc').textContent='Draft yang ditolak akan dihapus dari daftar. Alasan penolakan bersifat opsional.';
+  g('modalFieldWrap').style.display='block';
+  g('modalFieldLabel').textContent='Alasan penolakan (opsional)';
+  g('modalReason').placeholder='Misalnya: nominal tidak sesuai, akun salah…';
+  g('modalReason').value=''; g('modalChar').textContent='0/200';
+  g('modalConfirmBtn').className='modal-confirm warn';
+  g('modalConfirmBtn').disabled=false;
+  g('modalConfirmIcon').innerHTML='<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+  g('modalConfirmLabel').textContent='Tolak Draft';
+  modalCb=()=>{ const idx=JE_DATA.findIndex(j=>j.id===id); if(idx>=0)JE_DATA.splice(idx,1); closeModal(); closeDrawer(); showToast('Draft '+id+' berhasil ditolak'); taskDone[1]=true; renderTable(); };
+  g('modalBd').classList.add('open');
+}
+function openDeleteModal(id){
+  const je=JE_DATA.find(j=>j.id===id); if(!je) return;
+  g('modalReversalPreview').style.display='none';
+  g('modalIcon').className='modal-icon danger';
+  g('modalIconSvg').setAttribute('viewBox','0 0 24 24');
+  g('modalIconSvg').innerHTML='<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>';
+  g('modalTitle').textContent='Hapus Draft';
+  g('modalDesc').textContent=`Hapus draft "${je.id}"? Tindakan ini tidak dapat dibatalkan.`;
+  g('modalFieldWrap').style.display='none';
+  g('modalConfirmBtn').className='modal-confirm danger';
+  g('modalConfirmBtn').disabled=false;
+  g('modalConfirmIcon').innerHTML='<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>';
+  g('modalConfirmLabel').textContent='Hapus Draft';
+  modalCb=()=>{ const idx=JE_DATA.findIndex(j=>j.id===id); if(idx>=0)JE_DATA.splice(idx,1); closeModal(); closeDrawer(); showToast('Draft '+id+' berhasil dihapus'); renderTable(); };
+  g('modalBd').classList.add('open');
+}
+function onModalInput(){ const v=g('modalReason').value.trim(); if(g('modalFieldLabel').textContent.includes('*')) g('modalConfirmBtn').disabled=v.length<3; }
+function closeModal(){ g('modalBd').classList.remove('open'); modalCb=null; }
+function confirmModal(){ if(modalCb) modalCb(); }
+
+function approveAndPost(id){
+  const je=JE_DATA.find(j=>j.id===id); if(!je) return;
+  je.status='posted'; je.postedBy='Sarah Wijaya'; je.postedDate=TODAY;
+  // Sync: resolve any ATX_ITEMS referencing this id
+  Object.keys(ATX_ITEMS).forEach(key=>{
+    ATX_ITEMS[key].forEach(it=>{ if(it.ref===id) it.resolved=true; });
+  });
+  closeDrawer(); showToast(id+' berhasil di-post ✓'); renderAnomalyTxSection(); renderTable();
+}
+function openReversalFlow(id){
+  openAddJE(); showToast('Menyiapkan jurnal pembalik untuk '+id);
+}
+
+// ── COMMAND SEARCH ──
+const tbSearch=g('tbSearch'), tbInput=g('tbSearchInput'), cmdDrop=g('cmdDropdown');
+tbInput.addEventListener('focus',()=>{ tbSearch.classList.add('focused'); cmdDrop.classList.add('open'); });
+tbInput.addEventListener('blur',()=>{ tbSearch.classList.remove('focused'); setTimeout(()=>cmdDrop.classList.remove('open'),150); });
+tbInput.addEventListener('input',()=>{
+  const q=tbInput.value.trim();
+  g('cmdAITitle').textContent=q?`✦ "${q}"`:'✦ Tanya AI tentang ini';
+  const res=g('cmdResults');
+  if(!q){res.innerHTML='';return;}
+  const m=JE_DATA.filter(r=>(r.id+r.memo).toLowerCase().includes(q.toLowerCase())).slice(0,4);
+  res.innerHTML=m.length?`<div class="cmd-divider"></div><div class="cmd-section-label">Hasil</div>${m.map(r=>`<div class="cmd-item" onclick="openDrawer('${r.id}');closeCmdDrop()"><div class="cmd-item-icon nav"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg></div><div class="cmd-item-text"><div class="cmd-item-title">${r.id}</div><div class="cmd-item-sub">${r.memo.slice(0,50)}…</div></div></div>`).join('')}`:`<div class="cmd-divider"></div><div style="padding:12px 14px;font-size:12px;color:var(--color-text-tertiary)">Tidak ditemukan</div>`;
+});
+g('cmdAskAI').addEventListener('click',()=>{ const q=tbInput.value.trim(); closeCmdDrop(); tbInput.value=''; openAI('command'); if(q){setTimeout(()=>{addBubble('user',q);const t=showTyping();setTimeout(()=>{t.remove();addBubble('ai',AI_RES[aiCnt%AI_RES.length]);},1200);},100);} });
+function closeCmdDrop(){ cmdDrop.classList.remove('open'); }
+
+// ── EXPORT ──
+function toggleExp(e){ e.stopPropagation(); g('expMenu').classList.toggle('open'); }
+document.addEventListener('click',()=>{ const m=g('expMenu');if(m)m.classList.remove('open'); });
+function doExport(f){ g('expMenu').classList.remove('open'); showToast('Mengunduh Journal_Entry.'+f); }
+
+// ── ADD JE PAGE ──
+function openAddJE(prefill){ g('addJEPage').classList.add('open'); ajeInitLines(); ajeAttachFiles=[]; ajeRenderAttach(); }
+function closeAddJE(){ g('addJEPage').classList.remove('open'); }
+let ajeLines=[],ajeId=0;
+const ACCTS=[{code:'1-1100',name:'Kas & Bank',group:'Aset Lancar'},{code:'1-1200',name:'Piutang Usaha',group:'Aset Lancar'},{code:'1-2100',name:'Peralatan Kantor',group:'Aset Tetap'},{code:'1-2110',name:'Akum. Penyusutan',group:'Aset Tetap'},{code:'2-1100',name:'Utang Usaha',group:'Kewajiban'},{code:'2-1200',name:'Utang Pajak',group:'Kewajiban'},{code:'2-1300',name:'Utang Gaji',group:'Kewajiban'},{code:'4-1010',name:'Penjualan Produk A',group:'Pendapatan'},{code:'4-1020',name:'Penjualan Produk B',group:'Pendapatan'},{code:'5-1000',name:'Beban Operasional',group:'Beban'},{code:'5-1010',name:'Beban Gaji',group:'Beban'},{code:'5-1040',name:'Beban Penyusutan',group:'Beban'},{code:'5-2200',name:'Beban PPN Masukan',group:'Beban'},{code:'6-1000',name:'Biaya Pokok Penjualan',group:'HPP'}];
+function ajeInitLines(){ ajeLines=[]; ajeId=0; ajeAddLine(); ajeAddLine(); ajeRecalc(); }
+function ajeAddLine(){ ajeId++; ajeLines.push({id:ajeId,acct:null,dr:0,cr:0}); ajeRenderLines(); }
+function ajeDelLine(id){ if(ajeLines.length<=2)return; ajeLines=ajeLines.filter(l=>l.id!==id); ajeRenderLines(); ajeRecalc(); }
+function fmtThousands(n){ return n?n.toLocaleString('id-ID'):''; }
+function parseAmt(s){ return parseInt(s.replace(/\./g,'').replace(/\D/g,''))||0; }
+
+function ajeRenderLines(){
+  const tb=g('ajeLinesTbody'); tb.innerHTML='';
+  ajeLines.forEach(l=>{
+    const tr=document.createElement('tr');
+    const lbl=l.acct?`<span style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary);margin-right:4px">${l.acct.code}</span><span>${l.acct.name}</span>`:'<span style="color:var(--color-text-tertiary)">Pilih akun…</span>';
+    tr.innerHTML=`<td style="font-size:11px;color:var(--color-text-tertiary);text-align:center">${l.id}</td><td><div id="aw-${l.id}"><div class="acct-trigger" onclick="ajeOpenAcct(${l.id})">${lbl}<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div></td><td><div class="amt-cell"><input class="amt-input" placeholder="0" value="${fmtThousands(l.dr)}" oninput="this.value=fmtThousands(parseAmt(this.value));ajeLines.find(x=>x.id===${l.id}).dr=parseAmt(this.value);ajeRecalc()" style="color:#A02020"></div></td><td><div class="amt-cell"><input class="amt-input" placeholder="0" value="${fmtThousands(l.cr)}" oninput="this.value=fmtThousands(parseAmt(this.value));ajeLines.find(x=>x.id===${l.id}).cr=parseAmt(this.value);ajeRecalc()" style="color:#166638"></div></td><td><button class="btn-del-row" ${ajeLines.length<=2?'disabled':''} onclick="ajeDelLine(${l.id})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></td>`;
+    tb.appendChild(tr);
+  });
+}
+function ajeOpenAcct(id){
+  const wrap=g('aw-'+id); const trigger=wrap.querySelector('.acct-trigger'); trigger.classList.add('open');
+  const rect=trigger.getBoundingClientRect();
+  const drop=document.createElement('div'); drop.className='acct-drop'; drop.style.top=(rect.bottom+4)+'px'; drop.style.left=rect.left+'px';
+  const s=document.createElement('div');s.className='acct-drop-search';const inp=document.createElement('input');inp.placeholder='Cari akun…';s.appendChild(inp);drop.appendChild(s);
+  const list=document.createElement('div');list.className='acct-drop-list';drop.appendChild(list);
+  function render(q){list.innerHTML='';const f=ACCTS.filter(a=>!q||a.code.toLowerCase().includes(q)||a.name.toLowerCase().includes(q));const gs=[...new Set(f.map(a=>a.group))];gs.forEach(gr=>{const gl=document.createElement('div');gl.className='acct-group-hd';gl.textContent=gr;list.appendChild(gl);f.filter(a=>a.group===gr).forEach(a=>{const o=document.createElement('div');o.className='acct-opt';o.innerHTML=`<span class="ao-code">${a.code}</span><span class="ao-name">${a.name}</span>`;o.onclick=()=>{ajeLines.find(x=>x.id===id).acct=a;drop.remove();trigger.classList.remove('open');ajeRenderLines();ajeRecalc();};list.appendChild(o);});});}
+  render('');inp.addEventListener('input',()=>render(inp.value.trim().toLowerCase()));
+  document.body.appendChild(drop); setTimeout(()=>inp.focus(),30);
+  document.addEventListener('mousedown',function h(e){if(!drop.contains(e.target)&&!wrap.contains(e.target)){drop.remove();trigger.classList.remove('open');document.removeEventListener('mousedown',h);}});
+}
+function ajeRecalc(){
+  let dr=0,cr=0;ajeLines.forEach(l=>{dr+=l.dr||0;cr+=l.cr||0;});
+  const bal=dr>0&&dr===cr, diff=Math.abs(dr-cr);
+  g('ajeBBDr').textContent=dr>0?fmtRp(dr):'—'; g('ajeBBDr').className='bb-val'+(dr===0?' empty':'');
+  g('ajeBBCr').textContent=cr>0?fmtRp(cr):'—'; g('ajeBBCr').className='bb-val'+(cr===0?' empty':'');
+  g('ajeBBDiff').textContent=dr===0&&cr===0?'—':bal?'Seimbang':fmtRp(diff); g('ajeBBDiff').className='bb-val'+(dr===0&&cr===0?' empty':bal?' zero':' nonzero');
+  const total=dr+cr; g('ajeBBDrBar').style.width=total>0?Math.round(dr/total*100)+'%':'0%'; g('ajeBBCrBar').style.width=total>0?Math.round(cr/total*100)+'%':'0%';
+  if(bal){g('ajeBBSt').className='bb-status balanced';g('ajeBBDot').style.background='var(--success-text)';g('ajeBBTxt').textContent='Seimbang';}
+  else if(!dr&&!cr){g('ajeBBSt').className='bb-status empty';g('ajeBBDot').style.background='var(--color-border-default)';g('ajeBBTxt').textContent='Belum ada nominal';}
+  else{g('ajeBBSt').className='bb-status unbalanced';g('ajeBBDot').style.background='var(--danger-text)';g('ajeBBTxt').textContent='Tidak seimbang';}
+  g('btnPostJE').disabled=!bal;
+  const btnApproval=g('btnKirimApproval'); if(btnApproval) btnApproval.disabled=!bal;
+  ajeUpdateImpact();
+}
+
+function ajeUpdateImpact(){
+  const imp=g('ajeImpactText'); if(!imp) return;
+  const drAcct=ajeLines.find(l=>l.dr>0&&l.acct);
+  const crAcct=ajeLines.find(l=>l.cr>0&&l.acct);
+  if(!drAcct&&!crAcct){ imp.textContent='Pilih akun dan isi nominal untuk melihat analisis dampak secara real-time.'; return; }
+  const drName=drAcct?.acct?.name||'—', crName=crAcct?.acct?.name||'—';
+  const isBeban=drAcct&&(drAcct.acct?.code?.startsWith('5')||drAcct.acct?.code?.startsWith('6'));
+  if(isBeban){
+    imp.innerHTML=`Entri ini akan meningkatkan saldo <strong>[${drName}]</strong> pada Laba Rugi dan menurunkan saldo <strong>[${crName}]</strong> pada Neraca. Rasio likuiditas jangka pendek akan terkoreksi sebesar <strong>-0.5%</strong>.`;
+  } else {
+    imp.innerHTML=`Entri ini akan mempengaruhi saldo <strong>[${drName}]</strong> (Debit) dan <strong>[${crName}]</strong> (Kredit). Dampak terhadap rasio keuangan tergantung pada klasifikasi akun final.`;
+  }
+}
+
+function sendForApproval(){
+  showToast('Jurnal dikirim untuk approval · Status → Pending');
+  closeAddJE();
+}
+function openJtype(){ g('jtypeDrawer').classList.add('open');g('jtypeOverlay').classList.add('open'); }
+function closeJtype(){ g('jtypeDrawer').classList.remove('open');g('jtypeOverlay').classList.remove('open'); }
+
+// ── ADD JE ATTACHMENTS ──
+let ajeAttachFiles=[];
+const AJE_FAKE_FILES=['Bukti_Transfer.pdf','Invoice_Vendor.pdf','Rekening_Koran.pdf','Kontrak_2025.pdf','Nota_Pembelian.pdf'];
+function ajeAddAttach(){
+  const name=AJE_FAKE_FILES[ajeAttachFiles.length%AJE_FAKE_FILES.length];
+  const size=(Math.floor(Math.random()*400+80))+' KB';
+  const id='att-'+Date.now();
+  ajeAttachFiles.push({id,name,size});
+  ajeRenderAttach();
+}
+function ajeRemoveAttach(id){
+  ajeAttachFiles=ajeAttachFiles.filter(f=>f.id!==id);
+  ajeRenderAttach();
+}
+function ajeRenderAttach(){
+  const list=g('ajeAttachList');
+  if(!list) return;
+  if(!ajeAttachFiles.length){ list.innerHTML=''; return; }
+  list.innerHTML=`<div class="d-attach-wrap" style="margin-bottom:8px">${ajeAttachFiles.map(f=>`
+    <div class="d-attach-file">
+      <div class="d-attach-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <div class="d-attach-meta"><div class="d-attach-name">${f.name}</div><div class="d-attach-size">${f.size}</div></div>
+      <button class="d-attach-del" onclick="ajeRemoveAttach('${f.id}')">hapus</button>
+    </div>`).join('')}</div>`;
+}
+
+// ── AI PANEL ──
+let aiOpen=false,aiCnt=0,aiHistory=[],aiSessions=[],curSession={id:1,name:'Percakapan Baru',msgs:[]};
+const AI_RES=[
+  'Berdasarkan data Journal Entry PT Sejahtera Makmur Jan–Apr 2025, terdapat 2 draft yang di-generate AI (JE-2025-009 & JE-2025-010) dengan akurasi 88–91% yang menunggu review Anda.',
+  'Running balance saat ini Rp 412.337.500 dari opening balance Rp 500.000.000. Ini mencerminkan net kas keluar yang wajar untuk periode Jan–Apr.',
+  'JE-2025-012 sudah tertunda lebih dari 48 jam sejak 14 April. Sebaiknya segera ditinjau atau dihapus untuk menjaga kebersihan buku.',
+  'Terdapat 1 jurnal yang di-void (JE-2025-008) dengan alasan duplikat. Ini menunjukkan proses review sudah berjalan dengan baik.',
+  'Draft penyusutan aset (JE-2025-010) dengan akurasi 88% — saya rekomendasikan cross-check dengan daftar aset tetap sebelum di-post.',
+];
+function openAI(ctx){ if(!aiOpen){aiOpen=true;g('aiPanel').classList.add('open');if(!curSession.msgs.length){addBubble('ai','Halo! Saya siap membantu analisis Journal Entry PT Sejahtera Makmur. Tanya apa saja tentang jurnal, draft, atau saldo.');}} }
+function closeAI(){ aiOpen=false; g('aiPanel').classList.remove('open'); }
+function addBubble(role,text){ const msgs=g('aiMsgs');const div=document.createElement('div');div.className='ai-bubble '+role;if(role==='ai')div.innerHTML=`<div class="ai-bubble-label">✦ AI TradeOS</div>${text}`;else div.textContent=text;msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;curSession.msgs.push({role,text});aiCnt++; }
+function showTyping(){ const msgs=g('aiMsgs');const div=document.createElement('div');div.className='ai-typing';div.innerHTML='<span></span><span></span><span></span>';msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;return div; }
+function sendAIMsg(){ const inp=g('aiInput');const txt=inp.value.trim();if(!txt)return;openAI();addBubble('user',txt);inp.value='';inp.style.height='auto';const t=showTyping();setTimeout(()=>{t.remove();addBubble('ai',AI_RES[aiCnt%AI_RES.length]);},1200+Math.random()*600); }
+function sendAISug(el){ const txt=el.textContent;openAI();addBubble('user',txt);const t=showTyping();setTimeout(()=>{t.remove();addBubble('ai',AI_RES[aiCnt%AI_RES.length]);},1000+Math.random()*800); }
+function aiKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAIMsg();} }
+function switchAITab(idx){
+  document.querySelectorAll('.ai-tab').forEach((t,i)=>t.classList.toggle('on',i===idx));
+  g('aiMsgs').classList.toggle('hidden',idx!==0);
+  g('aiHistList').classList.toggle('hidden',idx!==1);
+  g('aiSessionTitleWrap').style.display=idx===0?'block':'none';
+  if(idx===1){
+    const hist=g('aiHistList');
+    // Save current session if has msgs
+    if(curSession.msgs.length>0){
+      const existing=aiSessions.find(s=>s.id===curSession.id);
+      if(!existing) aiSessions.push({...curSession});
+      else Object.assign(existing,curSession);
+    }
+    if(!aiSessions.length){ hist.innerHTML='<div style="padding:20px;text-align:center;font-size:12px;color:var(--color-text-tertiary)">Belum ada riwayat percakapan</div>'; return; }
+    hist.innerHTML=aiSessions.map(s=>`<div class="ai-hist-item" onclick="loadSession(${s.id})">
+      <div class="ai-hist-title">
+        <span class="ai-hist-title-text" id="histTitle${s.id}">${s.name}</span>
+        <button class="ai-hist-edit-btn" onclick="event.stopPropagation();editHistTitle(${s.id})" title="Edit nama"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+      </div>
+      <div class="ai-hist-preview">${s.msgs.filter(m=>m.role==='user')[0]?.text||'—'}</div>
+    </div>`).join('');
+  }
+}
+function editSessionTitle(){ const disp=g('aiSessionTitleDisp'),inp=g('aiSessionTitleInput');disp.style.display='none';inp.style.display='block';inp.value=curSession.name;inp.focus();inp.select(); }
+function saveSessionTitle(){ const inp=g('aiSessionTitleInput');const v=inp.value.trim()||'Percakapan Baru';curSession.name=v;g('aiSessionTitleText').textContent=v;inp.style.display='none';g('aiSessionTitleDisp').style.display='inline-flex'; }
+function editHistTitle(id){ const el=g('histTitle'+id);const orig=el.textContent;const inp=document.createElement('input');inp.className='ai-hist-title-input';inp.value=orig;el.replaceWith(inp);inp.focus();inp.select();inp.onblur=()=>{const nv=inp.value.trim()||orig;const s=aiSessions.find(x=>x.id===id);if(s)s.name=nv;if(curSession.id===id)curSession.name=nv;inp.replaceWith(Object.assign(el,{textContent:nv}));};inp.onkeydown=e=>{if(e.key==='Enter')inp.blur();}; }
+function loadSession(id){ const s=aiSessions.find(x=>x.id===id);if(!s)return;curSession={...s};g('aiSessionTitleText').textContent=s.name;g('aiMsgs').innerHTML='';s.msgs.forEach(m=>addBubble(m.role,m.text));switchAITab(0); }
+
+// ── TOAST ──
+function showToast(msg){ const t=g('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800); }
+
+// ── ESC ──
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    closeCmdDrop();
+    if(g('jtypeOverlay').classList.contains('open'))closeJtype();
+    else if(g('modalBd').classList.contains('open'))closeModal();
+    else if(g('anomalyDrawer').classList.contains('open'))closeAnomalyDrawer();
+    else if(g('filterDrawer').classList.contains('open'))closeFilterDrawer();
+    else if(g('drawer').classList.contains('open'))closeDrawer();
+    else if(g('addJEPage').classList.contains('open'))closeAddJE();
+  }
+});
+
+// ── INIT ──
+renderTable();
+renderAnomalyTxSection();
+</script>
+</body>
+</html>
