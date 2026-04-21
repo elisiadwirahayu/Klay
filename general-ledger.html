@@ -773,7 +773,7 @@ const BILL_REFS = {
 };
 const INV_REFS = {
   'INV001': 'INV-C001-20250118',
-  'INV002': 'INV-C002-20250125',
+  'INV002': 'JE-2025-0005',
   'INV003': 'INV-C001-20250210',
   'INV004': 'INV-C003-20250220',
   'INV005': 'INV-C004-20250315',
@@ -896,11 +896,9 @@ function buildGLRows(){
   let runBal=500000000;
   sorted.forEach(je=>{
     const displayRef=getDisplayRef(je);
-    // Calculate totals across all lines
     const totalDebit=je.lines.reduce((s,l)=>s+(l.debit||0),0);
     const totalCredit=je.lines.reduce((s,l)=>s+(l.credit||0),0);
     runBal += totalDebit - totalCredit;
-    // Use first debit line's account as primary display account, fallback to first line
     const primaryLine = je.lines.find(l=>l.debit>0) || je.lines[0];
     rows.push({
       id: je.id,
@@ -919,6 +917,28 @@ function buildGLRows(){
       balance: runBal,
       jeData: je
     });
+
+    // Inject duplicate row for JE-2025-0005 — same values, ref INV-C002-20250125
+    if(je.id==='JE-2025-0005'){
+      rows.push({
+        id: 'INV-C002-20250125',
+        jeId: je.id,
+        date: je.date,
+        dateLabel: fmtDate(je.date),
+        ref: 'INV-C002-20250125',
+        refRaw: 'INV-C002-20250125',
+        refType: 'inv',
+        refId: 'INV002',
+        acct: primaryLine.acct,
+        acctName: primaryLine.acctName,
+        desc: je.memo,
+        debit: totalDebit,
+        credit: totalCredit,
+        balance: runBal, // same balance — duplicate, belum dipost ulang
+        jeData: je,
+        isDuplicate: true
+      });
+    }
   });
   return rows;
 }
@@ -1030,7 +1050,8 @@ function resetFilters(){
 /* ── ANOMALY DATA ── */
 const ANOMALIES = {
   'JE-2025-0001': {type:'warn', flag:'Nilai tidak wajar', detail:'Nilai beban gaji melebihi rata-rata 3 bulan sebelumnya.', grid:[{label:'Rata-rata Historis',val:'Rp 38.500.000'},{label:'Nilai Saat Ini',val:'Rp 45.000.000'},{label:'Selisih',val:'+16.9%'}]},
-  'JE-2025-0005': {type:'danger', flag:'Kemungkinan duplikasi', detail:'Transaksi ini memiliki karakteristik yang sangat mirip dengan INV-C002-20250125 yang diinput 4 menit sebelumnya.', grid:[{label:'Pelanggan Sama',val:'CV Distributor'},{label:'Nilai Identik',val:'Rp 9.625.000'},{label:'Selisih Waktu',val:'4 menit'}]},
+  'JE-2025-0005': {type:'danger', flag:'Kemungkinan duplikasi', detail:'Transaksi ini memiliki karakteristik yang sangat mirip dengan INV-C002-20250125 yang diinput 4 menit setelahnya.', grid:[{label:'Pelanggan Sama',val:'CV Distributor'},{label:'Nilai Identik',val:'Rp 9.625.000'},{label:'Selisih Waktu',val:'4 menit'}]},
+  'INV-C002-20250125': {type:'danger', flag:'Kemungkinan duplikasi', detail:'Transaksi ini memiliki karakteristik yang sangat mirip dengan JE-2025-0005 yang diinput 4 menit sebelumnya.', grid:[{label:'Pelanggan Sama',val:'CV Distributor'},{label:'Nilai Identik',val:'Rp 9.625.000'},{label:'Selisih Waktu',val:'4 menit'}]},
 };
 let dismissedAnomalies = new Set();
 let expandedRows = new Set();
@@ -1119,7 +1140,9 @@ function renderTable(){
     empty.style.display='none';
     const rows=[];
     pageRows.forEach(r=>{
-      const anom = !dismissedAnomalies.has(r.jeId) ? ANOMALIES[r.jeId] : null;
+      // Lookup anomaly by row id first, then jeId as fallback
+      const anomId = ANOMALIES[r.id] ? r.id : r.jeId;
+      const anom = !dismissedAnomalies.has(anomId) ? ANOMALIES[anomId] : null;
       const anomClass = anom ? (anom.type==='warn'?'anomaly-warn':'anomaly-danger') : '';
       const isExpanded = expandedRows.has(r.id);
       const flagHtml = anom ? `<span class="anomaly-flag ${anom.type}">✨ ${anom.flag}</span>` : '';
@@ -1144,8 +1167,8 @@ function renderTable(){
                 ${anom.grid.map(g=>`<div class="anomaly-expand-cell"><div class="anomaly-expand-cell-label">${g.label}</div><div class="anomaly-expand-cell-val">${g.val}</div></div>`).join('')}
               </div>
               <div class="anomaly-expand-actions">
-                <button class="ai-btn-valid" onclick="event.stopPropagation();markValid('${r.jeId}')">Tandai sebagai valid</button>
-                <button class="ai-btn-reklasifikasi" onclick="event.stopPropagation();doReklasifikasi('${r.jeId}')">Reklasifikasi</button>
+                <button class="ai-btn-valid" onclick="event.stopPropagation();markValid('${anomId}')">Tandai sebagai valid</button>
+                <button class="ai-btn-reklasifikasi" onclick="event.stopPropagation();doReklasifikasi('${anomId}')">Reklasifikasi</button>
               </div>
             </div>
           </td>
