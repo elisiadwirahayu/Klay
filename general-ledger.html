@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>General Ledger — Klay</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Manrope:wght@300;400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-brand:#B83D08;--color-brand-hover:#A03206;
+  --color-action:#1A46C8;--color-action-hover:#1338A8;
+  --color-text-primary:#080706;--color-text-secondary:#2E2B27;--color-text-tertiary:#8C857C;
+  --color-surface-base:#FBF8F5;--color-surface-raised:#FFFFFF;--color-surface-sunken:#F4F0EB;--color-surface-deep:#080706;
+  --color-border-default:#E2DDD7;
+  --success-text:#166638;--success-border:#A8D9BC;--success-surface:#E8F5EE;
+  --warning-text:#7A4D00;--warning-border:#E8C870;--warning-surface:#FDF3E0;
+  --danger-text:#A02020;--danger-border:#EAB8B8;--danger-surface:#FBF0F0;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;--radius-full:9999px;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;
+  --transition-fast:0.1s ease;--transition-base:0.15s ease;--transition-slow:0.2s ease;
+  --font-display:'Playfair Display',serif;--font-sans:'Manrope',sans-serif;--font-mono:'Inconsolata',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-surface-base);color:var(--color-text-primary);-webkit-font-smoothing:antialiased;font-size:13px;height:100vh;overflow:hidden}
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sb{width:196px;flex-shrink:0;background:var(--color-surface-raised);border-right:1px solid var(--color-border-default);display:flex;flex-direction:column;overflow-y:auto;transition:width var(--transition-slow)}
+.sb-top{padding:0 16px;height:52px;display:flex;align-items:center;border-bottom:1px solid var(--color-border-default);gap:8px;flex-shrink:0}
+.sb-logomark{width:26px;height:26px;background:var(--color-brand);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logomark svg{width:12px;height:12px;fill:#fff}
+.sb-brand{font-size:14px;font-weight:700;letter-spacing:-.02em;color:var(--color-text-primary)}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-border-default);padding:16px 16px 6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 12px;margin:1px 6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:400;color:var(--color-text-tertiary);text-decoration:none;transition:background var(--transition-fast),color var(--transition-fast)}
+.sb-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.sb-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+.sb-item.active{background:var(--color-surface-sunken);color:var(--color-text-primary);font-weight:600;border-left:2px solid var(--color-brand);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-left:0;padding-left:14px}
+.sb-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--color-surface-sunken)}
+.sb-footer-item{display:flex;align-items:center;gap:8px;padding:6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--color-text-tertiary)}
+.sb-footer-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+.sb-footer-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+
+/* ── MAIN AREA ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden;transition:all var(--transition-slow)}
+
+/* ── TOPBAR ── */
+.topbar{height:52px;flex-shrink:0;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 20px;gap:12px;position:relative;z-index:10}
+.tb-search-wrap{position:relative;flex:1;max-width:400px}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 12px;cursor:text;transition:border-color var(--transition-fast),box-shadow var(--transition-fast)}
+.tb-search.focused{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.1);background:var(--color-surface-raised)}
+.tb-search svg{width:13px;height:13px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.tb-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.tb-search input::placeholder{color:var(--color-text-tertiary)}
+.tb-kbd{font-size:10px;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:4px;padding:1px 5px;font-family:var(--font-mono);flex-shrink:0}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-notif{width:30px;height:30px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.tb-notif svg{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--color-brand);border-radius:50%;border:1.5px solid var(--color-surface-raised)}
+.tb-org{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);cursor:pointer;white-space:nowrap}
+.tb-org-name{font-size:12px;font-weight:500;color:var(--color-text-secondary);white-space:nowrap}
+.tb-av{width:24px;height:24px;border-radius:var(--radius-sm);background:var(--color-action);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── COMMAND DROPDOWN ── */
+.cmd-dropdown{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);box-shadow:0 8px 32px rgba(8,7,6,.12),0 2px 8px rgba(8,7,6,.06);z-index:100;overflow:hidden;display:none}
+.cmd-dropdown.open{display:block}
+.cmd-section-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);padding:10px 14px 4px}
+.cmd-item{display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;transition:background var(--transition-fast)}
+.cmd-item:hover,.cmd-item.active{background:var(--color-surface-sunken)}
+.cmd-item-icon{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cmd-item-icon.ai{background:linear-gradient(135deg,#1A46C8,#7C3AED);animation:aiPulse 2s ease-in-out infinite}
+@keyframes aiPulse{0%,100%{box-shadow:0 0 0 0 rgba(26,70,200,.3)}50%{box-shadow:0 0 0 6px rgba(26,70,200,.0)}}
+.cmd-item-icon svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:1.5}
+.cmd-item-icon.nav{background:var(--color-surface-sunken)}
+.cmd-item-icon.nav svg{stroke:var(--color-text-secondary)}
+.cmd-item-text{flex:1;min-width:0}
+.cmd-item-title{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.cmd-item-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.cmd-item-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:var(--radius-full);flex-shrink:0}
+.cmd-item-tag.ai{background:linear-gradient(135deg,#EBF0FD,#EDE9FE);color:#1A46C8}
+.cmd-divider{height:1px;background:var(--color-border-default);margin:4px 0}
+
+/* ── SCROLL AREA ── */
+.scroll-area{flex:1;overflow-y:auto;padding:var(--space-6) var(--space-6) 0;min-height:0}
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-5)}
+.page-title{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.head-right{display:flex;gap:8px;align-items:center}
+
+/* ── BUTTONS ── */
+.btn-primary{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:8px 16px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base)}
+.btn-primary:hover{background:var(--color-action-hover)}
+.btn-primary svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
+.btn-ghost{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 13px;cursor:pointer;transition:border-color var(--transition-fast),color var(--transition-fast)}
+.btn-ghost svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+.btn-ghost:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+
+/* ── CLOSING PROGRESS ── */
+.closing-progress{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);padding:10px var(--space-5);margin-bottom:var(--space-3);display:flex;align-items:center;gap:12px}
+.cp-icon{width:26px;height:26px;background:var(--color-action);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cp-icon svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:1.5}
+.cp-label{font-size:12px;font-weight:600;color:var(--color-text-secondary);white-space:nowrap}
+.cp-pct{font-size:12px;font-weight:800;color:var(--color-action);white-space:nowrap}
+.cp-bar-track{flex:1;height:5px;background:var(--color-surface-sunken);border-radius:var(--radius-full);overflow:hidden}
+.cp-bar-fill{height:100%;background:linear-gradient(90deg,var(--color-action),#4D72E0);border-radius:var(--radius-full);transition:width 0.6s ease}
+
+/* ── AI ALERT SECTION ── */
+.ai-alert-section{background:#F0F4FF;border:1px solid #C8D8FA;border-radius:var(--radius-lg);margin-bottom:var(--space-3);overflow:hidden}
+.ai-alert-head{display:flex;align-items:center;gap:10px;padding:11px var(--space-5);cursor:pointer;user-select:none;transition:background var(--transition-fast)}
+.ai-alert-head:hover{background:rgba(26,70,200,.06)}
+.ai-noticed-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--color-action);background:#EBF0FD;border:1px solid #C8D8FA;border-radius:var(--radius-full);padding:3px 9px;letter-spacing:.03em;flex-shrink:0}
+.ai-noticed-badge-star{font-size:11px;line-height:1}
+.ai-alert-title{font-size:13px;font-weight:600;color:var(--color-text-primary);flex:1}
+.ai-alert-chevron{width:16px;height:16px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;transition:transform var(--transition-base);flex-shrink:0}
+.ai-alert-chevron.open{transform:rotate(180deg)}
+.ai-alert-body{border-top:1px solid #C8D8FA;padding:var(--space-3) var(--space-5) var(--space-4);display:flex;flex-direction:column;gap:var(--space-2)}
+.ai-alert-body.collapsed{display:none}
+/* Each item is a card now */
+.ai-alert-item{display:flex;gap:12px;align-items:flex-start;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4)}
+.ai-alert-item.warn{border-left:3px solid var(--warning-border);background:#FFFDF5}
+.ai-alert-item.danger{border-left:3px solid var(--danger-border);background:#FFFAFA}
+.ai-alert-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ai-alert-dot.warn{background:var(--warning-surface);border:1.5px solid var(--warning-border)}
+.ai-alert-dot.warn svg{width:13px;height:13px;stroke:var(--warning-text);fill:none;stroke-width:2}
+.ai-alert-dot.danger{background:var(--danger-surface);border:1.5px solid var(--danger-border)}
+.ai-alert-dot.danger svg{width:13px;height:13px;stroke:var(--danger-text);fill:none;stroke-width:2}
+.ai-alert-content{flex:1;min-width:0}
+.ai-alert-ref{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--color-text-primary)}
+.ai-alert-msg{font-size:12px;color:var(--color-text-secondary);line-height:1.4}
+.ai-alert-amount{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--color-text-primary);background:var(--color-surface-sunken);padding:1px 6px;border-radius:var(--radius-sm)}
+.ai-alert-actions{display:flex;gap:6px;margin-top:8px}
+.ai-btn-valid{font-family:var(--font-sans);font-size:11px;font-weight:600;padding:5px 11px;border-radius:var(--radius-md);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-secondary);cursor:pointer;transition:all var(--transition-fast)}
+.ai-btn-valid:hover{border-color:#c8c2ba;background:var(--color-surface-sunken)}
+.ai-btn-reklasifikasi{font-family:var(--font-sans);font-size:11px;font-weight:600;padding:5px 11px;border-radius:var(--radius-md);border:none;background:var(--color-action);color:#fff;cursor:pointer;transition:background var(--transition-fast)}
+.ai-btn-reklasifikasi:hover{background:var(--color-action-hover)}
+.ai-alert-empty{display:flex;align-items:center;gap:10px;padding:var(--space-3) 0}
+.ai-alert-empty-icon{width:28px;height:28px;border-radius:50%;background:var(--success-surface);border:1.5px solid var(--success-border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ai-alert-empty-icon svg{width:13px;height:13px;stroke:var(--success-text);fill:none;stroke-width:2.5}
+.ai-alert-empty-text{font-size:12px;font-weight:600;color:var(--success-text)}
+
+/* ── ANOMALY ROWS ── */
+tbody tr.anomaly-warn{background:#FFFBEE}
+tbody tr.anomaly-warn:hover{background:#FFF5CC}
+tbody tr.anomaly-danger{background:#FFF5F5}
+tbody tr.anomaly-danger:hover{background:#FFEBEB}
+.anomaly-flag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:var(--radius-full);white-space:nowrap;margin-left:6px;vertical-align:middle}
+.anomaly-flag.warn{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.anomaly-flag.danger{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.anomaly-expand-row td{padding:0!important;background:inherit}
+.anomaly-expand-inner{padding:12px 14px 14px 14px;border-top:1px dashed var(--color-border-default)}
+.anomaly-expand-title{font-size:11px;color:var(--color-text-secondary);margin-bottom:10px;line-height:1.4}
+.anomaly-expand-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.anomaly-expand-cell{background:var(--color-surface-sunken);border-radius:var(--radius-sm);padding:8px 10px}
+.anomaly-expand-cell-label{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:3px}
+.anomaly-expand-cell-val{font-size:12px;font-weight:700;color:var(--color-text-primary);font-family:var(--font-mono)}
+.anomaly-expand-actions{display:flex;gap:6px}
+
+/* ── STICKY STATUS BAR ── */
+.sticky-status-bar{position:fixed;bottom:0;left:196px;right:0;background:var(--color-surface-deep);border-top:1px solid rgba(255,255,255,.08);padding:9px 20px;display:flex;align-items:center;gap:var(--space-5);z-index:30;transition:right var(--transition-slow)}
+.sticky-status-bar.ai-open{right:340px}
+.scroll-area{padding-bottom:44px}
+
+/* ── UPDATED EXPORT DROPDOWN ── */
+.exp-section-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-tertiary);padding:8px 10px 3px}
+.exp-item-check{display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:500;color:var(--color-text-secondary);transition:background var(--transition-fast)}
+.exp-item-check:hover{background:var(--color-surface-sunken)}
+.exp-item-check input[type=radio]{accent-color:var(--color-action);flex-shrink:0}
+.exp-divider-sm{height:1px;background:var(--color-border-default);margin:4px 0}
+.exp-do-btn{width:calc(100% - 20px);margin:6px 10px 8px;font-family:var(--font-sans);font-size:12px;font-weight:600;padding:7px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;transition:background var(--transition-fast)}
+.exp-do-btn:hover{background:var(--color-action-hover)}
+
+/* ── SUMMARY CARDS (kept for CSS, hidden) ── */
+.summary-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-3);align-items:stretch}
+.scard{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);transition:box-shadow var(--transition-base);display:flex;flex-direction:column}
+.scard:hover{box-shadow:0 2px 12px rgba(8,7,6,.07)}
+.scard-label{font-size:11px;font-weight:600;color:var(--color-text-tertiary);letter-spacing:.04em;text-transform:uppercase;margin-bottom:var(--space-2)}
+.scard-value{font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--color-text-primary);letter-spacing:-.02em;line-height:1}
+.scard-value.debit{color:#A02020}
+.scard-value.credit{color:#166638}
+.scard-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:auto;padding-top:var(--space-2)}
+.scard-balance{background:linear-gradient(135deg,var(--color-surface-raised) 0%,#F0F4FF 100%);border-color:#C8D8FA}
+.scard-ai-row{display:flex;align-items:center;justify-content:space-between;margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-border-default);gap:var(--space-3)}
+.scard-insight{font-size:11px;color:var(--color-text-secondary);line-height:1.4;flex:1}
+.scard-ai-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--color-action);background:linear-gradient(135deg,#EBF0FD,#EDE9FE);border:1px solid #C8D8FA;border-radius:var(--radius-full);padding:4px 11px;cursor:pointer;white-space:nowrap;transition:background var(--transition-fast),box-shadow var(--transition-fast);flex-shrink:0;letter-spacing:.01em}
+.scard-ai-btn:hover{background:linear-gradient(135deg,#d8e4fc,#ddd6fe);box-shadow:0 0 0 3px rgba(26,70,200,.1)}
+
+
+/* ── FILTER BAR ── */
+.filter-bar{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);margin-bottom:var(--space-3);display:flex;align-items:center;gap:var(--space-2)}
+.f-search{display:flex;align-items:center;gap:7px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:6px 10px;width:200px;flex-shrink:0;transition:border-color var(--transition-fast),box-shadow var(--transition-fast)}
+.f-search:focus-within{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.f-search svg{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.f-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.f-search input::placeholder{color:var(--color-text-tertiary)}
+.fsep{width:1px;height:18px;background:var(--color-border-default);flex-shrink:0;margin:0 2px}
+.chip-grp{display:flex;gap:3px}
+.chip{font-family:var(--font-sans);font-size:11px;font-weight:500;padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-tertiary);cursor:pointer;transition:all var(--transition-fast);white-space:nowrap}
+.chip:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.chip.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.f-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.f-filter-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:6px 11px;cursor:pointer;transition:all var(--transition-fast)}
+.f-filter-btn:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.f-filter-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5}
+.f-filter-btn .badge{background:var(--color-action);color:#fff;border-radius:var(--radius-full);font-size:9px;font-weight:700;padding:1px 5px;margin-left:2px}
+.export-wrap{position:relative}
+.exp-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);box-shadow:0 4px 20px rgba(8,7,6,.1);padding:var(--space-2);min-width:160px;display:none;z-index:50}
+.exp-menu.open{display:block}
+.exp-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:500;color:var(--color-text-secondary);transition:background var(--transition-fast)}
+.exp-item:hover{background:var(--color-surface-sunken)}
+.exp-item svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+
+/* ── TABLE WRAPPER ── */
+.table-wrap{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);overflow:hidden;display:flex;flex-direction:column;margin-bottom:var(--space-6)}
+.tbl-scroll{overflow-y:auto;flex:1}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--color-surface-sunken);border-bottom:1px solid var(--color-border-default)}
+thead th{font-size:11px;font-weight:700;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;text-align:left;white-space:nowrap;user-select:none}
+thead th.sortable{cursor:pointer;transition:color var(--transition-fast)}
+thead th.sortable:hover{color:var(--color-text-primary)}
+thead th.sort-asc .sort-arrow::after{content:'↑';margin-left:4px;color:var(--color-action);font-size:10px}
+thead th.sort-desc .sort-arrow::after{content:'↓';margin-left:4px;color:var(--color-action);font-size:10px}
+thead th .sort-arrow::after{content:'↕';margin-left:4px;color:var(--color-border-default);font-size:9px}
+thead th.r,.r{text-align:right}
+tbody tr{border-bottom:1px solid var(--color-surface-sunken);transition:background var(--transition-fast);cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#FAFAF9}
+tbody tr.active-row{background:#EBF0FD}
+td{padding:10px 14px;vertical-align:middle}
+.td-ref{font-family:var(--font-mono);font-size:12px;color:var(--color-text-primary)}
+.td-desc{font-size:12px;color:var(--color-text-secondary);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.td-acct{font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary)}
+.td-acct-name{font-size:12px;color:var(--color-text-secondary)}
+.td-amount{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--color-text-primary)}
+.td-amount.debit{color:#A02020}
+.td-amount.credit{color:#166638}
+.td-balance{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--color-text-secondary)}
+.td-date{font-size:12px;color:var(--color-text-tertiary);white-space:nowrap}
+.type-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-full);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.type-badge.je{background:#EBF0FD;color:var(--color-action)}
+.type-badge.inv{background:var(--success-surface);color:var(--success-text)}
+.type-badge.bill{background:var(--warning-surface);color:var(--warning-text)}
+.type-badge.pay{background:var(--color-surface-sunken);color:var(--color-text-tertiary)}
+.empty-state{padding:48px 24px;text-align:center;color:var(--color-text-tertiary)}
+.empty-state svg{width:32px;height:32px;stroke:var(--color-border-default);fill:none;stroke-width:1;margin:0 auto 12px}
+.empty-title{font-size:14px;font-weight:600;color:var(--color-text-secondary);margin-bottom:4px}
+.empty-sub{font-size:12px}
+
+/* ── STATUS BAR ── */
+.status-bar{background:var(--color-surface-deep);border-top:1px solid rgba(255,255,255,.08);padding:9px 14px;display:flex;align-items:center;gap:var(--space-5);flex-shrink:0}
+.sb-stat{display:flex;align-items:center;gap:6px}
+.sb-stat-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.sb-stat-val{font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(255,255,255,.85)}
+.sb-stat-val.debit{color:#F59A9A}
+.sb-stat-val.credit{color:#86D4A4}
+.sb-stat-val.balance{color:#93B4F8}
+.sb-sep{width:1px;height:14px;background:rgba(255,255,255,.12)}
+.sb-right{margin-left:auto;display:flex;align-items:center;gap:var(--space-4)}
+
+/* ── DETAIL DRAWER ── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(8,7,6,.35);z-index:40;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:400px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow);box-shadow:-4px 0 24px rgba(8,7,6,.1)}
+.drawer.open{transform:translateX(0)}
+.drawer-head{padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--color-border-default);display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-3);flex-shrink:0}
+.d-ref{font-family:var(--font-mono);font-size:14px;font-weight:600;color:var(--color-text-primary)}
+.d-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-full);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:4px}
+.d-badge.posted{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.d-close{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-tertiary);transition:background var(--transition-fast);flex-shrink:0}
+.d-close:hover{background:var(--color-surface-sunken);color:var(--color-text-primary)}
+.d-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* Drawer tabs */
+.d-tabs{display:flex;padding:0 var(--space-5);border-bottom:1px solid var(--color-border-default);flex-shrink:0}
+.d-tab{padding:10px 0;margin-right:var(--space-5);font-size:12px;font-weight:500;color:var(--color-text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--transition-fast);white-space:nowrap}
+.d-tab:hover{color:var(--color-text-secondary)}
+.d-tab.on{color:var(--color-action);border-bottom-color:var(--color-action);font-weight:600}
+.d-body{flex:1;overflow-y:auto;padding:var(--space-4) var(--space-5)}
+.d-pane{display:none}
+.d-pane.on{display:block}
+.dsec{margin-bottom:var(--space-5)}
+.dlbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:var(--space-3)}
+.info-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--color-surface-sunken);gap:var(--space-3)}
+.info-row:last-child{border-bottom:none}
+.info-row label{font-size:11px;color:var(--color-text-tertiary);flex-shrink:0}
+.info-row span,.info-row a{font-size:12px;font-weight:500;color:var(--color-text-primary);text-align:right}
+.info-row a{color:var(--color-action);text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.info-row a:hover{text-decoration:underline}
+.info-row a svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2}
+.dpill{display:inline-flex;padding:3px 9px;border-radius:var(--radius-full);font-size:11px;font-weight:600}
+.dp-dept{background:#EBF0FD;color:var(--color-action)}
+.dp-proj{background:var(--success-surface);color:var(--success-text)}
+.dp-branch{background:var(--warning-surface);color:var(--warning-text)}
+.d-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.d-tbl thead tr{background:var(--color-surface-sunken)}
+.d-tbl thead th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-tertiary);padding:7px 10px;text-align:left;border-bottom:1px solid var(--color-border-default)}
+.d-tbl thead th.r{text-align:right}
+.d-tbl tbody td{padding:7px 10px;border-bottom:1px solid var(--color-surface-sunken);color:var(--color-text-secondary)}
+.d-tbl tbody tr:last-child td{border-bottom:none}
+.d-tbl tfoot td{padding:7px 10px;font-weight:700;color:var(--color-text-primary);border-top:1px solid var(--color-border-default);font-family:var(--font-mono);font-size:12px}
+.d-tbl .r{text-align:right;font-family:var(--font-mono)}
+.li-sub{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.d-open-link{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--color-action);text-decoration:none;padding:7px 12px;border:1px solid #C8D8FA;border-radius:var(--radius-md);background:#EBF0FD;margin-bottom:var(--space-4);transition:background var(--transition-fast)}
+.d-open-link:hover{background:#d8e4fc}
+.d-open-link svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* Audit trail */
+.audit-list{display:flex;flex-direction:column;gap:0}
+.audit-item{display:flex;gap:10px;padding:8px 0;position:relative}
+.audit-item:not(:last-child)::after{content:'';position:absolute;left:11px;top:30px;bottom:-8px;width:1px;background:var(--color-border-default)}
+.audit-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.audit-dot.posted{background:var(--success-surface);border:1.5px solid var(--success-border)}
+.audit-dot.posted svg{width:10px;height:10px;stroke:var(--success-text);fill:none;stroke-width:2.5}
+.audit-dot.created{background:var(--color-surface-sunken);border:1.5px solid var(--color-border-default)}
+.audit-dot.created svg{width:8px;height:8px;stroke:var(--color-text-tertiary);fill:currentColor}
+.audit-content{flex:1}
+.audit-action{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.audit-meta{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+
+/* ── FILTER DRAWER ── */
+.filter-overlay{position:fixed;inset:0;background:rgba(8,7,6,.35);z-index:38;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.filter-overlay.open{opacity:1;pointer-events:all}
+.filter-drawer{position:fixed;top:0;right:0;height:100vh;width:320px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow);box-shadow:-4px 0 24px rgba(8,7,6,.08)}
+.filter-drawer.open{transform:translateX(0)}
+.fd-head{padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.fd-title{font-size:14px;font-weight:700;color:var(--color-text-primary)}
+.fd-body{flex:1;overflow-y:auto;padding:var(--space-4) var(--space-5)}
+.fd-section{margin-bottom:var(--space-5)}
+.fd-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:var(--space-3)}
+.fd-shortcuts{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:var(--space-3)}
+.fd-sc{font-size:11px;font-weight:500;padding:4px 10px;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-tertiary);cursor:pointer;transition:all var(--transition-fast)}
+.fd-sc:hover{border-color:var(--color-action);color:var(--color-action)}
+.fd-sc.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.fd-date-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2)}
+.fd-input{font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:7px 10px;width:100%;outline:none;transition:border-color var(--transition-fast)}
+.fd-input:focus{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.fd-select{font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:7px 10px;width:100%;outline:none}
+.fd-foot{padding:var(--space-4) var(--space-5);border-top:1px solid var(--color-border-default);display:flex;gap:var(--space-2);flex-shrink:0}
+
+/* ── AI PANEL ── */
+.ai-panel{width:0;flex-shrink:0;height:100vh;transition:width 0.2s ease;overflow:hidden;position:relative}
+.ai-panel.open{width:340px}
+.ai-panel-inner{width:340px;height:100vh;display:flex;flex-direction:column;background:var(--color-surface-raised);border-left:2px solid var(--color-action);position:relative}
+.ai-panel-inner::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(26,70,200,.03) 0%,transparent 60%);pointer-events:none;z-index:0}
+.ai-head{padding:14px 16px;border-bottom:1px solid rgba(26,70,200,.15);display:flex;align-items:center;gap:10px;flex-shrink:0;position:relative;z-index:1;background:linear-gradient(135deg,#EBF0FD,#F0ECFF)}
+.ai-head-icon{width:28px;height:28px;border-radius:var(--radius-sm);background:linear-gradient(135deg,#1A46C8,#7C3AED);display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:aiPulse 3s ease-in-out infinite}
+.ai-head-icon svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:1.5}
+.ai-head-text{flex:1;min-width:0}
+.ai-head-title{font-size:13px;font-weight:700;color:var(--color-text-primary)}
+.ai-head-sub{font-size:10px;color:var(--color-action);font-weight:600;letter-spacing:.04em}
+.ai-head-close{width:24px;height:24px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-tertiary);transition:background var(--transition-fast);flex-shrink:0}
+.ai-head-close:hover{background:rgba(26,70,200,.12);color:var(--color-action)}
+.ai-head-close svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.ai-tabs{display:flex;padding:0 16px;border-bottom:1px solid rgba(26,70,200,.1);flex-shrink:0;background:var(--color-surface-raised)}
+.ai-tab{padding:8px 0;margin-right:16px;font-size:11px;font-weight:600;color:var(--color-text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--transition-fast);letter-spacing:.02em}
+.ai-tab.on{color:var(--color-action);border-bottom-color:var(--color-action)}
+.ai-msgs{flex:1;min-height:0;overflow-y:auto;padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-3);position:relative;z-index:1}
+.ai-msgs.hidden{display:none}
+.ai-hist-list{flex:1;min-height:0;overflow-y:auto;padding:var(--space-3);display:flex;flex-direction:column;gap:var(--space-1)}
+.ai-hist-list.hidden{display:none}
+.ai-hist-item{padding:10px 12px;border-radius:var(--radius-md);border:1px solid var(--color-border-default);cursor:pointer;transition:background var(--transition-fast)}
+.ai-hist-item:hover{background:var(--color-surface-sunken)}
+.ai-hist-title{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.ai-hist-preview{font-size:11px;color:var(--color-text-tertiary);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ai-bubble{max-width:90%;border-radius:var(--radius-lg);padding:10px 13px;font-size:12px;line-height:1.5}
+.ai-bubble.user{align-self:flex-end;background:var(--color-action);color:#fff;border-radius:var(--radius-lg) var(--radius-lg) 4px var(--radius-lg)}
+.ai-bubble.ai{align-self:flex-start;background:var(--color-surface-sunken);color:var(--color-text-primary);border-radius:var(--radius-lg) var(--radius-lg) var(--radius-lg) 4px;border:1px solid var(--color-border-default)}
+.ai-bubble.ai .ai-bubble-label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-action);margin-bottom:4px}
+.ai-typing{display:flex;align-items:center;gap:4px;padding:10px 13px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-lg) var(--radius-lg) var(--radius-lg) 4px;align-self:flex-start}
+.ai-typing span{width:6px;height:6px;border-radius:50%;background:var(--color-action);animation:typingBounce 1.2s ease-in-out infinite}
+.ai-typing span:nth-child(2){animation-delay:.2s}
+.ai-typing span:nth-child(3){animation-delay:.4s}
+@keyframes typingBounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+
+/* AI chat input — rebuilt, pinned to bottom of inner panel */
+.ai-chat-box{flex-shrink:0;border-top:1px solid rgba(26,70,200,.12);background:var(--color-surface-raised);padding:10px 12px;z-index:2;position:relative}
+.ai-chat-box-inner{display:flex;align-items:flex-end;gap:8px;background:var(--color-surface-sunken);border:1.5px solid rgba(26,70,200,.2);border-radius:var(--radius-lg);padding:8px 10px;transition:border-color var(--transition-fast),box-shadow var(--transition-fast)}
+.ai-chat-box-inner:focus-within{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.ai-chat-textarea{flex:1;border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;resize:none;line-height:1.5;max-height:80px;overflow-y:auto;min-height:20px}
+.ai-chat-textarea::placeholder{color:var(--color-text-tertiary)}
+.ai-chat-send{width:30px;height:30px;border-radius:var(--radius-sm);background:var(--color-action);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background var(--transition-fast);flex-shrink:0}
+.ai-chat-send:hover{background:var(--color-action-hover)}
+.ai-chat-send svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ai-chat-hint{font-size:10px;color:var(--color-text-tertiary);margin-top:5px;padding:0 2px}
+.ai-suggestion-chips{display:flex;flex-wrap:wrap;gap:5px;padding:0 var(--space-4) var(--space-3);flex-shrink:0}
+.ai-sc{font-size:10px;font-weight:500;padding:4px 9px;border-radius:var(--radius-full);border:1px solid rgba(26,70,200,.2);background:var(--color-surface-raised);color:var(--color-action);cursor:pointer;transition:all var(--transition-fast)}
+.ai-sc:hover{background:#EBF0FD}
+
+/* ── AI SESSION TITLE ── */
+.ai-session-bar{padding:8px 16px 0;flex-shrink:0;position:relative;z-index:1}
+.ai-session-title{font-size:12px;font-weight:700;color:var(--color-text-primary);padding:4px 8px;border-radius:var(--radius-sm);border:1.5px solid transparent;cursor:text;display:inline-block;min-width:60px;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:border-color var(--transition-fast),background var(--transition-fast)}
+.ai-session-title:hover{border-color:var(--color-border-default);background:var(--color-surface-sunken)}
+.ai-session-title:focus{border-color:var(--color-action);background:var(--color-surface-raised);outline:none;box-shadow:0 0 0 3px rgba(26,70,200,.08);white-space:normal;overflow:visible}
+.ai-session-edit-hint{font-size:10px;color:var(--color-text-tertiary);margin-left:4px;opacity:0;transition:opacity var(--transition-fast)}
+.ai-session-bar:hover .ai-session-edit-hint{opacity:1}
+
+/* ── DIMENSION PILLS IN DRAWER ── */
+.dim-grid{display:flex;flex-direction:column;gap:6px}
+.dim-row{display:flex;align-items:center;justify-content:space-between}
+.dim-row-label{font-size:11px;color:var(--color-text-tertiary)}
+
+
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--color-surface-sunken)}
+.pg-info{font-size:11px;color:var(--color-text-tertiary)}
+.pg-btns{display:flex;gap:4px}
+.pg-btn{width:28px;height:28px;border-radius:var(--radius-sm);border:1px solid var(--color-border-default);background:var(--color-surface-raised);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:600;color:var(--color-text-tertiary);transition:all var(--transition-fast)}
+.pg-btn:hover{border-color:var(--color-action);color:var(--color-action)}
+.pg-btn.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.pg-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* ── CONTENT AREA (flex row for main+AI) ── */
+.content-row{display:flex;flex:1;min-height:0;overflow:hidden}
+.content-main{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sb">
+  <div class="sb-top">
+    <div class="sb-logomark"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <span class="sb-brand">Klay</span>
+  </div>
+  <div class="sb-section">Overview</div>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+  <div class="sb-section">Keuangan</div>
+  <a class="sb-item active" href="#"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>General Ledger</a>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Journal Entry</a>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Bills</a>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Invoices</a>
+  <div class="sb-section">Operasional</div>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Vendors</a>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Customers</a>
+  <div class="sb-footer">
+    <div class="sb-footer-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Settings</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main" id="mainArea">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-search-wrap">
+      <div class="tb-search" id="tbSearch">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="tbSearchInput" placeholder="Cari atau ketik perintah…" autocomplete="off">
+        <span class="tb-kbd">⌘K</span>
+      </div>
+      <div class="cmd-dropdown" id="cmdDropdown">
+        <div class="cmd-section-label">Tanya AI</div>
+        <div class="cmd-item" id="cmdAskAI">
+          <div class="cmd-item-icon ai"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><circle cx="19" cy="5" r="3"/></svg></div>
+          <div class="cmd-item-text">
+            <div class="cmd-item-title" id="cmdAskAITitle">✦ Tanya AI tentang ini</div>
+            <div class="cmd-item-sub" id="cmdAskAISub">Buka percakapan dengan TradeOS AI</div>
+          </div>
+          <span class="cmd-item-tag ai">AI</span>
+        </div>
+        <div class="cmd-divider"></div>
+        <div class="cmd-section-label">Navigasi Cepat</div>
+        <div class="cmd-item" onclick="filterByType('je')">
+          <div class="cmd-item-icon nav"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <div class="cmd-item-text"><div class="cmd-item-title">Journal Entry</div><div class="cmd-item-sub">Filter hanya JE</div></div>
+        </div>
+        <div class="cmd-item" onclick="filterByType('inv')">
+          <div class="cmd-item-icon nav"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+          <div class="cmd-item-text"><div class="cmd-item-title">Invoice</div><div class="cmd-item-sub">Filter hanya Invoice</div></div>
+        </div>
+        <div class="cmd-item" onclick="filterByType('bill')">
+          <div class="cmd-item-icon nav"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <div class="cmd-item-text"><div class="cmd-item-title">Bill</div><div class="cmd-item-sub">Filter hanya Bill</div></div>
+        </div>
+        <div id="cmdResults"></div>
+      </div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-notif"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>
+      <div class="tb-org">
+        <div class="tb-av">PT</div>
+        <span class="tb-org-name">PT Sejahtera Makmur</span>
+        <svg class="tb-caret" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT ROW (main content + AI panel side by side) -->
+  <div class="content-row">
+    <div class="content-main">
+      <div class="scroll-area" id="scrollArea">
+
+        <!-- PAGE HEADER -->
+        <div class="page-head">
+          <div>
+            <div class="page-title">General Ledger</div>
+            <div style="font-size:12px;color:var(--color-text-tertiary);margin-top:2px">PT Sejahtera Makmur · Jan–Apr 2025</div>
+          </div>
+          <div class="head-right">
+            <div class="export-wrap">
+              <button class="btn-ghost" onclick="toggleExp(event)">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export
+              </button>
+              <div class="exp-menu" id="expMenu" style="min-width:200px">
+                <div class="exp-section-label">Scope</div>
+                <label class="exp-item-check"><input type="radio" name="expScope" value="visible" checked> Hanya yang terlihat</label>
+                <label class="exp-item-check"><input type="radio" name="expScope" value="all"> Semua data</label>
+                <div class="exp-divider-sm"></div>
+                <div class="exp-section-label">Format</div>
+                <label class="exp-item-check"><input type="radio" name="expFmt" value="xlsx" checked> Excel (.xlsx)</label>
+                <label class="exp-item-check"><input type="radio" name="expFmt" value="csv"> CSV</label>
+                <div class="exp-divider-sm"></div>
+                <button class="exp-do-btn" onclick="doExportNew()">Export Sekarang</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLOSING PROGRESS -->
+        <div class="closing-progress">
+          <div class="cp-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+          <span class="cp-label">Closing Progress</span>
+          <span class="cp-pct">80%</span>
+          <div class="cp-bar-track"><div class="cp-bar-fill" style="width:80%"></div></div>
+        </div>
+
+        <!-- AI ALERT SECTION -->
+        <div class="ai-alert-section" id="aiAlertSection">
+          <div class="ai-alert-head" onclick="toggleAlertAccordion()">
+            <span class="ai-noticed-badge" id="aiNoticedBadge">
+              <span class="ai-noticed-badge-star">✦</span>
+              AI
+            </span>
+            <span class="ai-alert-title" id="aiAlertTitle">Beberapa transaksi perlu ditinjau sebelum penutupan periode</span>
+            <svg class="ai-alert-chevron open" id="alertChevron" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+          </div>
+          <div class="ai-alert-body" id="aiAlertBody">
+            <div id="aiAlertList"></div>
+          </div>
+        </div>
+
+        <!-- FILTER BAR -->
+        <div class="filter-bar">
+          <div class="f-search">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="localSearch" placeholder="Cari di General Ledger…" autocomplete="off">
+          </div>
+          <div class="fsep"></div>
+          <div class="chip-grp" id="typeChips">
+            <div class="chip on" data-v="all">Semua</div>
+            <div class="chip" data-v="je">Jurnal Entry</div>
+            <div class="chip" data-v="inv">Invoice</div>
+            <div class="chip" data-v="bill">Bill</div>
+          </div>
+          <div class="fsep"></div>
+          <div class="chip-grp" id="timeChips">
+            <div class="chip" data-range="today" onclick="setTimeChip(this)">Hari Ini</div>
+            <div class="chip" data-range="month" onclick="setTimeChip(this)">Bulan Ini</div>
+            <div class="chip" data-range="q1" onclick="setTimeChip(this)">Q1</div>
+            <div class="chip" data-range="q2" onclick="setTimeChip(this)">Q2</div>
+          </div>
+          <div class="f-right">
+            <button class="f-filter-btn" onclick="openFilterDrawer()">
+              <svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+              Filter Lainnya
+              <span class="badge" id="filterBadge" style="display:none">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-wrap">
+          <div class="tbl-scroll">
+            <table id="glTable">
+              <thead>
+                <tr>
+                  <th class="sortable" data-col="date">Tanggal<span class="sort-arrow"></span></th>
+                  <th class="sortable" data-col="ref">Referensi<span class="sort-arrow"></span></th>
+                  <th>Tipe</th>
+                  <th class="sortable" data-col="acct">Akun<span class="sort-arrow"></span></th>
+                  <th class="sortable r" data-col="debit">Debit (Rp)<span class="sort-arrow"></span></th>
+                  <th class="sortable r" data-col="credit">Kredit (Rp)<span class="sort-arrow"></span></th>
+                  <th class="sortable r" data-col="balance">Saldo (Rp)<span class="sort-arrow"></span></th>
+                </tr>
+              </thead>
+              <tbody id="glBody"></tbody>
+            </table>
+            <div id="emptyState" class="empty-state" style="display:none">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+              <div class="empty-title">Tidak ada data</div>
+              <div class="empty-sub">Coba ubah filter atau pencarian</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /scroll-area -->
+    </div><!-- /content-main -->
+
+    <!-- AI PANEL -->
+    <div class="ai-panel" id="aiPanel">
+      <div class="ai-panel-inner">
+      <div class="ai-head">
+        <div class="ai-head-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><circle cx="19" cy="5" r="3" fill="white" stroke="none"/></svg>
+        </div>
+        <div class="ai-head-text">
+          <div class="ai-head-title">Asisten AI Klay</div>
+          <div class="ai-head-sub">● AKTIF · General Ledger</div>
+        </div>
+        <div class="ai-head-close" onclick="closeAI()">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+      </div>
+      <div class="ai-tabs">
+        <div class="ai-tab on" onclick="switchAITab(0,this)">Percakapan</div>
+        <div class="ai-tab" onclick="switchAITab(1,this)">Riwayat</div>
+      </div>
+      <div class="ai-session-bar" id="aiSessionBar">
+        <span class="ai-session-title" id="aiSessionTitle" contenteditable="true" spellcheck="false" onblur="saveSessionTitle()" onkeydown="sessionTitleKey(event)">Sesi 1</span><span class="ai-session-edit-hint">✎ edit</span>
+      </div>
+      <div class="ai-msgs" id="aiMsgs"></div>
+      <div class="ai-hist-list hidden" id="aiHistList"></div>
+      <div class="ai-suggestion-chips" id="aiChips">
+        <span class="ai-sc" onclick="sendAISuggestion(this)">Analisis saldo</span>
+        <span class="ai-sc" onclick="sendAISuggestion(this)">Cek anomali</span>
+        <span class="ai-sc" onclick="sendAISuggestion(this)">Ringkasan periode</span>
+        <span class="ai-sc" onclick="sendAISuggestion(this)">Top akun aktif</span>
+      </div>
+      <div class="ai-chat-box">
+        <div class="ai-chat-box-inner">
+          <textarea class="ai-chat-textarea" id="aiInput" placeholder="Tanya tentang GL ini…" rows="1" onkeydown="aiInputKey(event)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+          <button class="ai-chat-send" onclick="sendAIMessage()">
+            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+        <div class="ai-chat-hint">Enter untuk kirim · Shift+Enter baris baru</div>
+      </div>
+      </div><!-- /ai-panel-inner -->
+    </div>
+
+  </div><!-- /content-row -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- STICKY STATUS BAR -->
+<div class="sticky-status-bar" id="stickyStatusBar">
+  <div class="sb-stat">
+    <span class="sb-stat-label">Total</span>
+    <span class="sb-stat-val" id="statTotal">0 item</span>
+  </div>
+  <div class="sb-sep"></div>
+  <div class="sb-stat">
+    <span class="sb-stat-label">Tampil</span>
+    <span class="sb-stat-val" id="statShowing">0 dari 0</span>
+  </div>
+  <div class="sb-sep"></div>
+  <div class="sb-stat">
+    <span class="sb-stat-label">Debit</span>
+    <span class="sb-stat-val debit" id="statDebit">Rp 0</span>
+  </div>
+  <div class="sb-sep"></div>
+  <div class="sb-stat">
+    <span class="sb-stat-label">Kredit</span>
+    <span class="sb-stat-val credit" id="statCredit">Rp 0</span>
+  </div>
+  <div class="sb-sep"></div>
+  <div class="sb-stat">
+    <span class="sb-stat-label">Saldo</span>
+    <span class="sb-stat-val balance" id="statBalance">Rp 0</span>
+  </div>
+  <div class="sb-right" style="margin-left:auto;display:flex;align-items:center;gap:16px">
+    <div class="sb-stat" style="gap:5px">
+      <span class="sb-stat-label">Baris</span>
+      <select id="pageSizeSelect" onchange="changePageSize(this.value)" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:4px;color:rgba(255,255,255,.85);font-family:var(--font-mono);font-size:11px;padding:2px 5px;cursor:pointer;outline:none">
+        <option value="20">20</option>
+        <option value="50" selected>50</option>
+        <option value="100">100</option>
+      </select>
+    </div>
+    <div class="sb-sep"></div>
+    <div class="sb-stat" style="gap:4px">
+      <button onclick="prevPage()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:4px;color:rgba(255,255,255,.6);width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;line-height:1">‹</button>
+      <span class="sb-stat-val" id="statPage" style="min-width:32px;text-align:center">1/1</span>
+      <button onclick="nextPage()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:4px;color:rgba(255,255,255,.6);width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;line-height:1">›</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- DETAIL DRAWER -->
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div>
+      <div class="d-ref" id="dRef">—</div>
+      <div class="d-badge posted" id="dBadge">Posted</div>
+    </div>
+    <div class="d-close" onclick="closeDrawer()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+  </div>
+  <div class="d-tabs">
+    <div class="d-tab on" onclick="switchDrawerTab(0,this)">Detail</div>
+    <div class="d-tab" onclick="switchDrawerTab(1,this)">Line Items</div>
+    <div class="d-tab" onclick="switchDrawerTab(2,this)">Audit Trail</div>
+  </div>
+  <div class="d-body" id="dBody">
+    <div class="d-pane on" id="dPane0"></div>
+    <div class="d-pane" id="dPane1"></div>
+    <div class="d-pane" id="dPane2"></div>
+  </div>
+</div>
+
+<!-- FILTER DRAWER OVERLAY -->
+<div class="filter-overlay" id="filterOverlay" onclick="closeFilterDrawer()"></div>
+
+<!-- FILTER DRAWER -->
+<div class="filter-drawer" id="filterDrawer">
+  <div class="fd-head">
+    <span class="fd-title">Filter Lainnya</span>
+    <div class="d-close" onclick="closeFilterDrawer()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+  </div>
+  <div class="fd-body">
+    <div class="fd-section">
+      <div class="fd-label">Rentang Tanggal</div>
+      <div class="fd-shortcuts">
+        <div class="fd-sc" data-range="today" onclick="setDateShortcut(this)">Hari ini</div>
+        <div class="fd-sc" data-range="week" onclick="setDateShortcut(this)">7 hari</div>
+        <div class="fd-sc" data-range="month" onclick="setDateShortcut(this)">Bulan ini</div>
+        <div class="fd-sc" data-range="q1" onclick="setDateShortcut(this)">Q1 2025</div>
+        <div class="fd-sc" data-range="all" onclick="setDateShortcut(this)">Semua</div>
+      </div>
+      <div class="fd-date-row">
+        <input type="date" class="fd-input" id="fdDateFrom" placeholder="Dari" onchange="applyFilters()">
+        <input type="date" class="fd-input" id="fdDateTo" placeholder="Sampai" onchange="applyFilters()">
+      </div>
+    </div>
+    <div class="fd-section">
+      <div class="fd-label">Akun</div>
+      <select class="fd-select" id="fdAcct" onchange="applyFilters()">
+        <option value="">Semua Akun</option>
+      </select>
+    </div>
+    <div class="fd-section">
+      <div class="fd-label">Dimensi</div>
+      <select class="fd-select" id="fdDim" onchange="applyFilters()">
+        <option value="">Semua Dimensi</option>
+        <option>Finance</option>
+        <option>Sales</option>
+        <option>Operations</option>
+        <option>HR</option>
+      </select>
+    </div>
+  </div>
+  <div class="fd-foot">
+    <button class="btn-ghost" onclick="resetFilters()" style="flex:1">Reset</button>
+    <button class="btn-primary" onclick="closeFilterDrawer()" style="flex:2">Terapkan</button>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   DATA — from tradeos-dummy-erp-data.json journal_entries
+   All entries balanced (debit = credit per JE)
+═══════════════════════════════════════════════════════════ */
+const BILL_REFS = {
+  'BILL001': 'INV-V001-20250115',
+  'BILL002': 'INV-V002-20250120',
+  'BILL003': 'INV-V003-20250208',
+  'BILL004': 'INV-V004-20250315',
+  'BILL005': 'INV-V005-20250315',
+};
+const INV_REFS = {
+  'INV001': 'INV-C001-20250118',
+  'INV002': 'INV-C002-20250125',
+  'INV003': 'INV-C001-20250210',
+  'INV004': 'INV-C003-20250220',
+  'INV005': 'INV-C004-20250315',
+};
+
+const JE_DATA = [
+  // ── MANUAL JOURNAL ENTRIES ──
+  {id:'JE-2025-0001',date:'2025-01-31',refType:'manual',refId:null,memo:'Beban gaji karyawan bulan Januari 2025',postedBy:'Budi Santoso',postedDate:'2025-01-31',createdBy:'Sarah Wijaya',createdDate:'2025-01-31',lines:[
+    {acct:'5-1010',acctName:'Beban Gaji & Tunjangan',debit:45000000,credit:0,desc:'Gaji pokok + tunjangan bulan Januari'},
+    {acct:'2-1300',acctName:'Utang Gaji & Tunjangan',debit:0,credit:45000000,desc:'Akrual gaji bulan Januari'}
+  ]},
+  {id:'JE-2025-0019',date:'2025-02-28',refType:'manual',refId:null,memo:'Beban gaji karyawan bulan Februari 2025',postedBy:'Budi Santoso',postedDate:'2025-02-28',createdBy:'Sarah Wijaya',createdDate:'2025-02-28',lines:[
+    {acct:'5-1010',acctName:'Beban Gaji & Tunjangan',debit:45000000,credit:0,desc:'Gaji pokok + tunjangan bulan Februari'},
+    {acct:'2-1300',acctName:'Utang Gaji & Tunjangan',debit:0,credit:45000000,desc:'Akrual gaji bulan Februari'}
+  ]},
+  {id:'JE-2025-0020',date:'2025-01-31',refType:'manual',refId:null,memo:'Penyusutan aset tetap bulan Januari 2025',postedBy:'Andi Prasetyo',postedDate:'2025-01-31',createdBy:'Andi Prasetyo',createdDate:'2025-01-31',lines:[
+    {acct:'5-1040',acctName:'Beban Penyusutan',debit:3200000,credit:0,desc:'Penyusutan peralatan kantor bulan Januari'},
+    {acct:'1-2110',acctName:'Akum. Penyusutan Peralatan',debit:0,credit:3200000,desc:'Akumulasi penyusutan peralatan kantor'}
+  ]},
+  // ── BILLS ──
+  {id:'JE-2025-0002',date:'2025-01-15',refType:'bill',refId:'BILL001',memo:'Pencatatan utang atas pembelian komponen elektronik dari supplier',postedBy:'Budi Santoso',postedDate:'2025-01-20',createdBy:'Sarah Wijaya',createdDate:'2025-01-15',lines:[
+    {acct:'6-1000',acctName:'Biaya Pokok Penjualan',debit:75000000,credit:0,desc:'Pembelian komponen elektronik'},
+    {acct:'5-2200',acctName:'Beban PPN Masukan',debit:7500000,credit:0,desc:'PPN masukan pembelian'},
+    {acct:'2-1100',acctName:'Utang Usaha',debit:0,credit:82500000,desc:'Pencatatan utang kepada supplier'}
+  ]},
+  {id:'JE-2025-0003',date:'2025-01-20',refType:'bill',refId:'BILL002',memo:'Pencatatan pembelian peralatan kantor - meja dan kursi kantor',postedBy:'Budi Santoso',postedDate:'2025-02-05',createdBy:'Andi Prasetyo',createdDate:'2025-01-20',lines:[
+    {acct:'1-2100',acctName:'Peralatan Kantor',debit:19200000,credit:0,desc:'Pembelian peralatan kantor (meja dan kursi)'},
+    {acct:'5-2200',acctName:'Beban PPN Masukan',debit:1920000,credit:0,desc:'PPN masukan pembelian aset'},
+    {acct:'2-1100',acctName:'Utang Usaha',debit:0,credit:21120000,desc:'Utang pembelian peralatan kantor'}
+  ]},
+  {id:'JE-2025-0004',date:'2025-02-08',refType:'bill',refId:'BILL003',memo:'Pencatatan biaya pengiriman & jasa logistik bulan Februari',postedBy:'Andi Prasetyo',postedDate:'2025-02-10',createdBy:'Rina Kusuma',createdDate:'2025-02-08',lines:[
+    {acct:'5-1000',acctName:'Beban Operasional',debit:12500000,credit:0,desc:'Biaya jasa logistik & pengiriman produk'},
+    {acct:'5-2200',acctName:'Beban PPN Masukan',debit:1250000,credit:0,desc:'PPN masukan jasa'},
+    {acct:'2-1100',acctName:'Utang Usaha',debit:0,credit:13750000,desc:'Utang atas biaya logistik'}
+  ]},
+  {id:'JE-2025-0008',date:'2025-03-15',refType:'bill',refId:'BILL004',memo:'Pencatatan biaya konsultasi audit internal dari PT Penyedia Layanan Konsultasi',postedBy:'Sarah Wijaya',postedDate:'2025-03-20',createdBy:'Budi Santoso',createdDate:'2025-03-15',lines:[
+    {acct:'5-1070',acctName:'Biaya Konsultan & Profesional',debit:25000000,credit:0,desc:'Jasa konsultasi audit internal'},
+    {acct:'5-2200',acctName:'Beban PPN Masukan',debit:2500000,credit:0,desc:'PPN masukan atas jasa konsultasi'},
+    {acct:'2-1100',acctName:'Utang Usaha',debit:0,credit:27500000,desc:'Utang atas jasa konsultasi'}
+  ]},
+  {id:'JE-2025-0009',date:'2025-03-15',refType:'bill',refId:'BILL005',memo:'Pencatatan pembelian bahan baku jagung dari koperasi tani',postedBy:'Andi Prasetyo',postedDate:'2025-03-18',createdBy:'Sarah Wijaya',createdDate:'2025-03-15',lines:[
+    {acct:'6-1000',acctName:'Biaya Pokok Penjualan',debit:12500000,credit:0,desc:'Pembelian bahan baku jagung'},
+    {acct:'5-2200',acctName:'Beban PPN Masukan',debit:1250000,credit:0,desc:'PPN masukan'},
+    {acct:'2-1100',acctName:'Utang Usaha',debit:0,credit:13750000,desc:'Utang pembelian bahan baku'}
+  ]},
+  // ── BILL PAYMENTS ──
+  {id:'JE-2025-0011',date:'2025-02-10',refType:'bill_payment',refId:'BILL001',memo:'Pembayaran utang pembelian komponen elektronik dari PT Supplier Elektronik',postedBy:'Sarah Wijaya',postedDate:'2025-02-10',createdBy:'Andi Prasetyo',createdDate:'2025-02-10',lines:[
+    {acct:'2-1100',acctName:'Utang Usaha',debit:82500000,credit:0,desc:'Pembayaran utang supplier'},
+    {acct:'1-1100',acctName:'Kas & Bank',debit:0,credit:82500000,desc:'Pengeluaran kas'}
+  ]},
+  {id:'JE-2025-0012',date:'2025-02-05',refType:'bill_payment',refId:'BILL002',memo:'Pembayaran utang pembelian peralatan kantor ke CV Toko Bangunan Jaya',postedBy:'Sarah Wijaya',postedDate:'2025-02-05',createdBy:'Andi Prasetyo',createdDate:'2025-02-05',lines:[
+    {acct:'2-1100',acctName:'Utang Usaha',debit:21120000,credit:0,desc:'Pembayaran utang supplier'},
+    {acct:'1-1100',acctName:'Kas & Bank',debit:0,credit:21120000,desc:'Pengeluaran kas'}
+  ]},
+  {id:'JE-2025-0013',date:'2025-02-16',refType:'bill_payment',refId:'BILL003',memo:'Pembayaran biaya logistik ke PT Jasa Logistik Cepat',postedBy:'Sarah Wijaya',postedDate:'2025-02-16',createdBy:'Andi Prasetyo',createdDate:'2025-02-16',lines:[
+    {acct:'2-1100',acctName:'Utang Usaha',debit:13750000,credit:0,desc:'Pembayaran utang logistik'},
+    {acct:'1-1100',acctName:'Kas & Bank',debit:0,credit:13750000,desc:'Pengeluaran kas'}
+  ]},
+  {id:'JE-2025-0014',date:'2025-04-10',refType:'bill_payment',refId:'BILL004',memo:'Pembayaran biaya konsultasi ke PT Penyedia Layanan Konsultasi',postedBy:'Andi Prasetyo',postedDate:'2025-04-10',createdBy:'Sarah Wijaya',createdDate:'2025-04-10',lines:[
+    {acct:'2-1100',acctName:'Utang Usaha',debit:27500000,credit:0,desc:'Pembayaran utang konsultasi'},
+    {acct:'1-1100',acctName:'Kas & Bank',debit:0,credit:27500000,desc:'Pengeluaran kas'}
+  ]},
+  // ── INVOICES ──
+  {id:'JE-2025-0005',date:'2025-01-25',refType:'invoice',refId:'INV002',memo:'Pencatatan penjualan produk divisi B kepada distributor',postedBy:'Sarah Wijaya',postedDate:'2025-03-09',createdBy:'Rina Kusuma',createdDate:'2025-01-25',lines:[
+    {acct:'1-1200',acctName:'Piutang Usaha',debit:9625000,credit:0,desc:'Piutang penjualan produk divisi B'},
+    {acct:'4-1020',acctName:'Penjualan Produk - Divisi B',debit:0,credit:8750000,desc:'Pendapatan penjualan produk divisi B'},
+    {acct:'2-1200',acctName:'Utang Pajak',debit:0,credit:875000,desc:'PPN keluaran atas penjualan'}
+  ]},
+  {id:'JE-2025-0006',date:'2025-02-10',refType:'invoice',refId:'INV003',memo:'Pencatatan penjualan produk divisi A + jasa setup & training',postedBy:'Andi Prasetyo',postedDate:'2025-03-10',createdBy:'Sarah Wijaya',createdDate:'2025-02-10',lines:[
+    {acct:'1-1200',acctName:'Piutang Usaha',debit:24200000,credit:0,desc:'Piutang penjualan produk + jasa'},
+    {acct:'4-1010',acctName:'Penjualan Produk - Divisi A',debit:0,credit:20000000,desc:'Pendapatan penjualan divisi A'},
+    {acct:'4-1030',acctName:'Penjualan Jasa Tambahan',debit:0,credit:2000000,desc:'Pendapatan jasa setup & training'},
+    {acct:'2-1200',acctName:'Utang Pajak',debit:0,credit:2200000,desc:'PPN keluaran atas penjualan'}
+  ]},
+  {id:'JE-2025-0007',date:'2025-02-20',refType:'invoice',refId:'INV004',memo:'Pencatatan penjualan produk divisi B ke Toko Modern Bandung',postedBy:'Sarah Wijaya',postedDate:'2025-03-11',createdBy:'Andi Prasetyo',createdDate:'2025-02-20',lines:[
+    {acct:'1-1200',acctName:'Piutang Usaha',debit:18562500,credit:0,desc:'Piutang penjualan produk'},
+    {acct:'4-1020',acctName:'Penjualan Produk - Divisi B',debit:0,credit:16875000,desc:'Pendapatan penjualan divisi B'},
+    {acct:'2-1200',acctName:'Utang Pajak',debit:0,credit:1687500,desc:'PPN keluaran'}
+  ]},
+  {id:'JE-2025-0010',date:'2025-03-15',refType:'invoice',refId:'INV005',memo:'Pencatatan penjualan produk divisi A ke Hypermarket Medan',postedBy:'Budi Santoso',postedDate:'2025-03-16',createdBy:'Sarah Wijaya',createdDate:'2025-03-15',lines:[
+    {acct:'1-1200',acctName:'Piutang Usaha',debit:48400000,credit:0,desc:'Piutang penjualan produk'},
+    {acct:'4-1010',acctName:'Penjualan Produk - Divisi A',debit:0,credit:44000000,desc:'Pendapatan penjualan divisi A'},
+    {acct:'2-1200',acctName:'Utang Pajak',debit:0,credit:4400000,desc:'PPN keluaran'}
+  ]},
+  // ── INVOICE PAYMENTS ──
+  {id:'JE-2025-0018',date:'2025-02-12',refType:'invoice_payment',refId:'INV001',memo:'Penerimaan pembayaran piutang dari PT Ritel Utama Indonesia - invoice pertama',postedBy:'Andi Prasetyo',postedDate:'2025-02-12',createdBy:'Sarah Wijaya',createdDate:'2025-02-12',lines:[
+    {acct:'1-1100',acctName:'Kas & Bank',debit:33000000,credit:0,desc:'Penerimaan kas dari pelanggan'},
+    {acct:'1-1200',acctName:'Piutang Usaha',debit:0,credit:33000000,desc:'Pelunasan piutang'}
+  ]},
+  {id:'JE-2025-0015',date:'2025-03-09',refType:'invoice_payment',refId:'INV002',memo:'Penerimaan pembayaran piutang dari CV Distributor Produk Rumahan',postedBy:'Andi Prasetyo',postedDate:'2025-03-09',createdBy:'Rina Kusuma',createdDate:'2025-03-09',lines:[
+    {acct:'1-1100',acctName:'Kas & Bank',debit:9625000,credit:0,desc:'Penerimaan kas dari pelanggan'},
+    {acct:'1-1200',acctName:'Piutang Usaha',debit:0,credit:9625000,desc:'Pelunasan piutang'}
+  ]},
+  {id:'JE-2025-0016',date:'2025-03-10',refType:'invoice_payment',refId:'INV003',memo:'Penerimaan pembayaran piutang dari PT Ritel Utama Indonesia',postedBy:'Budi Santoso',postedDate:'2025-03-10',createdBy:'Sarah Wijaya',createdDate:'2025-03-10',lines:[
+    {acct:'1-1100',acctName:'Kas & Bank',debit:24200000,credit:0,desc:'Penerimaan kas dari pelanggan'},
+    {acct:'1-1200',acctName:'Piutang Usaha',debit:0,credit:24200000,desc:'Pelunasan piutang'}
+  ]},
+  {id:'JE-2025-0017',date:'2025-03-11',refType:'invoice_payment',refId:'INV004',memo:'Penerimaan pembayaran piutang dari Toko Modern Bandung',postedBy:'Sarah Wijaya',postedDate:'2025-03-11',createdBy:'Andi Prasetyo',createdDate:'2025-03-11',lines:[
+    {acct:'1-1100',acctName:'Kas & Bank',debit:18562500,credit:0,desc:'Penerimaan kas dari pelanggan'},
+    {acct:'1-1200',acctName:'Piutang Usaha',debit:0,credit:18562500,desc:'Pelunasan piutang'}
+  ]}
+];
+
+// Get display reference number based on source type
+function getDisplayRef(je){
+  if(je.refType==='invoice'||je.refType==='invoice_payment'){
+    return INV_REFS[je.refId] || je.id;
+  }
+  if(je.refType==='bill'||je.refType==='bill_payment'){
+    return BILL_REFS[je.refId] || je.id;
+  }
+  return je.id; // manual JE
+}
+
+// Flatten JE data into GL rows — 1 row per JE (not per line)
+// Running balance tracks the net effect of all lines
+function buildGLRows(){
+  const sorted=[...JE_DATA].sort((a,b)=>a.date.localeCompare(b.date));
+  const rows=[];
+  let runBal=500000000;
+  sorted.forEach(je=>{
+    const displayRef=getDisplayRef(je);
+    // Calculate totals across all lines
+    const totalDebit=je.lines.reduce((s,l)=>s+(l.debit||0),0);
+    const totalCredit=je.lines.reduce((s,l)=>s+(l.credit||0),0);
+    runBal += totalDebit - totalCredit;
+    // Use first debit line's account as primary display account, fallback to first line
+    const primaryLine = je.lines.find(l=>l.debit>0) || je.lines[0];
+    rows.push({
+      id: je.id,
+      jeId: je.id,
+      date: je.date,
+      dateLabel: fmtDate(je.date),
+      ref: displayRef,
+      refRaw: je.id,
+      refType: mapRefType(je.refType),
+      refId: je.refId,
+      acct: primaryLine.acct,
+      acctName: primaryLine.acctName,
+      desc: je.memo,
+      debit: totalDebit,
+      credit: totalCredit,
+      balance: runBal,
+      jeData: je
+    });
+  });
+  return rows;
+}
+
+function mapRefType(t){
+  if(t==='invoice'||t==='invoice_payment') return 'inv';
+  if(t==='bill'||t==='bill_payment') return 'bill';
+  return 'je'; // manual or any other
+}
+
+function fmtDate(d){
+  const dt=new Date(d);
+  return dt.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+function fmt(n){
+  if(!n&&n!==0) return '–';
+  return 'Rp '+Math.abs(n).toLocaleString('id-ID');
+}
+// For table cells - no Rp prefix (header already says Rp)
+function fmtNum(n){
+  if(!n) return '–';
+  return Math.abs(n).toLocaleString('id-ID');
+}
+
+const ALL_ROWS = buildGLRows();
+let filteredRows = [...ALL_ROWS];
+let sortCol = 'date';
+let sortDir = 'asc';
+let currentPage = 1;
+let PAGE_SIZE = 50;
+let activeRowId = null;
+let filterType = 'all';
+let filterDateFrom = '';
+let filterDateTo = '';
+let filterAcct = '';
+let filterSearch = '';
+
+// Build account list for filter
+const acctSet = new Set(ALL_ROWS.map(r=>r.acct+'|'+r.acctName));
+const fdAcctSel = document.getElementById('fdAcct');
+[...acctSet].sort().forEach(a=>{
+  const [code,name]=a.split('|');
+  const opt=document.createElement('option');
+  opt.value=code;opt.textContent=`${code} — ${name}`;
+  fdAcctSel.appendChild(opt);
+});
+
+/* ── FILTER & SORT ── */
+function getFiltered(){
+  let rows=[...ALL_ROWS];
+  if(filterType!=='all') rows=rows.filter(r=>r.refType===filterType);
+  if(filterSearch) rows=rows.filter(r=>(r.ref+r.acct+r.acctName+r.desc).toLowerCase().includes(filterSearch.toLowerCase()));
+  if(filterDateFrom) rows=rows.filter(r=>r.date>=filterDateFrom);
+  if(filterDateTo) rows=rows.filter(r=>r.date<=filterDateTo);
+  if(filterAcct) rows=rows.filter(r=>r.acct===filterAcct);
+  return rows;
+}
+
+function getSorted(rows){
+  return [...rows].sort((a,b)=>{
+    let va=a[sortCol]||0, vb=b[sortCol]||0;
+    if(sortCol==='date'){va=a.date;vb=b.date;}
+    if(sortCol==='ref'){va=a.ref;vb=b.ref;}
+    if(sortCol==='acct'){va=a.acct;vb=b.acct;}
+    const cmp = va<vb?-1:va>vb?1:0;
+    return sortDir==='asc'?cmp:-cmp;
+  });
+}
+
+function applyFilters(){
+  filterSearch=document.getElementById('localSearch').value;
+  filterDateFrom=document.getElementById('fdDateFrom').value;
+  filterDateTo=document.getElementById('fdDateTo').value;
+  filterAcct=document.getElementById('fdAcct').value;
+  filteredRows=getFiltered();
+  currentPage=1;
+  updateFilterBadge();
+  renderTable();
+}
+
+function updateFilterBadge(){
+  let cnt=0;
+  if(filterDateFrom||filterDateTo) cnt++;
+  if(filterAcct) cnt++;
+  const b=document.getElementById('filterBadge');
+  b.style.display=cnt?'inline-flex':'none';
+  b.textContent=cnt;
+}
+
+function filterByType(t){
+  filterType=t;
+  document.querySelectorAll('#typeChips .chip').forEach(c=>{
+    c.classList.toggle('on',c.dataset.v===t);
+  });
+  closeCmdDropdown();
+  applyFilters();
+}
+
+function resetFilters(){
+  filterDateFrom=''; filterDateTo=''; filterAcct='';
+  document.getElementById('fdDateFrom').value='';
+  document.getElementById('fdDateTo').value='';
+  document.getElementById('fdAcct').value='';
+  document.querySelectorAll('.fd-sc').forEach(s=>s.classList.remove('on'));
+  applyFilters();
+}
+
+/* ── ANOMALY DATA ── */
+const ANOMALIES = {
+  'JE-2025-0001': {type:'warn', flag:'Nilai tidak wajar', detail:'Nilai beban gaji melebihi rata-rata 3 bulan sebelumnya.', grid:[{label:'Rata-rata Historis',val:'Rp 38.500.000'},{label:'Nilai Saat Ini',val:'Rp 45.000.000'},{label:'Selisih',val:'+16.9%'}]},
+  'JE-2025-0005': {type:'danger', flag:'Kemungkinan duplikasi', detail:'Transaksi ini memiliki karakteristik yang sangat mirip dengan INV-C002-20250125 yang diinput 4 menit sebelumnya.', grid:[{label:'Pelanggan Sama',val:'CV Distributor'},{label:'Nilai Identik',val:'Rp 9.625.000'},{label:'Selisih Waktu',val:'4 menit'}]},
+};
+let dismissedAnomalies = new Set();
+let expandedRows = new Set();
+
+/* ── RENDER ALERT SECTION ── */
+function renderAlertSection(){
+  const active = Object.entries(ANOMALIES).filter(([id])=>!dismissedAnomalies.has(id));
+  const list = document.getElementById('aiAlertList');
+  const titleEl = document.getElementById('aiAlertTitle');
+  // Badge always stays visible — just update text
+  if(!active.length){
+    titleEl.textContent='Semua transaksi sudah aman';
+    list.innerHTML=`<div class="ai-alert-empty">
+      <div class="ai-alert-empty-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <span class="ai-alert-empty-text">Tidak ada transaksi yang perlu ditinjau</span>
+    </div>`;
+  } else {
+    titleEl.textContent='Beberapa transaksi perlu ditinjau sebelum penutupan periode';
+    list.innerHTML=active.map(([id,a])=>`
+      <div class="ai-alert-item ${a.type}" id="alert-${id}">
+        <div class="ai-alert-dot ${a.type}">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="ai-alert-content">
+          <div><span class="ai-alert-ref">${id}</span> — <span class="ai-alert-msg">${a.detail.split('.')[0]}</span> <span class="ai-alert-amount">${a.grid[1]?.val||''}</span></div>
+          <div class="ai-alert-actions">
+            <button class="ai-btn-valid" onclick="markValid('${id}')">Tandai sebagai valid</button>
+            <button class="ai-btn-reklasifikasi" onclick="doReklasifikasi('${id}')">Reklasifikasi</button>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+}
+
+function toggleAlertAccordion(){
+  const body=document.getElementById('aiAlertBody');
+  const chev=document.getElementById('alertChevron');
+  body.classList.toggle('collapsed');
+  chev.classList.toggle('open');
+}
+
+function markValid(id){
+  dismissedAnomalies.add(id);
+  renderAlertSection();
+  renderTable();
+}
+
+function doReklasifikasi(id){
+  dismissedAnomalies.add(id);
+  // Auto-generate reversal note
+  renderAlertSection();
+  renderTable();
+  // Show brief toast
+  showToast('Jurnal pembalik otomatis dibuat untuk '+id);
+}
+
+function showToast(msg){
+  let t=document.getElementById('klay-toast');
+  if(!t){t=document.createElement('div');t.id='klay-toast';t.style.cssText='position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#080706;color:#fff;font-size:12px;font-weight:600;padding:8px 18px;border-radius:9999px;z-index:9999;opacity:0;transition:opacity .2s ease;pointer-events:none';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',2500);
+}
+
+function toggleRow(rowId){
+  if(expandedRows.has(rowId)) expandedRows.delete(rowId);
+  else expandedRows.add(rowId);
+  renderTable();
+}
+
+/* ── RENDER TABLE ── */
+function renderTable(){
+  const sorted = getSorted(filteredRows);
+  const total = sorted.length;
+  const pages = Math.max(1,Math.ceil(total/PAGE_SIZE));
+  if(currentPage>pages) currentPage=pages;
+  const start=(currentPage-1)*PAGE_SIZE;
+  const pageRows=sorted.slice(start,start+PAGE_SIZE);
+
+  const tbody=document.getElementById('glBody');
+  const empty=document.getElementById('emptyState');
+
+  if(!total){
+    tbody.innerHTML='';
+    empty.style.display='block';
+  } else {
+    empty.style.display='none';
+    const rows=[];
+    pageRows.forEach(r=>{
+      const anom = !dismissedAnomalies.has(r.jeId) ? ANOMALIES[r.jeId] : null;
+      const anomClass = anom ? (anom.type==='warn'?'anomaly-warn':'anomaly-danger') : '';
+      const isExpanded = expandedRows.has(r.id);
+      const flagHtml = anom ? `<span class="anomaly-flag ${anom.type}">✨ ${anom.flag}</span>` : '';
+      const expandBtn = anom ? `<span onclick="event.stopPropagation();toggleRow('${r.id}')" style="cursor:pointer;margin-left:6px;font-size:10px;color:var(--color-text-tertiary)">${isExpanded?'▲':'▼'}</span>` : '';
+
+      rows.push(`<tr class="${anomClass}" onclick="openDrawer('${r.jeId}')">
+        <td class="td-date">${r.dateLabel}</td>
+        <td><span class="td-ref">${r.ref}</span>${flagHtml}${expandBtn}</td>
+        <td><span class="type-badge ${r.refType}">${typeLbl(r.refType)}</span></td>
+        <td><div class="td-acct-name">${r.acctName}</div><div class="td-acct">${r.acct}</div></td>
+        <td class="r">${r.debit?`<span class="td-amount debit" style="font-weight:800">${fmtNum(r.debit)}</span>`:'<span style="color:var(--color-border-default)">–</span>'}</td>
+        <td class="r">${r.credit?`<span class="td-amount credit" style="font-weight:800">${fmtNum(r.credit)}</span>`:'<span style="color:var(--color-border-default)">–</span>'}</td>
+        <td class="r"><span class="td-balance" style="font-weight:800">${fmtNum(r.balance)}</span></td>
+      </tr>`);
+
+      if(anom && isExpanded){
+        rows.push(`<tr class="anomaly-expand-row ${anomClass}">
+          <td colspan="7">
+            <div class="anomaly-expand-inner">
+              <div class="anomaly-expand-title">${anom.detail}</div>
+              <div class="anomaly-expand-grid">
+                ${anom.grid.map(g=>`<div class="anomaly-expand-cell"><div class="anomaly-expand-cell-label">${g.label}</div><div class="anomaly-expand-cell-val">${g.val}</div></div>`).join('')}
+              </div>
+              <div class="anomaly-expand-actions">
+                <button class="ai-btn-valid" onclick="event.stopPropagation();markValid('${r.jeId}')">Tandai sebagai valid</button>
+                <button class="ai-btn-reklasifikasi" onclick="event.stopPropagation();doReklasifikasi('${r.jeId}')">Reklasifikasi</button>
+              </div>
+            </div>
+          </td>
+        </tr>`);
+      }
+    });
+    tbody.innerHTML=rows.join('');
+  }
+
+  // Sticky status bar
+  const allD=filteredRows.reduce((s,r)=>s+r.debit,0);
+  const allC=filteredRows.reduce((s,r)=>s+r.credit,0);
+  const sortedAll=getSorted(filteredRows);
+  const lastBal=sortedAll.length>0?sortedAll[sortedAll.length-1].balance:500000000;
+  document.getElementById('statTotal').textContent=total+' item';
+  document.getElementById('statShowing').textContent=pageRows.length+' dari '+total;
+  document.getElementById('statDebit').textContent=fmt(allD);
+  document.getElementById('statCredit').textContent=fmt(allC);
+  document.getElementById('statBalance').textContent=fmt(lastBal);
+  document.getElementById('statPage').textContent=currentPage+'/'+pages;
+
+  updateSortHeaders();
+}
+
+function typeLbl(t){
+  const m={je:'JE',inv:'Invoice',bill:'Bill',pay:'Payment'};
+  if(t==='inv') return 'Invoice';
+  if(t==='bill') return 'Bill';
+  if(t==='je') return 'JE';
+  return 'JE';
+}
+
+/* ── SORT ── */
+document.querySelectorAll('thead th.sortable').forEach(th=>{
+  th.addEventListener('click',()=>{
+    const col=th.dataset.col;
+    if(sortCol===col) sortDir=sortDir==='asc'?'desc':'asc';
+    else{sortCol=col;sortDir='asc';}
+    renderTable();
+  });
+});
+
+function updateSortHeaders(){
+  document.querySelectorAll('thead th.sortable').forEach(th=>{
+    th.classList.remove('sort-asc','sort-desc');
+    if(th.dataset.col===sortCol) th.classList.add('sort-'+sortDir);
+  });
+}
+
+/* ── LOCAL SEARCH ── */
+document.getElementById('localSearch').addEventListener('input',applyFilters);
+
+/* ── TYPE CHIPS ── */
+document.getElementById('typeChips').addEventListener('click',e=>{
+  const c=e.target.closest('.chip'); if(!c) return;
+  filterByType(c.dataset.v);
+});
+
+/* ── COMMAND SEARCH ── */
+const tbSearchEl=document.getElementById('tbSearch');
+const tbInput=document.getElementById('tbSearchInput');
+const cmdDrop=document.getElementById('cmdDropdown');
+
+tbInput.addEventListener('focus',()=>{
+  tbSearchEl.classList.add('focused');
+  cmdDrop.classList.add('open');
+});
+tbInput.addEventListener('blur',()=>{
+  tbSearchEl.classList.remove('focused');
+  setTimeout(()=>cmdDrop.classList.remove('open'),150);
+});
+tbInput.addEventListener('input',()=>{
+  const q=tbInput.value.trim();
+  const titleEl=document.getElementById('cmdAskAITitle');
+  const subEl=document.getElementById('cmdAskAISub');
+  if(q){
+    titleEl.textContent=`✦ "${q}"`;
+    subEl.textContent='Buka percakapan dengan TradeOS AI';
+  } else {
+    titleEl.textContent='✦ Tanya AI tentang ini';
+    subEl.textContent='Buka percakapan dengan TradeOS AI';
+  }
+  const results=document.getElementById('cmdResults');
+  if(!q){results.innerHTML='';return;}
+  const matches=ALL_ROWS.filter(r=>(r.ref+r.acctName+r.desc).toLowerCase().includes(q.toLowerCase())).slice(0,4);
+  results.innerHTML=matches.length?`
+    <div class="cmd-divider"></div>
+    <div class="cmd-section-label">Hasil GL</div>
+    ${matches.map(r=>`<div class="cmd-item" onclick="openDrawer('${r.jeId}')">
+      <div class="cmd-item-icon nav"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+      <div class="cmd-item-text"><div class="cmd-item-title">${r.ref}</div><div class="cmd-item-sub">${r.acctName} · ${r.dateLabel}</div></div>
+    </div>`).join('')}`:
+    '<div class="cmd-divider"></div><div style="padding:12px 14px;font-size:12px;color:var(--color-text-tertiary)">Tidak ditemukan</div>';
+});
+
+document.getElementById('cmdAskAI').addEventListener('click',()=>{
+  const q=tbInput.value.trim();
+  closeCmdDropdown();
+  tbInput.value='';
+  document.getElementById('cmdAskAITitle').textContent='✦ Tanya AI tentang ini';
+  openAI('command');
+  if(q) {
+    setTimeout(()=>{
+      addAIBubble('user', q);
+      const typing=showTyping();
+      setTimeout(()=>{typing.remove();addAIBubble('ai', AI_RESPONSES[aiMsgCount % AI_RESPONSES.length]);},1200);
+    },100);
+  }
+});
+
+function closeCmdDropdown(){cmdDrop.classList.remove('open');}
+
+/* ── FILTER DRAWER ── */
+function openFilterDrawer(){
+  document.getElementById('filterDrawer').classList.add('open');
+  document.getElementById('filterOverlay').classList.add('open');
+}
+function closeFilterDrawer(){
+  document.getElementById('filterDrawer').classList.remove('open');
+  document.getElementById('filterOverlay').classList.remove('open');
+}
+
+function setDateShortcut(el){
+  document.querySelectorAll('.fd-sc').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+  const today=new Date().toISOString().slice(0,10);
+  const r=el.dataset.range;
+  if(r==='today'){document.getElementById('fdDateFrom').value=today;document.getElementById('fdDateTo').value=today;}
+  else if(r==='week'){const d=new Date();d.setDate(d.getDate()-7);document.getElementById('fdDateFrom').value=d.toISOString().slice(0,10);document.getElementById('fdDateTo').value=today;}
+  else if(r==='month'){const d=new Date();d.setDate(1);document.getElementById('fdDateFrom').value=d.toISOString().slice(0,10);document.getElementById('fdDateTo').value=today;}
+  else if(r==='q1'){document.getElementById('fdDateFrom').value='2025-01-01';document.getElementById('fdDateTo').value='2025-03-31';}
+  else if(r==='all'){document.getElementById('fdDateFrom').value='';document.getElementById('fdDateTo').value='';}
+  applyFilters();
+}
+
+/* ── DETAIL DRAWER ── */
+// Dimension data per JE
+const JE_DIM = {
+  'JE-2025-0001': {dept:'Finance',proj:null,branch:'HQ Jakarta'},
+  'JE-2025-0002': {dept:'Operations',proj:'Produk Divisi A',branch:'HQ Jakarta'},
+  'JE-2025-0003': {dept:'General Affairs',proj:null,branch:'HQ Jakarta'},
+  'JE-2025-0004': {dept:'Operations',proj:'Distribusi Feb',branch:'Surabaya'},
+  'JE-2025-0005': {dept:'Sales',proj:'Produk Divisi B',branch:'HQ Jakarta'},
+  'JE-2025-0006': {dept:'Sales',proj:'Produk Divisi A',branch:'HQ Jakarta'},
+  'JE-2025-0007': {dept:'Sales',proj:'Produk Divisi B',branch:'Bandung'},
+  'JE-2025-0008': {dept:'Finance',proj:'Audit Internal Q1',branch:'HQ Jakarta'},
+  'JE-2025-0009': {dept:'Operations',proj:'Produk Divisi B',branch:'Yogyakarta'},
+  'JE-2025-0010': {dept:'Sales',proj:'Produk Divisi A',branch:'Medan'},
+  'JE-2025-0019': {dept:'Finance',proj:null,branch:'HQ Jakarta'},
+  'JE-2025-0020': {dept:'Finance',proj:null,branch:'HQ Jakarta'},
+};
+
+let drawerJeId=null;
+function openDrawer(jeId){
+  const je=JE_DATA.find(j=>j.id===jeId); if(!je) return;
+  drawerJeId=jeId;
+  document.getElementById('dRef').textContent=getDisplayRef(je);
+
+  const tD=je.lines.reduce((s,l)=>s+(l.debit||0),0);
+  const tC=je.lines.reduce((s,l)=>s+(l.credit||0),0);
+  const refLabel = je.refType==='invoice'?'Invoice':je.refType==='bill'?'Bill':je.refType==='bill_payment'?'Pembayaran Bill':je.refType==='invoice_payment'?'Pembayaran Invoice':'Jurnal Entry Manual';
+  const dim = JE_DIM[je.id] || null;
+
+  const openLink = (je.refType.includes('invoice')||je.refType.includes('bill'))?
+    `<a href="#" class="d-open-link" onclick="alert('Buka ${je.refId}');return false;">
+      <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      Buka ${je.refId}
+    </a>`:'';
+
+  // ── TAB 0: DETAIL + DIMENSI ──
+  const dimSection = dim ? `
+    <div class="dsec">
+      <div class="dlbl">Dimensi</div>
+      <div class="dim-grid">
+        ${dim.dept?`<div class="dim-row"><span class="dim-row-label">Departemen</span><span class="dpill dp-dept">${dim.dept}</span></div>`:''}
+        ${dim.proj?`<div class="dim-row"><span class="dim-row-label">Proyek</span><span class="dpill dp-proj">${dim.proj}</span></div>`:''}
+        ${dim.branch?`<div class="dim-row"><span class="dim-row-label">Cabang</span><span class="dpill dp-branch">${dim.branch}</span></div>`:''}
+      </div>
+    </div>` : `<div class="dsec"><div class="dlbl">Dimensi</div><div style="font-size:12px;color:var(--color-text-tertiary);padding:4px 0">Tidak ada dimensi untuk transaksi ini.</div></div>`;
+
+  document.getElementById('dPane0').innerHTML=`
+    ${openLink}
+    <div class="dsec">
+      <div class="dlbl">Informasi Transaksi</div>
+      <div class="info-row"><label>Referensi</label><span>${getDisplayRef(je)}</span></div>
+      <div class="info-row"><label>No. JE</label><span>${je.id}</span></div>
+      <div class="info-row"><label>Tipe</label><span>${refLabel}</span></div>
+      <div class="info-row"><label>Tanggal</label><span>${fmtDate(je.date)}</span></div>
+      <div class="info-row"><label>Keterangan</label><span style="text-align:right;max-width:180px;line-height:1.4">${je.memo}</span></div>
+      <div class="info-row"><label>Dibuat oleh</label><span>${je.createdBy}</span></div>
+      <div class="info-row"><label>Posted oleh</label><span>${je.postedBy}</span></div>
+      <div class="info-row"><label>Tanggal post</label><span>${fmtDate(je.postedDate)}</span></div>
+    </div>
+    ${dimSection}`;
+
+  // ── TAB 1: LINE ITEMS ──
+  document.getElementById('dPane1').innerHTML=`
+    <div class="dsec">
+      <div class="dlbl">Line Items</div>
+      <table class="d-tbl">
+        <thead><tr><th>Akun</th><th class="r">Debit (Rp)</th><th class="r">Kredit (Rp)</th></tr></thead>
+        <tbody>
+          ${je.lines.map(l=>`<tr>
+            <td><div style="font-weight:600;color:var(--color-text-primary)">${l.acctName}</div><div class="li-sub">${l.acct} · ${l.desc}</div></td>
+            <td class="r" style="color:${l.debit?'#A02020':'var(--color-text-tertiary)'}">${l.debit?fmt(l.debit):'–'}</td>
+            <td class="r" style="color:${l.credit?'#166638':'var(--color-text-tertiary)'}">${l.credit?fmt(l.credit):'–'}</td>
+          </tr>`).join('')}
+        </tbody>
+        <tfoot>
+          <tr><td style="font-weight:700">Total</td><td class="r">${fmt(tD)}</td><td class="r">${fmt(tC)}</td></tr>
+          ${tD===tC?`<tr><td colspan="3" style="font-size:10px;color:var(--success-text);text-align:center;background:var(--success-surface);padding:5px;border-radius:4px">✓ Seimbang — Debit = Kredit</td></tr>`:''}
+        </tfoot>
+      </table>
+    </div>`;
+
+  // ── TAB 2: AUDIT TRAIL ──
+  document.getElementById('dPane2').innerHTML=`
+    <div class="dsec">
+      <div class="dlbl">Audit Trail</div>
+      <div class="audit-list">
+        <div class="audit-item">
+          <div class="audit-dot posted"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/></svg></div>
+          <div class="audit-content">
+            <div class="audit-action">Posted</div>
+            <div class="audit-meta">oleh <strong>${je.postedBy}</strong> · ${fmtDate(je.postedDate)}</div>
+          </div>
+        </div>
+        <div class="audit-item">
+          <div class="audit-dot created"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg></div>
+          <div class="audit-content">
+            <div class="audit-action">Dibuat</div>
+            <div class="audit-meta">oleh <strong>${je.createdBy}</strong> · ${fmtDate(je.createdDate)}</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  switchDrawerTab(0, null);
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  drawerJeId=null;
+}
+
+function switchDrawerTab(idx, el){
+  document.querySelectorAll('.d-tab').forEach((t,i)=>t.classList.toggle('on',i===idx));
+  document.querySelectorAll('.d-pane').forEach((p,i)=>p.classList.toggle('on',i===idx));
+}
+
+/* ── AI SESSION TITLE ── */
+let sessionTitle = 'Sesi 1';
+let sessionCount = 1;
+
+function saveSessionTitle(){
+  const el=document.getElementById('aiSessionTitle');
+  const val=el.textContent.trim();
+  sessionTitle = val || `Sesi ${sessionCount}`;
+  el.textContent = sessionTitle;
+}
+
+function sessionTitleKey(e){
+  if(e.key==='Enter'){e.preventDefault();document.getElementById('aiSessionTitle').blur();}
+  if(e.key==='Escape'){document.getElementById('aiSessionTitle').textContent=sessionTitle;document.getElementById('aiSessionTitle').blur();}
+}
+
+/* ── AI PANEL ── */
+let aiHistory = [];
+let aiOpen = false;
+const AI_RESPONSES = [
+  'Berdasarkan data GL periode Jan–Apr 2025, total debit sebesar Rp 413.357.500 dan kredit Rp 413.357.500 — seimbang sempurna. Ini menunjukkan tidak ada entri yang tidak ter-posting dengan benar.',
+  'Akun dengan aktivitas tertinggi adalah Kas & Bank (1-1100) dengan 7 transaksi senilai total Rp 200.387.500. Ini normal untuk bisnis dagang dengan volume pembayaran dan penerimaan yang aktif.',
+  'Terdapat 1 piutang belum terlunasi (INV005 — Rp 48.400.000) dan 1 utang belum dibayar (BILL005 — Rp 13.750.000). Net exposure Rp 34.650.000 masih dalam batas wajar untuk periode ini.',
+  'Beban PPN Masukan (5-2200) mencatat Rp 14.420.000 untuk periode ini. Pastikan dikompensasi dengan PPN Keluaran (2-1200) sebesar Rp 9.162.500 sebelum pelaporan SPT masa.',
+  'Margin operasional bersih terlihat positif di Feb–Mar 2025. Perlu perhatian di April karena hanya ada 1 transaksi pembayaran tanpa pendapatan yang tercatat.',
+];
+let aiMsgCount = 0;
+
+function openAI(context){
+  const panel=document.getElementById('aiPanel');
+  if(!aiOpen){
+    aiOpen=true;
+    panel.classList.add('open');
+    document.getElementById('stickyStatusBar').classList.add('ai-open');
+    if(!aiHistory.length){
+      const welcome = context==='insight' ?
+        'Halo! Saya akan menganalisis saldo General Ledger PT Sejahtera Makmur. Ada hal spesifik yang ingin kamu ketahui?' :
+        'Halo! Saya siap membantu analisis General Ledger. Kamu bisa tanya tentang saldo, anomali, atau ringkasan periode.';
+      addAIBubble('ai', welcome);
+    }
+  }
+}
+
+function closeAI(){
+  aiOpen=false;
+  document.getElementById('aiPanel').classList.remove('open');
+  document.getElementById('stickyStatusBar').classList.remove('ai-open');
+}
+
+function addAIBubble(role, text){
+  const msgs=document.getElementById('aiMsgs');
+  const div=document.createElement('div');
+  div.className='ai-bubble '+role;
+  if(role==='ai') div.innerHTML=`<div class="ai-bubble-label">✦ AI TradeOS</div>${text}`;
+  else div.textContent=text;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+  if(role==='user') aiHistory.push({role,text,ts:new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})});
+  if(role==='ai') aiHistory.push({role,text,ts:new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})});
+  aiMsgCount++;
+}
+
+function showTyping(){
+  const msgs=document.getElementById('aiMsgs');
+  const div=document.createElement('div');
+  div.className='ai-typing';div.id='aiTyping';
+  div.innerHTML='<span></span><span></span><span></span>';
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+  return div;
+}
+
+function sendAIMessage(){
+  const inp=document.getElementById('aiInput');
+  const txt=inp.value.trim(); if(!txt) return;
+  openAI('manual');
+  addAIBubble('user',txt);
+  inp.value='';
+  inp.style.height='auto';
+  const typing=showTyping();
+  setTimeout(()=>{
+    typing.remove();
+    addAIBubble('ai', AI_RESPONSES[aiMsgCount % AI_RESPONSES.length]);
+  },1200+Math.random()*600);
+}
+
+function sendAISuggestion(el){
+  const txt=el.textContent;
+  openAI('manual');
+  addAIBubble('user',txt);
+  const typing=showTyping();
+  setTimeout(()=>{
+    typing.remove();
+    addAIBubble('ai', AI_RESPONSES[aiMsgCount % AI_RESPONSES.length]);
+  },1000+Math.random()*800);
+}
+
+function aiInputKey(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAIMessage();}
+}
+
+function switchAITab(idx, el){
+  document.querySelectorAll('.ai-tab').forEach((t,i)=>t.classList.toggle('on',i===idx));
+  document.getElementById('aiMsgs').classList.toggle('hidden',idx!==0);
+  document.getElementById('aiHistList').classList.toggle('hidden',idx!==1);
+  document.getElementById('aiSessionBar').style.display = idx===0 ? '' : 'none';
+  document.getElementById('aiChips').style.display = idx===0 ? '' : 'none';
+  if(idx===1){
+    const hist=document.getElementById('aiHistList');
+    if(!aiHistory.length){
+      hist.innerHTML='<div style="padding:20px;text-align:center;font-size:12px;color:var(--color-text-tertiary)">Belum ada riwayat percakapan</div>';
+    } else {
+      const userMsgs=aiHistory.filter(h=>h.role==='user');
+      hist.innerHTML=`
+        <div style="padding:10px 12px 4px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary)">Sesi Saat Ini</div>
+        <div class="ai-hist-item" style="border-left:3px solid var(--color-action);cursor:default">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+            <span id="histSessionTitle" contenteditable="true" spellcheck="false"
+              style="font-size:12px;font-weight:700;color:var(--color-action);outline:none;border-bottom:1px dashed transparent;cursor:text;padding:0 2px;border-radius:2px;transition:border-color .1s,background .1s"
+              onfocus="this.style.borderBottomColor='var(--color-action)';this.style.background='rgba(26,70,200,.06)'"
+              onblur="syncSessionTitle(this)"
+              onkeydown="histTitleKey(event,this)"
+            >${sessionTitle}</span>
+            <span style="font-size:10px;color:var(--color-text-tertiary)">✎</span>
+          </div>
+          <div class="ai-hist-preview" style="cursor:pointer" onclick="switchAITab(0,this)">${userMsgs.length} pesan · ${userMsgs[userMsgs.length-1]?.text||'—'}</div>
+        </div>
+        <div style="padding:10px 12px 4px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-top:4px">Pertanyaan</div>
+        ${userMsgs.map((m,i)=>`<div class="ai-hist-item" onclick="switchAITab(0,this)">
+          <div class="ai-hist-preview" style="color:var(--color-text-secondary)">${m.text}</div>
+          <div style="font-size:10px;color:var(--color-text-tertiary);margin-top:2px">${m.ts}</div>
+        </div>`).join('')}`;
+    }
+  }
+}
+
+function syncSessionTitle(el){
+  const val=el.textContent.trim();
+  sessionTitle = val || sessionTitle;
+  el.textContent = sessionTitle;
+  el.style.borderBottomColor='transparent';
+  el.style.background='transparent';
+  // Sync back to conversation tab title
+  const convTitle=document.getElementById('aiSessionTitle');
+  if(convTitle) convTitle.textContent=sessionTitle;
+}
+
+function histTitleKey(e, el){
+  if(e.key==='Enter'){e.preventDefault();el.blur();}
+  if(e.key==='Escape'){el.textContent=sessionTitle;el.blur();}
+}
+
+/* ── EXPORT ── */
+function toggleExp(e){e.stopPropagation();document.getElementById('expMenu').classList.toggle('open');}
+document.addEventListener('click',()=>{const m=document.getElementById('expMenu');if(m)m.classList.remove('open');});
+
+function doExport(fmt_,data){
+  data=data||getSorted(filteredRows);
+  const rows=[['Tanggal','Referensi','Tipe','Akun','Nama Akun','Keterangan','Debit (Rp)','Kredit (Rp)','Saldo (Rp)']];
+  data.forEach(r=>rows.push([r.dateLabel,r.ref,r.refType.toUpperCase(),r.acct,r.acctName,r.desc,r.debit||'',r.credit||'',r.balance]));
+  const csv=rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download=`GL_Klay_${new Date().toISOString().slice(0,10)}.${fmt_==='csv'?'csv':'csv'}`;
+  a.click();
+}
+
+function changePageSize(v){
+  PAGE_SIZE=parseInt(v);
+  currentPage=1;
+  renderTable();
+}
+function prevPage(){
+  if(currentPage>1){currentPage--;renderTable();}
+}
+function nextPage(){
+  const pages=Math.max(1,Math.ceil(filteredRows.length/PAGE_SIZE));
+  if(currentPage<pages){currentPage++;renderTable();}
+}
+
+function setTimeChip(el){
+  const wasOn = el.classList.contains('on');
+  document.querySelectorAll('#timeChips .chip').forEach(c=>c.classList.remove('on'));
+  if(!wasOn){
+    el.classList.add('on');
+    const r=el.dataset.range;
+    const today=new Date().toISOString().slice(0,10);
+    if(r==='today'){filterDateFrom=today;filterDateTo=today;}
+    else if(r==='month'){const d=new Date();d.setDate(1);filterDateFrom=d.toISOString().slice(0,10);filterDateTo=today;}
+    else if(r==='q1'){filterDateFrom='2025-01-01';filterDateTo='2025-03-31';}
+    else if(r==='q2'){filterDateFrom='2025-04-01';filterDateTo='2025-06-30';}
+  } else {
+    filterDateFrom=''; filterDateTo='';
+  }
+  document.getElementById('fdDateFrom').value=filterDateFrom;
+  document.getElementById('fdDateTo').value=filterDateTo;
+  filteredRows=getFiltered();
+  currentPage=1;
+  updateFilterBadge();
+  renderTable();
+}
+
+function doExportNew(){
+  document.getElementById('expMenu').classList.remove('open');
+  const scope=document.querySelector('input[name=expScope]:checked')?.value||'visible';
+  const fmt_=document.querySelector('input[name=expFmt]:checked')?.value||'xlsx';
+  const data=getSorted(scope==='visible'?filteredRows:[...ALL_ROWS]);
+  doExport(fmt_,data);
+}
+
+/* ── INIT ── */
+// Default filter: Bulan Ini
+(function(){
+  // "Bulan Ini" chip aktif secara visual tapi tidak memfilter — tampilkan semua data
+  const monthChip=document.querySelector('#timeChips .chip[data-range="month"]');
+  if(monthChip) monthChip.classList.add('on');
+})();
+filteredRows=getFiltered();
+renderAlertSection();
+renderTable();
+</script>
+</body>
+</html>
