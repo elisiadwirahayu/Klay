@@ -1097,11 +1097,16 @@ function updateFilterBadge(){
 
 function filterByType(t){
   filterType=t;
+  // Reset any custom filter state (e.g. from showGroupItems)
+  filteredRows=getFiltered();
   document.querySelectorAll('#typeChips .chip').forEach(c=>{
     c.classList.toggle('on',c.dataset.v===t);
+    c.style.borderStyle='';
+    c.textContent=({'all':'Semua','je':'Jurnal Entry','inv':'Invoice','bill':'Bill'})[c.dataset.v]||c.dataset.v;
   });
   closeCmdDropdown();
-  applyFilters();
+  currentPage=1;
+  renderTable();
 }
 
 function resetFilters(){
@@ -1136,6 +1141,7 @@ const ANOM_GROUPS = [
     id: 'grp-duplikat',
     title: 'Indikasi Transaksi Duplikat',
     sub: '2 transaksi memiliki detail yang sangat mirip',
+    showAll: true,
     items: [
       {id:'JE-2025-0005', ref:'JE-2025-0005', desc:'Piutang Usaha', amount:'9.625.000', note:'Karakteristik sangat mirip dengan INV-C002-20250125 (Input selisih 4 menit)'},
       {id:'INV-C002-20250125', ref:'INV-C002-20250125', desc:'Piutang Usaha', amount:'9.625.000', note:'Karakteristik sangat mirip dengan JE-2025-0005 (Input selisih 4 menit)'}
@@ -1155,6 +1161,34 @@ function toggleGroup(grpId){
   if(expandedGroups.has(grpId)) expandedGroups.delete(grpId);
   else expandedGroups.add(grpId);
   renderAlertSection();
+}
+
+function showGroupItems(grpId){
+  // Find all jeIds belonging to this group
+  const grp = ANOM_GROUPS.find(g=>g.id===grpId);
+  if(!grp) return;
+  const jeIds = grp.items.filter(item=>!dismissedAnomalies.has(item.id)).map(i=>i.id);
+
+  // Filter ALL_ROWS to only rows whose jeId is in this group
+  filteredRows = ALL_ROWS.filter(r=>jeIds.includes(r.jeId));
+  currentPage=1;
+
+  // Update type chips to clear active state visually, show no chip as "active"
+  // so user knows they're in a custom filter state
+  document.querySelectorAll('#typeChips .chip').forEach(c=>c.classList.remove('on'));
+  document.querySelectorAll('#timeChips .chip').forEach(c=>c.classList.remove('on'));
+
+  // Mark "Semua" chip with a muted style to hint user can click it to reset
+  const allChip = document.querySelector('#typeChips .chip[data-v="all"]');
+  if(allChip){
+    allChip.style.borderStyle='dashed';
+    allChip.textContent='Semua ↩';
+  }
+
+  renderTable();
+
+  // Scroll table into view
+  document.querySelector('.table-wrap')?.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function renderAlertSection(){
@@ -1183,6 +1217,7 @@ function renderAlertSection(){
 
   list.innerHTML=activeGroups.map(g=>{
     const isOpen=expandedGroups.has(g.id);
+    const showAllBtn = g.showAll ? `<button class="ai-btn-lihat" style="font-size:11px;margin-left:4px" onclick="event.stopPropagation();showGroupItems('${g.id}')">Lihat semua item</button>` : '';
     return `
     <div class="anom-group">
       <div class="anom-group-head" onclick="toggleGroup('${g.id}')">
@@ -1191,6 +1226,7 @@ function renderAlertSection(){
           <div class="anom-group-title">${g.title}</div>
           <div class="anom-group-sub">${g.sub}</div>
         </div>
+        ${showAllBtn}
         <span class="anom-group-badge">${g.items.length}</span>
         <svg class="anom-group-chevron ${isOpen?'open':''}" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
       </div>

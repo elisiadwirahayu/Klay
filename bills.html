@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Manrope:wght@300;400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<title>Bills &mdash; Klay</title>
+<style>
+:root{
+  --color-brand:#B83D08;--color-brand-hover:#A03206;
+  --color-action:#1A46C8;--color-action-hover:#1338A8;
+  --color-text-primary:#080706;--color-text-secondary:#2E2B27;--color-text-tertiary:#8C857C;
+  --color-surface-base:#FBF8F5;--color-surface-raised:#FFFFFF;--color-surface-sunken:#F4F0EB;--color-surface-deep:#080706;
+  --color-border-default:#E2DDD7;
+  --success-text:#166638;--success-border:#A8D9BC;--success-surface:#E8F5EE;
+  --warning-text:#7A4D00;--warning-border:#E8C870;--warning-surface:#FDF3E0;
+  --danger-text:#A02020;--danger-border:#EAB8B8;--danger-surface:#FBF0F0;
+  --ai-surface:#EBF0FD;--ai-border:#C8D8FA;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;--radius-full:9999px;
+  --transition-fast:0.1s ease;--transition-base:0.15s ease;--transition-slow:0.2s ease;
+  --font-sans:'Manrope',sans-serif;--font-mono:'Inconsolata',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-surface-base);color:var(--color-text-primary);-webkit-font-smoothing:antialiased;font-size:13px;height:100vh;overflow:hidden}
+.shell{display:flex;height:100vh;overflow:hidden}
+.sb{width:196px;flex-shrink:0;background:var(--color-surface-raised);border-right:1px solid var(--color-border-default);display:flex;flex-direction:column;overflow-y:auto}
+.sb-top{padding:0 16px;height:52px;display:flex;align-items:center;border-bottom:1px solid var(--color-border-default);gap:8px;flex-shrink:0}
+.sb-logomark{width:26px;height:26px;background:var(--color-brand);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logomark svg{width:12px;height:12px;fill:#fff}
+.sb-brand{font-size:14px;font-weight:700;letter-spacing:-.02em}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-border-default);padding:16px 16px 6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 12px;margin:1px 6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:400;color:var(--color-text-tertiary);text-decoration:none;transition:background var(--transition-fast),color var(--transition-fast)}
+.sb-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.sb-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+.sb-item.active{background:var(--color-surface-sunken);color:var(--color-text-primary);font-weight:600;border-left:2px solid var(--color-brand);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-left:0;padding-left:14px}
+.sb-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--color-surface-sunken)}
+.sb-footer-item{display:flex;align-items:center;gap:8px;padding:6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--color-text-tertiary)}
+.sb-footer-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.topbar{height:52px;flex-shrink:0;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 20px;gap:12px;position:relative;z-index:10}
+.tb-search-wrap{position:relative;flex:1;max-width:400px}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 12px;cursor:text;transition:border-color var(--transition-fast),box-shadow var(--transition-fast)}
+.tb-search.focused{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.1);background:var(--color-surface-raised)}
+.tb-search svg{width:13px;height:13px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.tb-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.tb-search input::placeholder{color:var(--color-text-tertiary)}
+.tb-kbd{font-size:10px;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:4px;padding:1px 5px;font-family:var(--font-mono);flex-shrink:0}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-notif{width:30px;height:30px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.tb-notif svg{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--color-brand);border-radius:50%;border:1.5px solid var(--color-surface-raised)}
+.tb-org{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);cursor:pointer;white-space:nowrap}
+.tb-org-name{font-size:12px;font-weight:500;color:var(--color-text-secondary)}
+.tb-av{width:24px;height:24px;border-radius:var(--radius-sm);background:var(--color-action);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tb-caret{width:11px;height:11px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;stroke-linecap:round}
+.cmd-dropdown{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);box-shadow:0 8px 32px rgba(8,7,6,.12);z-index:100;overflow:hidden;display:none}
+.cmd-dropdown.open{display:block}
+.cmd-section-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);padding:10px 14px 4px}
+.cmd-item{display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;transition:background var(--transition-fast)}
+.cmd-item:hover{background:var(--color-surface-sunken)}
+.cmd-item-icon{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cmd-item-icon.ai{background:linear-gradient(135deg,#1A46C8,#7C3AED);animation:aiPulse 2s ease-in-out infinite}
+@keyframes aiPulse{0%,100%{box-shadow:0 0 0 0 rgba(26,70,200,.3)}50%{box-shadow:0 0 0 6px rgba(26,70,200,0)}}
+.cmd-item-icon svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:1.5}
+.cmd-item-icon.nav{background:var(--color-surface-sunken)}
+.cmd-item-icon.nav svg{stroke:var(--color-text-secondary)}
+.cmd-item-text{flex:1}
+.cmd-item-title{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.cmd-item-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.cmd-item-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:var(--radius-full);flex-shrink:0;background:linear-gradient(135deg,#EBF0FD,#EDE9FE);color:#1A46C8}
+.cmd-divider{height:1px;background:var(--color-border-default);margin:4px 0}
+.btn-ai-top{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:700;padding:6px 14px;background:linear-gradient(135deg,#1A46C8,#7C3AED);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:opacity var(--transition-fast)}
+.btn-ai-top:hover{opacity:.92}
+.btn-ai-top svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:1.5}
+.scroll-area{flex:1;overflow-y:auto;padding:20px 24px 16px}
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.page-title{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.head-right{display:flex;gap:8px;align-items:center;position:relative}
+.btn-primary{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:8px 16px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base)}
+.btn-primary:hover{background:var(--color-action-hover)}
+.btn-primary svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
+.btn-ghost{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 13px;cursor:pointer;transition:all var(--transition-fast);position:relative}
+.btn-ghost svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+.btn-ghost:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.exp-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);box-shadow:0 6px 20px rgba(0,0,0,.1);width:232px;z-index:200;display:none;padding:12px}
+.exp-menu.open{display:block}
+.em-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:6px}
+.em-chips{display:flex;gap:4px;margin-bottom:10px}
+.em-chip{font-family:var(--font-sans);font-size:11px;font-weight:500;flex:1;text-align:center;padding:5px 8px;border-radius:var(--radius-sm);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-tertiary);cursor:pointer;transition:all var(--transition-fast)}
+.em-chip.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.em-div{height:1px;background:var(--color-border-default);margin:8px 0}
+.em-dl{width:100%;font-family:var(--font-sans);font-size:12px;font-weight:600;padding:8px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background var(--transition-fast)}
+.em-dl:hover{background:var(--color-action-hover)}
+.em-dl svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2}
+.em-preview{font-size:10px;color:var(--color-text-tertiary);text-align:center;margin-top:5px}
+</style>
+<style>
+.ap-outstanding{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:12px;display:flex;align-items:flex-start;gap:16px}
+.ap-outstanding-icon{width:40px;height:40px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ap-outstanding-icon svg{width:18px;height:18px;stroke:var(--color-text-secondary);fill:none;stroke-width:1.5}
+.ap-outstanding-left{flex:1;min-width:0}
+.ap-outstanding-label{font-size:11px;font-weight:600;color:var(--color-text-tertiary);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.ap-outstanding-ai{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--color-action);font-weight:500;background:var(--ai-surface);border:1px solid var(--ai-border);border-radius:var(--radius-full);padding:3px 10px;cursor:pointer;transition:background var(--transition-fast)}
+.ap-outstanding-ai:hover{background:#dde8fc}
+.ap-outstanding-ai svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.ap-outstanding-amount{font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--color-text-primary);letter-spacing:-.02em;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.ap-ai-summary{background:var(--ai-surface);border:1px solid var(--ai-border);border-radius:var(--radius-md);padding:10px 14px;font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+
+.ap-ai-summary strong{color:var(--color-text-primary);font-weight:600}
+.attn-section{background:var(--warning-surface);border:1px solid var(--warning-border);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden}
+.attn-header{display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;user-select:none}
+.attn-icon{width:30px;height:30px;border-radius:var(--radius-sm);background:rgba(122,77,0,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.attn-icon svg{width:16px;height:16px;stroke:var(--warning-text);fill:none;stroke-width:1.5}
+.attn-title{font-size:14px;font-weight:700;color:var(--color-text-primary);flex:1}
+.attn-toggle{width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform var(--transition-base)}
+.attn-toggle.open{transform:rotate(180deg)}
+.attn-toggle svg{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2}
+.attn-body{display:none;padding:0 18px 14px}
+.attn-body.open{display:block}
+.attn-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.5;margin-bottom:12px}
+.child-acc{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);margin-bottom:8px;overflow:hidden}
+.child-acc:last-child{margin-bottom:0}
+.child-acc-header{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;user-select:none}
+.child-acc-icon{width:26px;height:26px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.child-acc-icon.unpaid{background:var(--danger-surface)}
+.child-acc-icon.unpaid svg{stroke:var(--danger-text)}
+.child-acc-icon.pending{background:var(--warning-surface)}
+.child-acc-icon.pending svg{stroke:var(--warning-text)}
+.child-acc-icon.draft{background:var(--color-surface-sunken)}
+.child-acc-icon.draft svg{stroke:var(--color-text-tertiary)}
+.child-acc-icon svg{width:13px;height:13px;fill:none;stroke-width:1.5}
+.child-acc-title{font-size:12px;font-weight:700;color:var(--color-text-primary);flex:1}
+.child-acc-amount{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--danger-text);margin-right:6px}
+.child-acc-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;background:var(--color-action);color:#fff;border-radius:9999px;font-size:10px;font-weight:700;flex-shrink:0}
+.child-acc-badge.danger{background:var(--danger-text)}
+.child-acc-badge.warn{background:var(--warning-text)}
+.child-acc-badge.neutral{background:var(--color-text-tertiary)}
+.child-acc-toggle{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform var(--transition-base)}
+.child-acc-toggle.open{transform:rotate(180deg)}
+.child-acc-toggle svg{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2}
+.child-acc-body{display:none;padding:0 14px 10px}
+.child-acc-body.open{display:block}
+.attn-item{background:var(--color-surface-base);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.attn-item:last-child{margin-bottom:0}
+.attn-item.overdue{background:var(--danger-surface);border-color:var(--danger-border)}
+.attn-item-info{flex:1;min-width:0}
+.attn-item-id{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--color-action)}
+.attn-item-vendor{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.attn-item-amt{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--color-text-primary);white-space:nowrap;margin-right:4px}
+.overdue-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--radius-full);background:var(--danger-text);color:#fff;white-space:nowrap;margin-bottom:3px}
+.overdue-badge svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:2}
+.attn-ctas{display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap}
+.attn-cta{font-family:var(--font-sans);font-size:11px;font-weight:600;padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;transition:all var(--transition-fast);border:1px solid;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.attn-cta.ghost{background:var(--color-surface-raised);border-color:var(--color-border-default);color:var(--color-text-secondary)}
+.attn-cta.ghost:hover{border-color:var(--color-text-tertiary);color:var(--color-text-primary)}
+.attn-cta.primary{background:var(--color-action);border-color:var(--color-action);color:#fff}
+.attn-cta.primary:hover{background:var(--color-action-hover);border-color:var(--color-action-hover)}
+.attn-cta.danger{background:var(--danger-surface);border-color:var(--danger-border);color:var(--danger-text)}
+.attn-cta.danger:hover{background:#f5e0e0}
+.attn-cta.success{background:var(--success-surface);border-color:var(--success-border);color:var(--success-text)}
+.attn-cta.success:hover{background:#d0eedc}
+.attn-empty{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--success-surface);border:1px solid var(--success-border);border-radius:var(--radius-md);font-size:12px;color:var(--success-text);font-weight:500}
+.child-acc-view-all{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-sans);font-size:10px;font-weight:600;color:var(--color-action);background:var(--ai-surface);border:1px solid var(--ai-border);border-radius:var(--radius-full);padding:3px 9px;cursor:pointer;transition:all var(--transition-fast);white-space:nowrap;flex-shrink:0}
+.child-acc-view-all:hover{background:#dde8fc;border-color:var(--color-action)}
+.child-acc-view-all svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round}
+
+.attn-empty svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.bulk-bar{display:none;align-items:center;gap:10px;background:var(--color-surface-deep);border-radius:var(--radius-md);padding:8px 14px;margin-bottom:10px}
+.bulk-bar.show{display:flex}
+.bulk-bar-info{font-size:12px;font-weight:600;color:#fff}
+.bulk-bar-info span{color:#93B4F8}
+.bulk-bar-sp{flex:1}
+.btn-bulk{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-sans);font-size:11px;font-weight:600;padding:6px 14px;border:none;border-radius:var(--radius-sm);cursor:pointer;transition:all var(--transition-fast)}
+.btn-bulk.approve{background:var(--success-text);color:#fff}
+.btn-bulk.approve:hover{background:#0d4d28}
+.btn-bulk.pay{background:var(--color-action);color:#fff}
+.btn-bulk.pay:hover{background:var(--color-action-hover)}
+.btn-bulk.cancel{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6)}
+.btn-bulk.cancel:hover{border-color:rgba(255,255,255,.4);color:#fff}
+.btn-bulk svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
+.filter-bar{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.f-search{display:flex;align-items:center;gap:7px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:6px 10px;width:200px;flex-shrink:0}
+.f-search:focus-within{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.f-search svg{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.f-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.f-search input::placeholder{color:var(--color-text-tertiary)}
+.fsep{width:1px;height:18px;background:var(--color-border-default);flex-shrink:0;margin:0 2px}
+.chip-grp{display:flex;gap:3px}
+.chip{font-family:var(--font-sans);font-size:11px;font-weight:500;padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-tertiary);cursor:pointer;transition:all var(--transition-fast);white-space:nowrap}
+.chip:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.chip.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.f-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.f-filter-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:6px 11px;cursor:pointer;transition:all var(--transition-fast)}
+.f-filter-btn:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.f-filter-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5}
+.f-filter-count{background:var(--color-action);color:#fff;border-radius:var(--radius-full);font-size:9px;font-weight:700;padding:1px 5px;margin-left:2px;display:none}
+.f-filter-count.show{display:inline}
+.tbl-wrap{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px}
+.tbl-wrap table{width:100%;border-collapse:collapse}
+.tbl-wrap thead tr{background:var(--color-surface-sunken);border-bottom:1px solid var(--color-border-default)}
+.tbl-wrap thead th{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);padding:10px 12px;text-align:left;white-space:nowrap;user-select:none}
+.tbl-wrap thead th.r{text-align:right}
+.tbl-wrap thead th.sortable{cursor:pointer;transition:color var(--transition-fast)}
+.tbl-wrap thead th.sortable:hover{color:var(--color-text-primary)}
+.sort-arrow::after{content:'⇅';margin-left:3px;font-size:9px;color:var(--color-border-default)}
+.sort-asc .sort-arrow::after{content:'↑';color:var(--color-action)}
+.sort-desc .sort-arrow::after{content:'↓';color:var(--color-action)}
+.tbl-wrap tbody tr{border-bottom:1px solid var(--color-surface-sunken);cursor:pointer;transition:background var(--transition-fast)}
+.tbl-wrap tbody tr:last-child{border-bottom:none}
+.tbl-wrap tbody tr:hover{background:#FAFAF9}
+.tbl-wrap tbody tr.sel{background:var(--ai-surface);box-shadow:inset 3px 0 0 var(--color-action)}
+.tbl-wrap tbody tr.row-overdue{background:var(--danger-surface)}
+.tbl-wrap tbody tr.row-overdue:hover{background:#f5e0e0}
+.tbl-wrap tbody tr.row-draft{background:#FFFBEB}
+.tbl-wrap tbody tr.row-draft:hover{background:#FFF5D6}
+.tbl-wrap tbody tr.row-highlight{outline:2px solid var(--color-action);outline-offset:-2px;background:var(--ai-surface)}
+.tbl-wrap tbody td{padding:9px 12px;font-size:12px;color:var(--color-text-secondary);vertical-align:middle}
+td.mono{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--color-action);white-space:nowrap}
+td.num{text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--color-text-primary);white-space:nowrap}
+td.num-warn{text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--danger-text);white-space:nowrap}
+td.num-ok{text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--success-text);white-space:nowrap}
+.pi-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 6px;border-radius:var(--radius-full);white-space:nowrap;vertical-align:middle;margin-left:4px;border:1px solid}
+.pi-badge.up{background:var(--danger-surface);color:var(--danger-text);border-color:var(--danger-border)}
+.pi-badge.down{background:var(--success-surface);color:var(--success-text);border-color:var(--success-border)}
+.pi-badge svg{width:8px;height:8px;stroke:currentColor;fill:none;stroke-width:2.5}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:var(--radius-full);white-space:nowrap;border:1px solid}
+.badge-draft{background:var(--warning-surface);color:var(--warning-text);border-color:var(--warning-border)}
+.badge-approved{background:var(--success-surface);color:var(--success-text);border-color:var(--success-border)}
+.badge-review{background:var(--ai-surface);color:var(--color-action);border-color:var(--ai-border)}
+.badge-paid{background:var(--success-surface);color:var(--success-text);border-color:var(--success-border)}
+.badge-unpaid{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border-color:var(--color-border-default)}
+.badge-overdue{background:var(--danger-text);color:#fff;border-color:var(--danger-text)}
+.badge-rejected{background:var(--danger-surface);color:var(--danger-text);border-color:var(--danger-border)}
+.ai-chip{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:var(--radius-full);background:linear-gradient(135deg,#EBF0FD,#EDE9FE);color:var(--color-action);border:1px solid var(--ai-border)}
+.ai-chip svg{width:8px;height:8px;stroke:currentColor;fill:none;stroke-width:2}
+.pay-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;white-space:nowrap}
+.pay-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.pay-paid .pay-dot{background:var(--success-text)}
+.pay-paid{color:var(--success-text)}
+.pay-unpaid .pay-dot{background:var(--color-border-default)}
+.pay-unpaid{color:var(--color-text-tertiary)}
+.pay-overdue .pay-dot{background:var(--danger-text);box-shadow:0 0 0 2px var(--danger-surface)}
+.pay-overdue{color:var(--danger-text);font-weight:600}
+.tbl-status-bar{background:var(--color-surface-deep);padding:8px 12px;display:flex;align-items:center;gap:16px;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.sb-stat{display:flex;align-items:center;gap:5px}
+.sb-stat-lbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.sb-stat-val{font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(255,255,255,.85)}
+.sb-stat-val.danger{color:#F59A9A}
+.sb-stat-val.warn{color:#FCD97A}
+.sb-sep{width:1px;height:14px;background:rgba(255,255,255,.12)}
+.sb-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.pg-size{display:flex;align-items:center;gap:6px;font-size:10px;color:rgba(255,255,255,.4)}
+.pg-size select{font-family:var(--font-sans);font-size:10px;color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:2px 5px;cursor:pointer;outline:none}
+.pg-btn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:4px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);cursor:pointer;transition:all var(--transition-fast)}
+.pg-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.pg-btn:disabled{opacity:.3;cursor:default}
+.pg-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.pg-info{font-size:10px;color:rgba(255,255,255,.4)}
+.tooltip-wrap{position:relative;display:inline-flex;align-items:center}
+.tooltip-wrap .tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--color-surface-deep);color:rgba(255,255,255,.9);font-size:11px;padding:6px 10px;border-radius:var(--radius-sm);white-space:normal;pointer-events:none;opacity:0;transition:opacity var(--transition-fast);z-index:100;max-width:220px;text-align:center;line-height:1.4}
+.tooltip-wrap:hover .tooltip{opacity:1}
+.drawer-overlay{position:fixed;inset:0;background:rgba(8,7,6,.35);z-index:40;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:410px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow);box-shadow:-4px 0 24px rgba(8,7,6,.1)}
+.drawer.open{transform:translateX(0)}
+.dh{padding:16px 18px;border-bottom:1px solid var(--color-border-default);flex-shrink:0}
+.dh-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.dh-vendor-name{font-size:15px;font-weight:700;color:var(--color-text-primary)}
+.dh-vendor-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.dclose{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:transparent;color:var(--color-text-tertiary);flex-shrink:0}
+.dclose:hover{background:var(--color-surface-sunken);color:var(--color-text-primary)}
+.dclose svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.dh-meta{display:flex;flex-wrap:wrap;align-items:center;gap:5px}
+.dh-ref{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--color-text-tertiary)}
+.grn-banner{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--radius-md);margin:12px 18px 0;font-size:11px;font-weight:600}
+.grn-banner.matched{background:var(--success-surface);border:1px solid var(--success-border);color:var(--success-text)}
+.grn-banner.pending{background:var(--warning-surface);border:1px solid var(--warning-border);color:var(--warning-text)}
+.grn-banner.mismatch{background:var(--danger-surface);border:1px solid var(--danger-border);color:var(--danger-text)}
+.grn-banner svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.dtab-bar{display:flex;border-bottom:1px solid var(--color-border-default);flex-shrink:0;padding:0 18px;margin-top:8px}
+.dtab{padding:10px 0;margin-right:18px;font-size:12px;font-weight:500;color:var(--color-text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--transition-fast);white-space:nowrap}
+.dtab:hover{color:var(--color-text-secondary)}
+.dtab.active{color:var(--color-action);border-bottom-color:var(--color-action);font-weight:600}
+.dpane{display:none;flex:1;overflow-y:auto;padding:16px 18px}
+.dpane.active{display:block}
+.dbody{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-height:0}
+.dsec{margin-bottom:18px}
+.dlbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:10px}
+.info-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--color-surface-sunken);gap:12px}
+.info-row:last-child{border-bottom:none}
+.info-row label{font-size:11px;color:var(--color-text-tertiary);flex-shrink:0}
+.info-row span{font-size:12px;font-weight:500;color:var(--color-text-primary);text-align:right}
+.info-row a{font-size:12px;font-weight:600;color:var(--color-action);text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.info-row a:hover{text-decoration:underline}
+.vendor-cta{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--color-action);background:var(--ai-surface);border:1px solid var(--ai-border);border-radius:var(--radius-md);padding:6px 12px;cursor:pointer;transition:background var(--transition-fast);margin-bottom:12px}
+.vendor-cta:hover{background:#dde8fc}
+.vendor-cta svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.d-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.d-tbl thead tr{background:var(--color-surface-sunken)}
+.d-tbl thead th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-tertiary);padding:7px 8px;text-align:left;border-bottom:1px solid var(--color-border-default)}
+.d-tbl thead th.r{text-align:right}
+.d-tbl tbody td{padding:7px 8px;border-bottom:1px solid var(--color-surface-sunken);color:var(--color-text-secondary);font-size:11px}
+.d-tbl tbody tr:last-child td{border-bottom:none}
+.d-tbl tfoot td{padding:7px 8px;font-weight:700;color:var(--color-text-primary);border-top:1px solid var(--color-border-default);font-family:var(--font-mono);font-size:11px}
+.d-tbl .r{text-align:right;font-family:var(--font-mono)}
+.tax-box{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);overflow:hidden;margin-top:10px}
+.tax-box-head{padding:7px 10px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary);background:var(--color-surface-sunken);border-bottom:1px solid var(--color-border-default);display:flex;justify-content:space-between}
+.tax-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-bottom:1px solid var(--color-surface-sunken)}
+.tax-row-lbl{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.tax-row-sub{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.tax-row-val{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.tax-row-val.pos{color:var(--success-text)}
+.tax-total-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--color-surface-sunken);border-top:1px solid var(--color-border-default)}
+.tax-total-lbl{font-size:12px;font-weight:700;color:var(--color-text-primary)}
+.tax-total-val{font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--color-text-primary)}
+.attach-list{display:flex;flex-direction:column;gap:6px}
+.attach-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--color-surface-sunken);border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-fast)}
+.attach-item:hover{background:var(--ai-surface)}
+.attach-icon{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.attach-icon.pdf{background:var(--danger-surface)}
+.attach-icon.pdf svg{stroke:var(--danger-text)}
+.attach-icon.img{background:var(--ai-surface)}
+.attach-icon.img svg{stroke:var(--color-action)}
+.attach-icon svg{width:13px;height:13px;fill:none;stroke-width:1.5}
+.attach-name{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.attach-size{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.audit-list{display:flex;flex-direction:column;gap:0}
+.audit-item{display:flex;gap:10px;padding:8px 0;position:relative}
+.audit-item:not(:last-child)::after{content:'';position:absolute;left:11px;top:30px;bottom:-8px;width:1px;background:var(--color-border-default)}
+.audit-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.audit-dot.approved{background:var(--success-surface);border:1.5px solid var(--success-border)}
+.audit-dot.approved svg{width:10px;height:10px;stroke:var(--success-text);fill:none;stroke-width:2.5}
+.audit-dot.rejected{background:var(--danger-surface);border:1.5px solid var(--danger-border)}
+.audit-dot.rejected svg{width:10px;height:10px;stroke:var(--danger-text);fill:none;stroke-width:2.5}
+.audit-dot.created,.audit-dot.submitted{background:var(--color-surface-sunken);border:1.5px solid var(--color-border-default)}
+.audit-dot.created svg,.audit-dot.submitted svg{width:8px;height:8px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2}
+.audit-content{flex:1}
+.audit-action{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.audit-meta{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.audit-note{margin-top:5px;padding:6px 8px;background:var(--danger-surface);border-radius:var(--radius-sm);font-size:11px;color:var(--danger-text);line-height:1.4}
+.dfooter{padding:12px 18px;border-top:1px solid var(--color-border-default);display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.btn-approve{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px 18px;background:var(--success-text);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;flex:1;justify-content:center;transition:background var(--transition-base)}
+.btn-approve:hover{background:#0d4d28}
+.btn-approve svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
+.btn-reject{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px 18px;background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border);border-radius:var(--radius-md);cursor:pointer}
+.btn-reject:hover{background:#f5e0e0}
+.btn-pay-now{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px 18px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;flex:1;justify-content:center;transition:background var(--transition-base)}
+.btn-pay-now:hover{background:var(--color-action-hover)}
+.btn-pay-now svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round}
+.btn-reopen{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px 18px;background:var(--color-surface-sunken);color:var(--color-text-secondary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;flex:1;justify-content:center}
+.btn-readonly{flex:1;text-align:center;font-size:12px;color:var(--color-text-tertiary);padding:10px;background:var(--color-surface-sunken);border-radius:var(--radius-md)}
+.btn-send-approval{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px 18px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;flex:1;justify-content:center;transition:background var(--transition-base)}
+.btn-send-approval:hover{background:var(--color-action-hover)}
+.btn-send-approval svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2}
+.modal-overlay{position:fixed;inset:0;background:rgba(8,7,6,.4);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--color-surface-raised);border-radius:var(--radius-xl);padding:24px;width:420px;box-shadow:0 20px 60px rgba(8,7,6,.2)}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:6px}
+.modal-sub{font-size:12px;color:var(--color-text-tertiary);line-height:1.5;margin-bottom:14px}
+.modal-preset{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.modal-preset-btn{font-family:var(--font-sans);font-size:11px;font-weight:500;padding:4px 10px;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-secondary);cursor:pointer}
+.modal-preset-btn:hover{border-color:var(--danger-border);color:var(--danger-text);background:var(--danger-surface)}
+.modal label{font-size:11px;font-weight:600;color:var(--color-text-tertiary);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+.modal textarea{width:100%;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:9px 11px;resize:vertical;min-height:80px;outline:none;transition:border-color var(--transition-fast);margin-bottom:14px}
+.modal textarea:focus{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.modal-footer{display:flex;gap:8px}
+.modal-cancel{font-family:var(--font-sans);font-size:13px;font-weight:500;padding:9px 16px;background:var(--color-surface-raised);color:var(--color-text-tertiary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer}
+.modal-confirm{font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px 18px;background:var(--danger-text);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;flex:1}
+.modal-confirm:hover{background:#841a1a}
+.filter-overlay{position:fixed;inset:0;background:rgba(8,7,6,.3);z-index:38;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.filter-overlay.open{opacity:1;pointer-events:all}
+.filter-drawer{position:fixed;top:0;right:0;height:100vh;width:320px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow)}
+.filter-drawer.open{transform:translateX(0)}
+.fd-head{padding:16px 18px;border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.fd-title{font-size:14px;font-weight:700}
+.fd-clear{font-size:11px;font-weight:600;color:var(--color-action);cursor:pointer}
+.fd-body{flex:1;overflow-y:auto;padding:16px 18px}
+.fd-section{margin-bottom:20px}
+.fd-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:8px}
+.fd-shortcuts{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.fd-sc{font-size:11px;font-weight:500;padding:4px 10px;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-tertiary);cursor:pointer}
+.fd-sc:hover{border-color:var(--color-action);color:var(--color-action)}
+.fd-sc.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.fd-date-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fd-input{font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:7px 10px;width:100%;outline:none}
+.fd-input:focus{border-color:var(--color-action)}
+.fd-select{font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:7px 10px;width:100%;outline:none;cursor:pointer}
+.fd-foot{padding:14px 18px;border-top:1px solid var(--color-border-default);display:flex;gap:8px;flex-shrink:0}
+.fd-apply{flex:1;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer}
+.fd-apply:hover{background:var(--color-action-hover)}
+.fd-cancel-btn{font-family:var(--font-sans);font-size:13px;font-weight:500;padding:9px 14px;background:var(--color-surface-raised);color:var(--color-text-tertiary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer}
+.content-row{display:flex;flex:1;min-height:0;overflow:hidden}
+.content-main{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column}
+.ai-panel{width:0;flex-shrink:0;transition:width var(--transition-slow);overflow:hidden;position:relative}
+.ai-panel.open{width:340px}
+.ai-panel-inner{width:340px;height:100%;display:flex;flex-direction:column;background:var(--color-surface-raised);border-left:2px solid var(--color-action);position:relative}
+.ai-panel-inner::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(26,70,200,.03) 0%,transparent 60%);pointer-events:none;z-index:0}
+.ai-panel-head{padding:14px 16px;border-bottom:1px solid rgba(26,70,200,.15);display:flex;align-items:center;gap:10px;flex-shrink:0;position:relative;z-index:1;background:linear-gradient(135deg,#EBF0FD,#F0ECFF)}
+.ai-panel-icon{width:28px;height:28px;border-radius:var(--radius-sm);background:linear-gradient(135deg,#1A46C8,#7C3AED);display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:aiPulse 3s ease-in-out infinite}
+.ai-panel-icon svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:1.5}
+.ai-panel-title{font-size:13px;font-weight:700;flex:1}
+.ai-panel-sub{font-size:10px;color:var(--color-action);font-weight:600;letter-spacing:.04em}
+.ai-panel-close{width:24px;height:24px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:transparent;color:var(--color-text-tertiary);transition:background var(--transition-fast);flex-shrink:0}
+.ai-panel-close:hover{background:rgba(26,70,200,.12);color:var(--color-action)}
+.ai-panel-close svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.ai-chat{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
+.ai-msg{max-width:90%;border-radius:var(--radius-lg);padding:10px 13px;font-size:12px;line-height:1.5}
+.ai-msg.ai{background:var(--ai-surface);border:1px solid var(--ai-border);color:var(--color-text-primary);align-self:flex-start;border-radius:4px var(--radius-lg) var(--radius-lg) var(--radius-lg)}
+.ai-msg.user{background:var(--color-action);color:#fff;align-self:flex-end;border-radius:var(--radius-lg) var(--radius-lg) 4px var(--radius-lg)}
+.ai-chips{display:flex;flex-wrap:wrap;gap:5px;padding:0 16px 10px;position:relative;z-index:1}
+.ai-chip-btn{font-family:var(--font-sans);font-size:11px;font-weight:500;padding:5px 11px;border-radius:var(--radius-full);border:1px solid var(--ai-border);background:var(--color-surface-raised);color:var(--color-action);cursor:pointer;transition:all var(--transition-fast)}
+.ai-chip-btn:hover{background:var(--ai-surface)}
+.ai-input-row{padding:10px 14px;border-top:1px solid rgba(26,70,200,.1);display:flex;gap:8px;flex-shrink:0;background:var(--color-surface-raised);position:relative;z-index:1}
+.ai-input{flex:1;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 11px;outline:none;transition:border-color var(--transition-fast)}
+.ai-input:focus{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.ai-send{width:32px;height:32px;border-radius:var(--radius-sm);background:linear-gradient(135deg,#1A46C8,#7C3AED);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:opacity var(--transition-fast)}
+.ai-send:hover{opacity:.88}
+.ai-send svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2}
+.addpage{position:fixed;inset:0;background:var(--color-surface-base);z-index:100;display:none;flex-direction:column}
+.addpage.open{display:flex}
+.ap-head{height:56px;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0}
+.ap-title{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.ap-step-ind{display:flex;align-items:center;gap:8px;flex:1;justify-content:center}
+.ap-step{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:var(--color-text-tertiary)}
+.ap-step-num{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;transition:all var(--transition-fast)}
+.ap-step.active .ap-step-num{background:var(--color-action);border-color:var(--color-action);color:#fff}
+.ap-step.active{color:var(--color-text-primary);font-weight:600}
+.ap-step.done .ap-step-num{background:var(--success-surface);border-color:var(--success-border);color:var(--success-text)}
+.ap-step-line{width:36px;height:1px;background:var(--color-border-default)}
+.ap-step-line.done{background:var(--success-border)}
+.ap-close{width:30px;height:30px;border-radius:var(--radius-sm);border:1px solid var(--color-border-default);background:var(--color-surface-raised);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-tertiary)}
+.ap-close:hover{background:var(--color-surface-sunken)}
+.ap-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.ap-body{flex:1;overflow-y:auto;padding:32px 0}
+.ap-inner{max-width:780px;margin:0 auto;padding:0 24px}
+.ap-panel{display:none}
+.ap-panel.active{display:block}
+.ap-foot{height:60px;flex-shrink:0;background:var(--color-surface-raised);border-top:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 24px;gap:10px}
+.ap-hint{font-size:11px;color:var(--color-text-tertiary);flex:1}
+.ap-btn-draft{font-family:var(--font-sans);font-size:12px;font-weight:500;padding:8px 14px;background:var(--color-surface-raised);color:var(--color-text-tertiary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;display:none;align-items:center;gap:6px}
+.ap-btn-draft.show{display:inline-flex}
+.ap-btn-draft svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5}
+.ap-btn-back{font-family:var(--font-sans);font-size:13px;font-weight:500;padding:9px 16px;background:var(--color-surface-raised);color:var(--color-text-tertiary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;display:none}
+.ap-btn-back.show{display:inline-block}
+.ap-btn-cancel{font-family:var(--font-sans);font-size:13px;font-weight:500;padding:9px 14px;background:transparent;border:none;cursor:pointer;color:var(--color-text-tertiary)}
+.ap-btn-next{font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px 22px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.ap-btn-next:hover{background:var(--color-action-hover)}
+.ap-btn-next svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
+.upload-zone{border:2px dashed var(--color-border-default);border-radius:var(--radius-lg);padding:40px 24px;text-align:center;cursor:pointer;background:var(--color-surface-raised);margin-bottom:20px;transition:all var(--transition-fast)}
+.upload-zone:hover{border-color:var(--color-action);background:var(--ai-surface)}
+.upload-zone-icon{width:44px;height:44px;border-radius:var(--radius-md);background:var(--color-surface-sunken);display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.upload-zone-icon svg{width:20px;height:20px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.upload-zone-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.upload-zone-sub{font-size:12px;color:var(--color-text-tertiary);margin-bottom:14px}
+.upload-btn{font-family:var(--font-sans);font-size:12px;font-weight:600;padding:7px 18px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer}
+.file-type-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.ftcard{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:14px;cursor:pointer;transition:all var(--transition-fast)}
+.ftcard:hover{border-color:var(--color-action);box-shadow:0 0 0 3px var(--ai-surface)}
+.ftcard-icon{width:34px;height:34px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;margin-bottom:9px}
+.ftcard-title{font-size:12px;font-weight:700;margin-bottom:2px}
+.ftcard-sub{font-size:11px;color:var(--color-text-tertiary);line-height:1.4}
+.ftcard-ext{margin-top:7px;font-size:10px;font-weight:600;color:var(--color-text-tertiary)}
+.scan-card{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:14px}
+.scan-doc-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--color-surface-sunken);border-bottom:1px solid var(--color-border-default)}
+.scan-doc-icon{width:32px;height:32px;border-radius:var(--radius-sm);background:var(--danger-surface);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.scan-doc-icon svg{width:14px;height:14px;stroke:var(--danger-text);fill:none;stroke-width:1.5}
+.scan-doc-name{font-size:12px;font-weight:600}
+.scan-doc-sub{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.scan-doc-meta{flex:1}
+.src-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--radius-full);background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.scan-steps{padding:4px 0}
+.scan-step-item{display:flex;align-items:center;gap:10px;padding:9px 16px}
+.scan-step-icon{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.scan-step-icon.done{background:var(--success-surface);border:1.5px solid var(--success-border)}
+.scan-step-icon.done svg{width:10px;height:10px;stroke:var(--success-text);fill:none;stroke-width:2.5}
+.scan-step-icon.active{background:var(--ai-surface);border:1.5px solid var(--ai-border);animation:scanPulse 1.2s ease-in-out infinite}
+@keyframes scanPulse{0%,100%{box-shadow:0 0 0 0 rgba(26,70,200,.3)}50%{box-shadow:0 0 0 4px rgba(26,70,200,0)}}
+.scan-step-icon.active svg{width:11px;height:11px;stroke:var(--color-action);fill:none;stroke-width:2}
+.scan-step-icon.wait{background:var(--color-surface-sunken);border:1.5px solid var(--color-border-default)}
+.scan-step-icon.wait svg{width:10px;height:10px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2}
+.scan-step-body{flex:1}
+.scan-step-label{font-size:12px;font-weight:600}
+.scan-step-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.scan-step-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--radius-full)}
+.sss-done{background:var(--success-surface);color:var(--success-text)}
+.sss-active{background:var(--ai-surface);color:var(--color-action)}
+.sss-wait{background:var(--color-surface-sunken);color:var(--color-text-tertiary)}
+.sim-btn{font-family:var(--font-sans);font-size:12px;font-weight:600;color:var(--color-action);background:transparent;border:1px dashed var(--ai-border);border-radius:var(--radius-md);padding:8px 20px;cursor:pointer}
+.sim-btn:hover{background:var(--ai-surface)}
+.ready-state{display:flex;align-items:center;gap:7px;padding:8px 12px;background:var(--success-surface);border:1px solid var(--success-border);border-radius:var(--radius-md);font-size:12px;font-weight:600;color:var(--success-text);margin-bottom:16px}
+.ready-state svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;flex-shrink:0}
+.review-section{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px}
+.review-section-lbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:12px}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.fld{display:flex;flex-direction:column;gap:4px}
+.fld label{font-size:10px;font-weight:700;color:var(--color-text-tertiary);letter-spacing:.04em;text-transform:uppercase}
+.fld input,.fld select{font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:7px 9px;outline:none}
+.fld input:focus,.fld select:focus{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.fld-conf{font-size:9px;font-weight:700;padding:1px 5px;border-radius:var(--radius-full)}
+.fld-conf.hi{background:var(--success-surface);color:var(--success-text)}
+.fld-conf.lo{background:var(--warning-surface);color:var(--warning-text)}
+.warn-field{border-color:var(--warning-border) !important}
+.warn-hint{font-size:10px;color:var(--warning-text)}
+.items-tbl-wrap{overflow-x:auto;margin-bottom:10px}
+.items-tbl-wrap table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
+.items-tbl-wrap thead th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--color-text-tertiary);padding:7px 8px;background:var(--color-surface-sunken);text-align:left;border-bottom:1px solid var(--color-border-default)}
+.items-tbl-wrap thead th.r{text-align:right}
+.items-tbl-wrap tbody td{padding:6px 6px;border-bottom:1px solid var(--color-surface-sunken)}
+.items-tbl-wrap tbody tr:last-child td{border-bottom:none}
+.items-tbl-wrap input,.items-tbl-wrap select{font-family:var(--font-sans);font-size:12px;border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:5px 7px;background:var(--color-surface-sunken);outline:none;width:100%}
+.items-tbl-wrap input:focus,.items-tbl-wrap select:focus{border-color:var(--color-action)}
+.prod-link{color:var(--color-action);cursor:pointer;text-decoration:underline;font-weight:600}
+.prod-link:hover{opacity:.8}
+.btn-add-item{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-sans);font-size:11px;font-weight:600;color:var(--color-action);background:transparent;border:1px dashed var(--ai-border);border-radius:var(--radius-md);padding:6px 12px;cursor:pointer;margin-bottom:12px}
+.btn-add-item:hover{background:var(--ai-surface)}
+.btn-add-item svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5}
+.total-block{background:var(--color-surface-sunken);border-radius:var(--radius-md);padding:12px}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
+.total-row.grand{border-top:1px solid var(--color-border-default);margin-top:6px;padding-top:10px}
+.total-row-lbl{font-size:12px;color:var(--color-text-secondary)}
+.total-row.grand .total-row-lbl{font-size:13px;font-weight:700}
+.total-row-val{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.total-row.grand .total-row-val{font-size:16px;font-weight:700}
+.je-tbl-wrap{overflow-x:auto}
+.je-tbl-wrap table{width:100%;border-collapse:collapse;font-size:12px}
+.je-tbl-wrap thead th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--color-text-tertiary);padding:7px 8px;background:var(--color-surface-sunken);text-align:left;border-bottom:1px solid var(--color-border-default)}
+.je-tbl-wrap thead th.r{text-align:right}
+.je-tbl-wrap tbody td{padding:7px 8px;border-bottom:1px solid var(--color-surface-sunken)}
+.je-tbl-wrap tbody tr:last-child td{border-bottom:none}
+.je-tbl-wrap .r{text-align:right;font-family:var(--font-mono);font-size:11px;font-weight:600}
+.je-tbl-wrap input{font-family:var(--font-mono);font-size:11px;font-weight:600;border:1px solid transparent;background:transparent;padding:3px 5px;border-radius:4px;outline:none;text-align:right;width:100%}
+.je-tbl-wrap input:focus{border-color:var(--color-action);background:var(--ai-surface)}
+.prod-drawer-overlay{position:fixed;inset:0;background:rgba(8,7,6,.3);z-index:120;display:none}
+.prod-drawer-overlay.open{display:block}
+.prod-drawer{position:fixed;top:0;right:0;height:100vh;width:360px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:130;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow)}
+.prod-drawer.open{transform:translateX(0)}
+.pd-head{padding:16px 18px;border-bottom:1px solid var(--color-border-default);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.pd-title{font-size:14px;font-weight:700}
+.pd-close{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:transparent;color:var(--color-text-tertiary)}
+.pd-close:hover{background:var(--color-surface-sunken)}
+.pd-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.pd-body{flex:1;overflow-y:auto;padding:14px 18px}
+.pd-search{display:flex;align-items:center;gap:7px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:7px 10px;margin-bottom:12px}
+.pd-search:focus-within{border-color:var(--color-action)}
+.pd-search svg{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.pd-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.pd-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);margin-bottom:6px;cursor:pointer;transition:all var(--transition-fast)}
+.pd-item:hover{border-color:var(--color-action);background:var(--ai-surface)}
+.pd-item-name{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.pd-item-unit{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.pd-item-price{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--color-text-primary);text-align:right}
+.pd-item-acct{font-size:10px;color:var(--color-text-tertiary);text-align:right;margin-top:1px}
+</style>
+<body>
+<div class="shell">
+<aside class="sb">
+  <div class="sb-top">
+    <div class="sb-logomark"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+    <span class="sb-brand">Klay</span>
+  </div>
+  <div class="sb-section">Keuangan</div>
+  <a class="sb-item"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Dashboard</a>
+  <a class="sb-item"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Journal Entry</a>
+  <a class="sb-item"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>General Ledger</a>
+  <a class="sb-item active"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>Bills</a>
+  <a class="sb-item"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Invoices</a>
+  <div class="sb-section">Pengadaan</div>
+  <a class="sb-item"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Vendors</a>
+  <a class="sb-item"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Purchase Orders</a>
+  <div class="sb-section">Settings</div>
+  <a class="sb-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</a>
+  <div class="sb-footer"><div class="sb-footer-item"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Component Library</div></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="tb-search-wrap">
+      <div class="tb-search" id="tbSearchBox" onclick="openCmdDropdown()">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Cari di Klay..." id="tbSearchInput" oninput="filterCmdDropdown(this.value)" onfocus="openCmdDropdown()">
+        <span class="tb-kbd">&#8984;K</span>
+      </div>
+      <div class="cmd-dropdown" id="cmdDropdown">
+        <div class="cmd-section-label">AI Entry Point</div>
+        <div class="cmd-item" onclick="openAIPanel();closeCmdDropdown()">
+          <div class="cmd-item-icon ai"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+          <div class="cmd-item-text"><div class="cmd-item-title">Tanya AI tentang Bills</div><div class="cmd-item-sub">Analisis, ringkasan, rekomendasi pembayaran</div></div>
+          <span class="cmd-item-tag">AI</span>
+        </div>
+        <div class="cmd-divider"></div>
+        <div class="cmd-section-label">Aksi Cepat</div>
+        <div class="cmd-item" onclick="openAddPage();closeCmdDropdown()">
+          <div class="cmd-item-icon nav"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+          <div class="cmd-item-text"><div class="cmd-item-title">Kirim Approval</div><div class="cmd-item-sub">Upload invoice baru</div></div>
+        </div>
+        <div class="cmd-item" onclick="filterOverdue();closeCmdDropdown()">
+          <div class="cmd-item-icon nav"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div class="cmd-item-text"><div class="cmd-item-title">Lihat Jatuh Tempo</div><div class="cmd-item-sub">Filter tagihan overdue</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="tb-right">
+      <button class="btn-ai-top" onclick="openAIPanel()">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        &#10022; Tanya AI
+      </button>
+      <div class="tb-notif"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><div class="notif-dot"></div></div>
+      <div class="tb-org"><span class="tb-org-name">PT Sejahtera Makmur</span><div class="tb-av">PS</div><svg class="tb-caret" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+    </div>
+  </div>
+
+  <div class="content-row">
+  <div class="content-main">
+  <div class="scroll-area" id="scrollArea">
+    <div class="page-head">
+      <h1 class="page-title">Bills</h1>
+      <div class="head-right">
+        <div style="position:relative">
+          <button class="btn-ghost" onclick="toggleExp(event)">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export
+            <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="exp-menu" id="expMenu">
+            <div class="em-lbl">Scope</div>
+            <div class="em-chips" id="scopeChips">
+              <button class="em-chip on" data-v="visible" onclick="setExpChip('scope',this)">Hanya terlihat</button>
+              <button class="em-chip" data-v="all" onclick="setExpChip('scope',this)">Semua</button>
+            </div>
+            <div class="em-lbl">Format File</div>
+            <div class="em-chips" id="fileChips">
+              <button class="em-chip on" data-v="xlsx" onclick="setExpChip('file',this)">Excel (.xlsx)</button>
+              <button class="em-chip" data-v="csv" onclick="setExpChip('file',this)">CSV (.csv)</button>
+            </div>
+            <div class="em-div"></div>
+            <button class="em-dl" onclick="doExport()">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download
+            </button>
+            <div class="em-preview" id="emPreview">Excel (.xlsx) &middot; Hanya yang terlihat</div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="openAddPage()">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Tambah Bill
+        </button>
+      </div>
+    </div>
+
+    <div class="ap-outstanding">
+      <div class="ap-outstanding-icon"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+      <div class="ap-outstanding-left">
+        <div class="ap-outstanding-label">AP Outstanding</div>
+        <div class="ap-ai-summary" id="apAISummary" style="margin-top:8px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:11px;font-weight:700;color:var(--color-action)"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>&#10022; Analisis AI</div>
+          Saldo bank Anda saat ini <strong>Rp 485.000.000</strong> cukup untuk menutup seluruh hutang outstanding, namun terdapat kenaikan biaya utilitas sebesar <strong>15%</strong> bulan ini. Disarankan untuk memprioritaskan tagihan dengan diskon pembayaran awal &mdash; <strong>BILL006</strong> dan <strong>BILL008</strong> telah melewati jatuh tempo dan perlu segera dibayar.
+        </div>
+      </div>
+      <div class="ap-outstanding-amount" id="apOutstandingAmt">Rp &mdash;</div>
+    </div>
+
+    <div class="attn-section" id="attnSection">
+      <div class="attn-header" onclick="toggleAttn()">
+        <div class="attn-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div>
+          <div class="attn-title">Beberapa hal memerlukan perhatianmu</div>
+        </div>
+        <div class="attn-toggle open" id="attnToggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+      </div>
+      <div class="attn-body open" id="attnBody">
+        <div class="attn-desc">Berdasarkan analisis cerdas, terdapat beberapa transaksi yang memerlukan tindakan segera untuk menjaga kesehatan arus kas dan hubungan vendor.</div>
+        <div id="attnChildren"></div>
+      </div>
+    </div>
+
+    <div class="bulk-bar" id="bulkBar">
+      <span class="bulk-bar-info"><span id="bulkCount">0</span> bill dipilih</span>
+      <div class="bulk-bar-sp"></div>
+      <button class="btn-bulk approve" id="bulkApproveBtn" onclick="bulkApprove()"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Setujui Semua</button>
+      <button class="btn-bulk pay" id="bulkPayBtn" onclick="bulkPay()"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Proses Bayar</button>
+      <button class="btn-bulk cancel" onclick="clearSelection()">Batal Pilih</button>
+    </div>
+
+    <div class="filter-bar">
+      <div class="f-search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Cari nomor referensi, vendor&#8230;" id="searchInput" oninput="renderTable()">
+      </div>
+      <div class="fsep"></div>
+      <div class="chip-grp" id="payChips">
+        <button class="chip on" data-val="" onclick="setPayChip(this)">Semua</button>
+        <button class="chip" data-val="paid" onclick="setPayChip(this)">Lunas</button>
+        <button class="chip" data-val="overdue" onclick="setPayChip(this)">Jatuh Tempo</button>
+        <button class="chip" data-val="unpaid" onclick="setPayChip(this)">Belum Bayar</button>
+      </div>
+      <div class="f-right">
+        <button class="f-filter-btn" onclick="openFilterDrawer()">
+          <svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+          Filter Lainnya
+          <span class="f-filter-count" id="filterCount">0</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:32px"><input type="checkbox" id="chkAll" style="accent-color:var(--color-action)" onchange="toggleAll(this)"></th>
+          <th class="sortable" data-col="id">Nomor Referensi<span class="sort-arrow"></span></th>
+          <th class="sortable" data-col="vendor">Vendor<span class="sort-arrow"></span></th>
+          <th class="sortable" data-col="due">Jatuh Tempo<span class="sort-arrow"></span></th>
+          <th class="sortable r" data-col="total">Total (Rp)<span class="sort-arrow"></span></th>
+          <th>Approval</th>
+          <th>Bayar</th>
+        </tr></thead>
+        <tbody id="tblBody"></tbody>
+      </table>
+
+    </div>
+  </div><!-- end scroll-area -->
+  <div class="tbl-status-bar" id="statusBar">
+        <div class="sb-stat"><span class="sb-stat-lbl">Total</span><span class="sb-stat-val" id="sb-total">&mdash;</span></div>
+        <div class="sb-sep"></div>
+        <div class="sb-stat"><span class="sb-stat-lbl">Ditampilkan</span><span class="sb-stat-val" id="sb-shown">&mdash;</span></div>
+        <div class="sb-sep"></div>
+        <div class="sb-stat"><span class="sb-stat-lbl">Belum Bayar</span><span class="sb-stat-val warn" id="sb-unpaid-amt">&mdash;</span></div>
+        <div class="sb-sep"></div>
+        <div class="sb-stat"><span class="sb-stat-lbl">Jatuh Tempo</span><span class="sb-stat-val danger" id="sb-overdue-amt">&mdash;</span></div>
+        <div class="sb-right">
+          <div class="pg-size">
+            <span>Baris:</span>
+            <select onchange="changePageSize(+this.value)">
+              <option value="20">20</option>
+              <option value="50" selected>50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          <div class="pg-info" id="pgInfo">1&ndash;8 dari 8</div>
+          <button class="pg-btn" onclick="prevPage()" id="pgPrev"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button class="pg-btn" onclick="nextPage()" id="pgNext"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+        </div>
+      </div>
+  
+  </div><!-- end content-main -->
+
+  <!-- AI PANEL (inline column, pushes content left) -->
+  <div class="ai-panel" id="aiPanel">
+    <div class="ai-panel-inner">
+      <div class="ai-panel-head">
+        <div class="ai-panel-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+        <div><div class="ai-panel-title">&#10022; Asisten Klay AI</div><div class="ai-panel-sub">&#9679; AKTIF &middot; Bills</div></div>
+        <button class="ai-panel-close" onclick="closeAIPanel()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="ai-chat" id="aiChat">
+        <div class="ai-msg ai">Halo! Saya siap membantu Anda menganalisis data Bills. Tanya tentang status pembayaran, vendor, atau minta ringkasan outstanding.</div>
+      </div>
+      <div class="ai-chips">
+        <button class="ai-chip-btn" onclick="sendAIMsg('Ringkasan AP outstanding saat ini')">Ringkasan outstanding</button>
+        <button class="ai-chip-btn" onclick="sendAIMsg('Bill mana yang perlu dibayar segera?')">Prioritas bayar</button>
+        <button class="ai-chip-btn" onclick="sendAIMsg('Analisis vendor dengan tagihan terbesar')">Analisis vendor</button>
+        <button class="ai-chip-btn" onclick="sendAIMsg('Ada berapa bill yang butuh approval?')">Status approval</button>
+      </div>
+      <div class="ai-input-row">
+        <input type="text" class="ai-input" id="aiInput" placeholder="Tanya sesuatu tentang Bills&#8230;" onkeydown="if(event.key==='Enter')sendAIMsg()">
+        <button class="ai-send" onclick="sendAIMsg()"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- end content-row -->
+</div>
+</div>
+
+<div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="dh">
+    <div class="dh-top">
+      <div>
+        <div class="dh-vendor-name" id="d-vendor-name">&mdash;</div>
+        <div class="dh-vendor-sub" id="d-vendor-sub">&mdash;</div>
+      </div>
+      <button class="dclose" onclick="closeDrawer()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="dh-meta">
+      <span class="dh-ref" id="d-ref">&mdash;</span>
+      <span id="d-badge-approval"></span>
+      <span id="d-badge-pay"></span>
+    </div>
+  </div>
+  <div id="d-grn-banner"></div>
+  <div class="dtab-bar">
+    <div class="dtab active" data-tab="tab-detail" onclick="switchDTab(this)">Detail</div>
+    <div class="dtab" data-tab="tab-items" onclick="switchDTab(this)">Item &amp; Pajak</div>
+    <div class="dtab" data-tab="tab-audit" onclick="switchDTab(this)">Audit Trail</div>
+  </div>
+  <div class="dbody">
+    <div class="dpane active" id="tab-detail"></div>
+    <div class="dpane" id="tab-items"></div>
+    <div class="dpane" id="tab-audit"></div>
+  </div>
+  <div class="dfooter" id="dFooter"></div>
+</div>
+
+<div class="modal-overlay" id="rejectModal">
+  <div class="modal">
+    <div class="modal-title">Tolak Bill</div>
+    <div class="modal-sub">Berikan alasan penolakan. Alasan ini akan tercatat di audit trail.</div>
+    <div class="modal-preset">
+      <button class="modal-preset-btn" onclick="setPreset(this)">Dokumen tidak lengkap</button>
+      <button class="modal-preset-btn" onclick="setPreset(this)">Harga tidak sesuai PO</button>
+      <button class="modal-preset-btn" onclick="setPreset(this)">Vendor tidak terdaftar</button>
+      <button class="modal-preset-btn" onclick="setPreset(this)">GRN belum match</button>
+      <button class="modal-preset-btn" onclick="setPreset(this)">Duplikat invoice</button>
+    </div>
+    <label>Alasan Penolakan</label>
+    <textarea id="rejectReason" placeholder="Tuliskan alasan penolakan secara detail..."></textarea>
+    <div class="modal-footer">
+      <button class="modal-cancel" onclick="closeRejectModal()">Batal</button>
+      <button class="modal-confirm" onclick="confirmReject()">Tolak Bill Ini</button>
+    </div>
+  </div>
+</div>
+
+<div class="filter-overlay" id="filterOverlay" onclick="closeFilterDrawer()"></div>
+<div class="filter-drawer" id="filterDrawer">
+  <div class="fd-head">
+    <span class="fd-title">Filter</span>
+    <span class="fd-clear" onclick="clearFilters()">Reset semua</span>
+  </div>
+  <div class="fd-body">
+    <div class="fd-section">
+      <div class="fd-label">Rentang Tanggal</div>
+      <div class="fd-shortcuts" id="fdShortcuts">
+        <div class="fd-sc" data-r="today" onclick="setDateSC(this)">Hari ini</div>
+        <div class="fd-sc" data-r="thisweek" onclick="setDateSC(this)">Minggu ini</div>
+        <div class="fd-sc" data-r="thismonth" onclick="setDateSC(this)">Bulan ini</div>
+        <div class="fd-sc" data-r="lastmonth" onclick="setDateSC(this)">Bulan lalu</div>
+        <div class="fd-sc" data-r="thisquarter" onclick="setDateSC(this)">Kuartal ini</div>
+      </div>
+      <div class="fd-date-row">
+        <div><div style="font-size:10px;color:var(--color-text-tertiary);font-weight:600;margin-bottom:4px">Dari</div><input type="date" class="fd-input" id="fdFrom"></div>
+        <div><div style="font-size:10px;color:var(--color-text-tertiary);font-weight:600;margin-bottom:4px">Sampai</div><input type="date" class="fd-input" id="fdTo"></div>
+      </div>
+    </div>
+    <div class="fd-section">
+      <div class="fd-label">Status Approval</div>
+      <select class="fd-select" id="fdStatus">
+        <option value="">Semua Status</option>
+        <option value="draft">Draft</option>
+        <option value="review">Dalam Review</option>
+        <option value="approved">Disetujui</option>
+        <option value="rejected">Ditolak</option>
+      </select>
+    </div>
+    <div class="fd-section">
+      <div class="fd-label">Vendor</div>
+      <select class="fd-select" id="fdVendor">
+        <option value="">Semua Vendor</option>
+        <option value="PT Supplier Elektronik Indonesia">PT Supplier Elektronik Indonesia</option>
+        <option value="CV Toko Bangunan Jaya">CV Toko Bangunan Jaya</option>
+        <option value="PT Jasa Logistik Cepat">PT Jasa Logistik Cepat</option>
+        <option value="PT Penyedia Layanan Konsultasi">PT Penyedia Layanan Konsultasi</option>
+        <option value="Koperasi Tani Sejahtera">Koperasi Tani Sejahtera</option>
+      </select>
+    </div>
+    <div class="fd-section">
+      <div class="fd-label" style="display:flex;align-items:center;gap:6px">
+        GRN
+        <div class="tooltip-wrap">
+          <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;cursor:help"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span class="tooltip">Goods Receipt Note &mdash; dokumen bukti penerimaan barang/jasa dari vendor.</span>
+        </div>
+      </div>
+      <select class="fd-select" id="fdGrn">
+        <option value="">Semua GRN</option>
+        <option value="matched">Matched</option>
+        <option value="pending">Pending</option>
+        <option value="mismatch">Mismatch</option>
+      </select>
+    </div>
+  </div>
+  <div class="fd-foot">
+    <button class="fd-cancel-btn" onclick="closeFilterDrawer()">Batal</button>
+    <button class="fd-apply" onclick="applyFilterDrawer()">Terapkan Filter</button>
+  </div>
+</div>
+
+
+
+<div class="addpage" id="addPage">
+  <div class="ap-head">
+    <div class="ap-title">Tambah Bill</div>
+    <div class="ap-step-ind">
+      <div class="ap-step active" id="apstep-1"><div class="ap-step-num" id="apnum-1">1</div>Upload Dokumen</div>
+      <div class="ap-step-line" id="apline-1"></div>
+      <div class="ap-step" id="apstep-2"><div class="ap-step-num" id="apnum-2">2</div>Scan &amp; Ekstrak</div>
+      <div class="ap-step-line" id="apline-2"></div>
+      <div class="ap-step" id="apstep-3"><div class="ap-step-num" id="apnum-3">3</div>Review &amp; Simpan</div>
+    </div>
+    <button class="ap-close" onclick="closeAddPage()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="ap-body">
+    <div class="ap-inner">
+      <div class="ap-panel active" id="appanel-1">
+        <div style="margin-bottom:28px"><div style="font-size:18px;font-weight:700;letter-spacing:-.01em;margin-bottom:4px">Upload Invoice</div><div style="font-size:13px;color:var(--color-text-tertiary)">Upload foto screenshot, foto invoice fisik, atau file PDF.</div></div>
+        <div class="upload-zone" onclick="apGoStep(2)">
+          <div class="upload-zone-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+          <div class="upload-zone-title">Drag &amp; drop file di sini</div>
+          <div class="upload-zone-sub">atau klik untuk memilih dari perangkat kamu</div>
+          <button class="upload-btn" onclick="event.stopPropagation();apGoStep(2)">Pilih File</button>
+        </div>
+        <div class="file-type-grid">
+          <div class="ftcard" onclick="apGoStep(2)"><div class="ftcard-icon" style="background:var(--success-surface)"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--success-text);fill:none;stroke-width:1.5"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg></div><div class="ftcard-title">Screenshot</div><div class="ftcard-sub">WA, email, atau tampilan invoice digital</div><div class="ftcard-ext">JPG &middot; PNG &middot; WEBP</div></div>
+          <div class="ftcard" onclick="apGoStep(2)"><div class="ftcard-icon" style="background:var(--warning-surface)"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--warning-text);fill:none;stroke-width:1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div><div class="ftcard-title">Foto Invoice Fisik</div><div class="ftcard-sub">Foto kamera HP, pastikan teks terbaca jelas</div><div class="ftcard-ext">JPG &middot; PNG &middot; HEIC</div></div>
+          <div class="ftcard" onclick="apGoStep(2)"><div class="ftcard-icon" style="background:var(--danger-surface)"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--danger-text);fill:none;stroke-width:1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="ftcard-title">PDF Invoice</div><div class="ftcard-sub">File PDF dari sistem vendor atau e-faktur</div><div class="ftcard-ext">PDF &middot; maks. 10 MB</div></div>
+        </div>
+        <div style="text-align:center;font-size:11px;color:var(--color-text-tertiary)">AI akan mengekstrak semua data otomatis &mdash; kamu bisa koreksi sebelum menyimpan</div>
+      </div>
+      <div class="ap-panel" id="appanel-2">
+        <div style="margin-bottom:24px"><div style="font-size:18px;font-weight:700;letter-spacing:-.01em;margin-bottom:4px">Memproses Dokumen</div><div style="font-size:13px;color:var(--color-text-tertiary)">AI sedang memverifikasi dan mengekstrak data dari invoice.</div></div>
+        <div class="scan-card">
+          <div class="scan-doc-bar">
+            <div class="scan-doc-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div class="scan-doc-meta"><div class="scan-doc-name">invoice_supplier_elektronik.pdf</div><div class="scan-doc-sub">2.4 MB &middot; upload manual</div></div>
+            <span class="src-badge"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Upload</span>
+          </div>
+          <div class="scan-steps">
+            <div class="scan-step-item"><div class="scan-step-icon done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="scan-step-body"><div class="scan-step-label">Verifikasi Keamanan</div><div class="scan-step-sub">PDF valid &middot; tidak ada malware</div></div><span class="scan-step-status sss-done">Selesai</span></div>
+            <div class="scan-step-item"><div class="scan-step-icon done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="scan-step-body"><div class="scan-step-label">OCR &amp; Ekstraksi Data</div><div class="scan-step-sub">8 field diekstrak &middot; 1 field confidence rendah</div></div><span class="scan-step-status sss-done">Selesai</span></div>
+            <div class="scan-step-item"><div class="scan-step-icon active"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="scan-step-body"><div class="scan-step-label">Matching Vendor &amp; PO</div><div class="scan-step-sub">Mencocokkan dengan PO dan master vendor&#8230;</div></div><span class="scan-step-status sss-active">Berjalan&#8230;</span></div>
+            <div class="scan-step-item"><div class="scan-step-icon wait"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="scan-step-body"><div class="scan-step-label">Draft Jurnal Otomatis</div><div class="scan-step-sub">Menunggu hasil matching untuk menentukan akun</div></div><span class="scan-step-status sss-wait">Menunggu</span></div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:12px"><button class="sim-btn" onclick="apGoStep(3)">Simulasi: lanjut ke Review &rarr;</button></div>
+      </div>
+      <div class="ap-panel" id="appanel-3">
+        <div style="margin-bottom:20px"><div style="font-size:18px;font-weight:700;letter-spacing:-.01em;margin-bottom:4px">Review &amp; Konfirmasi</div><div style="font-size:13px;color:var(--color-text-tertiary)">Periksa hasil ekstraksi OCR. Semua field bisa diedit sebelum disimpan.</div></div>
+        <div class="ready-state"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>OCR selesai &middot; Vendor matched &middot; 1 field perlu koreksi</span></div>
+        <div class="review-section">
+          <div class="review-section-lbl">Informasi Tagihan</div>
+          <div class="form-grid-2">
+            <div class="fld"><label>Vendor <span class="fld-conf hi">98%</span></label><select><option>PT Supplier Elektronik Indonesia</option><option>CV Toko Bangunan Jaya</option><option>PT Jasa Logistik Cepat</option></select></div>
+            <div class="fld"><label>Nomor Invoice <span class="fld-conf hi">97%</span></label><input type="text" value="INV-V001-20250415"></div>
+          </div>
+          <div class="form-grid-3">
+            <div class="fld"><label>Tanggal Invoice <span class="fld-conf hi">96%</span></label><input type="text" value="15 Apr 2025"></div>
+            <div class="fld"><label>Jatuh Tempo <span class="fld-conf hi">94%</span></label><input type="text" value="15 Mei 2025"></div>
+            <div class="fld"><label>Nomor PO <span class="fld-conf hi">97%</span></label><input type="text" value="PO-2025-0006"></div>
+          </div>
+        </div>
+        <div class="review-section">
+          <div class="review-section-lbl">Rincian Item</div>
+          <div class="items-tbl-wrap">
+            <table>
+              <thead><tr><th style="width:30%">Produk</th><th class="r" style="width:8%">Qty</th><th class="r" style="width:14%">Harga (Rp)</th><th class="r" style="width:14%">Subtotal (Rp)</th><th style="width:34%">Akun</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><span class="prod-link" onclick="openProdDrawer(this)">Komponen Elektronik - Panel LCD 24 inch</span></td>
+                  <td><input type="text" value="50" style="text-align:right"></td>
+                  <td><input type="text" value="1.500.000" style="text-align:right"></td>
+                  <td><input type="text" value="75.000.000" style="text-align:right;font-weight:700"></td>
+                  <td><select><option value="6-1000">6-1000 &mdash; Beban Pembelian</option><option value="1-2100">1-2100 &mdash; Aset Tetap</option></select></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <button class="btn-add-item"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Tambah Baris</button>
+          <div class="total-block">
+            <div class="total-row"><span class="total-row-lbl">DPP (sebelum pajak)</span><span class="total-row-val">75.000.000</span></div>
+            <div class="total-row"><div style="display:flex;align-items:center;gap:8px"><span class="total-row-lbl">PPN Masukan</span><select style="font-family:var(--font-sans);font-size:11px;border:1px solid var(--color-border-default);border-radius:4px;padding:2px 6px;background:var(--color-surface-sunken);outline:none"><option>11%</option><option>10%</option><option>0%</option></select></div><span class="total-row-val" style="color:var(--danger-text)">+ 8.250.000</span></div>
+            <div class="total-row grand"><span class="total-row-lbl">Total Tagihan</span><span class="total-row-val">82.500.000</span></div>
+          </div>
+        </div>
+        <div class="review-section">
+          <div class="review-section-lbl" style="display:flex;align-items:center;gap:8px">Jurnal Entry <span class="ai-chip"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>AI Generated &middot; Akurasi 95%</span></div>
+          <div class="je-tbl-wrap">
+            <table>
+              <thead><tr><th>Akun</th><th>Nama Akun</th><th>Keterangan</th><th class="r">Debit (Rp)</th><th class="r">Kredit (Rp)</th></tr></thead>
+              <tbody>
+                <tr><td style="font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--color-text-tertiary)">6-1000</td><td style="font-size:11px;color:var(--color-text-primary);font-weight:600">Beban Pembelian</td><td style="font-size:11px;color:var(--color-text-tertiary)">Panel LCD 24 inch</td><td><input value="75.000.000"></td><td><input value="&mdash;" style="color:var(--color-text-tertiary)"></td></tr>
+                <tr><td style="font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--color-text-tertiary)">1-1400</td><td style="font-size:11px;color:var(--color-text-primary);font-weight:600">PPN Masukan 11%</td><td style="font-size:11px;color:var(--color-text-tertiary)">PPN input pembelian</td><td><input value="8.250.000"></td><td><input value="&mdash;" style="color:var(--color-text-tertiary)"></td></tr>
+                <tr><td style="font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--color-text-tertiary)">2-1100</td><td style="font-size:11px;color:var(--color-text-primary);font-weight:600">Utang Usaha</td><td style="font-size:11px;color:var(--color-text-tertiary)">PT Supplier Elektronik Indonesia</td><td><input value="&mdash;" style="color:var(--color-text-tertiary)"></td><td><input value="82.500.000"></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ap-foot">
+    <button class="ap-btn-back" id="apBtnBack" onclick="apGoStep(apCurrentStep-1)">&larr; Kembali</button>
+    <span class="ap-hint" id="apHint"></span>
+    <button class="ap-btn-draft" id="apBtnDraft" onclick="saveAsDraft()"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v14a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Simpan sebagai Draft</button>
+    <button class="ap-btn-cancel" onclick="closeAddPage()">Batal</button>
+    <button class="ap-btn-next" id="apBtnNext" onclick="apNextStep()">Lanjut <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+  </div>
+</div>
+
+<div class="prod-drawer-overlay" id="prodOverlay" onclick="closeProdDrawer()"></div>
+<div class="prod-drawer" id="prodDrawer">
+  <div class="pd-head">
+    <span class="pd-title">Pilih Produk</span>
+    <button class="pd-close" onclick="closeProdDrawer()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="pd-body">
+    <div class="pd-search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Cari produk&#8230;" id="pdSearch" oninput="renderProdList(this.value)">
+    </div>
+    <div id="pdList"></div>
+  </div>
+</div>
+<script>
+const g=id=>document.getElementById(id);
+const fmt=n=>n==null?'\u2014':n.toLocaleString('id-ID');
+const pad=n=>String(n).padStart(2,'0');
+const fmtD=s=>{if(!s)return'\u2014';const d=new Date(s+'T00:00:00');return`${d.getDate()} ${['\u0054\u0069\u0064\u0061\u006B','\u0046\u0065\u0062','\u004D\u0061\u0072','\u0041\u0070\u0072','\u004D\u0065\u0069','\u004A\u0075\u006E','\u004A\u0075\u006C','\u0041\u0067\u0075','\u0053\u0065\u0070','\u004F\u006B\u0074','\u004E\u006F\u0076','\u0044\u0065\u0073'][d.getMonth()]} ${d.getFullYear()}`};
+
+const MONTHS=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+const fmtDate=s=>{if(!s)return'\u2014';const d=new Date(s+'T00:00:00');return`${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`};
+
+const TODAY='2025-04-19';
+
+const BILLS=[
+  {id:'BILL001',vendor:'PT Supplier Elektronik Indonesia',npwp:'12.987.654.3-123.000',initials:'SE',poNo:'PO001',invNo:'INV-V001-20250115',date:'2025-01-15',due:'2025-02-14',grn:'matched',dpp:75000000,ppn:8250000,pph23:0,total:82500000,sisa:0,approval:'approved',pay:'paid',isAI:false,
+    items:[{desc:'Komponen Elektronik - Panel LCD 24 inch',qty:50,price:1500000,subtotal:75000000,acct:'6-1000',acctName:'Beban Pembelian'}],
+    audit:[{type:'created',action:'Bill dibuat',by:'Sarah Wijaya',date:'20 Jan 2025',time:'10:00',note:null},{type:'submitted',action:'Dikirim ke review',by:'Sarah Wijaya',date:'20 Jan 2025',time:'10:05',note:null},{type:'approved',action:'Disetujui',by:'Budi Santoso',date:'21 Jan 2025',time:'09:30',note:null}],
+    attachments:[{name:'invoice_supplier_elektronik_0115.pdf',size:'2.4 MB',type:'pdf'}]},
+  {id:'BILL002',vendor:'CV Toko Bangunan Jaya',npwp:'11.234.567.8-987.000',initials:'TB',poNo:'PO002',invNo:'INV-V002-20250120',date:'2025-01-20',due:'2025-02-04',grn:'matched',dpp:19200000,ppn:2112000,pph23:0,total:21120000,sisa:0,approval:'approved',pay:'paid',isAI:false,
+    items:[{desc:'Meja Kerja Ergonomis',qty:12,price:850000,subtotal:10200000,acct:'1-2100',acctName:'Aset Tetap'},{desc:'Kursi Kantor',qty:20,price:450000,subtotal:9000000,acct:'1-2100',acctName:'Aset Tetap'}],
+    audit:[{type:'created',action:'Bill dibuat',by:'Andi Prasetyo',date:'25 Jan 2025',time:'14:00',note:null},{type:'approved',action:'Disetujui',by:'Budi Santoso',date:'26 Jan 2025',time:'10:00',note:null}],
+    attachments:[{name:'invoice_toko_bangunan_0120.pdf',size:'1.2 MB',type:'pdf'}]},
+  {id:'BILL003',vendor:'PT Jasa Logistik Cepat',npwp:'12.345.678.9-456.000',initials:'JL',poNo:'PO003',invNo:'INV-V003-20250208',date:'2025-02-08',due:'2025-02-15',grn:'matched',dpp:12500000,ppn:1375000,pph23:250000,total:13750000,sisa:0,approval:'approved',pay:'paid',isAI:false,
+    items:[{desc:'Jasa Pengiriman & Logistik - Paket Bulanan Februari',qty:1,price:12500000,subtotal:12500000,acct:'5-1000',acctName:'Beban Logistik'}],
+    audit:[{type:'created',action:'Bill dibuat',by:'Rina Kusuma',date:'10 Feb 2025',time:'09:00',note:null},{type:'approved',action:'Disetujui',by:'Budi Santoso',date:'11 Feb 2025',time:'11:00',note:null}],
+    attachments:[{name:'invoice_logistik_cepat_0208.pdf',size:'980 KB',type:'pdf'}]},
+  {id:'BILL004',vendor:'PT Penyedia Layanan Konsultasi',npwp:'13.456.789.0-321.000',initials:'PK',poNo:'PO004',invNo:'INV-V004-20250315',date:'2025-03-15',due:'2025-04-29',grn:'matched',dpp:25000000,ppn:2750000,pph23:500000,total:27500000,sisa:27500000,approval:'approved',pay:'unpaid',isAI:false,
+    items:[{desc:'Jasa Konsultasi - Audit Internal & Rekomendasi Proses',qty:1,price:25000000,subtotal:25000000,acct:'5-1070',acctName:'Beban Konsultasi'}],
+    audit:[{type:'created',action:'Bill dibuat',by:'Budi Santoso',date:'20 Mar 2025',time:'13:00',note:null},{type:'approved',action:'Disetujui',by:'Budi Santoso',date:'21 Mar 2025',time:'09:00',note:null}],
+    attachments:[{name:'invoice_konsultasi_0315.pdf',size:'1.8 MB',type:'pdf'}]},
+  {id:'BILL005',vendor:'Koperasi Tani Sejahtera',npwp:'14.567.890.1-654.000',initials:'KT',poNo:'PO005',invNo:'INV-V005-20250315',date:'2025-03-15',due:'2025-05-14',grn:'pending',dpp:12500000,ppn:1375000,pph23:0,total:13750000,sisa:13750000,approval:'review',pay:'unpaid',isAI:false,
+    items:[{desc:'Bahan Baku - Jagung Pipil Kualitas Premium',qty:5000,price:2500,subtotal:12500000,acct:'6-1000',acctName:'Beban Bahan Baku'}],
+    audit:[{type:'created',action:'Bill dibuat',by:'Sarah Wijaya',date:'18 Mar 2025',time:'10:00',note:null},{type:'submitted',action:'Dikirim ke review',by:'Sarah Wijaya',date:'18 Mar 2025',time:'10:05',note:null}],
+    attachments:[{name:'invoice_koperasi_tani_0315.pdf',size:'760 KB',type:'pdf'}]},
+  {id:'BILL006',vendor:'PT Jasa Logistik Cepat',npwp:'12.345.678.9-456.000',initials:'JL',poNo:'PO006',invNo:'INV-V003-20250401',date:'2025-04-01',due:'2025-04-08',grn:'matched',dpp:15000000,ppn:1650000,pph23:300000,total:16650000,sisa:16650000,approval:'approved',pay:'overdue',isAI:false,
+    items:[{desc:'Jasa Pengiriman - Paket April Minggu 1',qty:1,price:15000000,subtotal:15000000,acct:'5-1000',acctName:'Beban Logistik'}],
+    audit:[{type:'created',action:'Bill dibuat',by:'Rina Kusuma',date:'3 Apr 2025',time:'09:00',note:null},{type:'approved',action:'Disetujui',by:'Budi Santoso',date:'4 Apr 2025',time:'10:00',note:null}],
+    attachments:[{name:'invoice_logistik_apr_w1.pdf',size:'850 KB',type:'pdf'}]},
+  {id:'BILL007',vendor:'PT Supplier Elektronik Indonesia',npwp:'12.987.654.3-123.000',initials:'SE',poNo:'\u2014',invNo:'\u2014',date:'2025-04-18',due:'2025-05-18',grn:'pending',dpp:45000000,ppn:4950000,pph23:0,total:49500000,sisa:49500000,approval:'draft',pay:'unpaid',isAI:true,
+    items:[{desc:'Monitor 27 inch 4K UHD',qty:10,price:4500000,subtotal:45000000,acct:'1-2100',acctName:'Aset Tetap'}],
+    audit:[{type:'created',action:'Bill dibuat (Draft \u2014 OCR AI)',by:'System (OCR Auto)',date:'18 Apr 2025',time:'22:14',note:null}],
+    attachments:[{name:'inv_supplier_elektronik_ai.jpg',size:'1.6 MB',type:'img'}]},
+  {id:'BILL008',vendor:'CV Toko Bangunan Jaya',npwp:'11.234.567.8-987.000',initials:'TB',poNo:'PO007',invNo:'INV-V002-20250410',date:'2025-04-10',due:'2025-04-17',grn:'mismatch',dpp:8500000,ppn:935000,pph23:0,total:9435000,sisa:9435000,approval:'review',pay:'overdue',isAI:false,
+    items:[{desc:'Material Renovasi - Cat & Plamir',qty:1,price:8500000,subtotal:8500000,acct:'5-1000',acctName:'Beban Operasional'}],
+    audit:[{type:'created',action:'Bill dibuat',by:'Andi Prasetyo',date:'12 Apr 2025',time:'08:30',note:null},{type:'submitted',action:'Dikirim ke review',by:'Andi Prasetyo',date:'12 Apr 2025',time:'08:35',note:null}],
+    attachments:[{name:'invoice_toko_bangunan_0410.pdf',size:'1.1 MB',type:'pdf'},{name:'grn_mismatch_note.jpg',size:'540 KB',type:'img'}]},
+];
+
+const PRODUCTS=[
+  {id:'P001',name:'Komponen Elektronik - Panel LCD 24 inch',unit:'pcs',price:1500000,acct:'6-1000',acctName:'Beban Pembelian'},
+  {id:'P002',name:'Monitor 27 inch 4K UHD',unit:'unit',price:4500000,acct:'1-2100',acctName:'Aset Tetap'},
+  {id:'P003',name:'Meja Kerja Ergonomis',unit:'unit',price:850000,acct:'1-2100',acctName:'Aset Tetap'},
+  {id:'P004',name:'Kursi Kantor Premium',unit:'unit',price:450000,acct:'1-2100',acctName:'Aset Tetap'},
+  {id:'P005',name:'Jasa Pengiriman & Logistik',unit:'paket',price:15000000,acct:'5-1000',acctName:'Beban Logistik'},
+  {id:'P006',name:'Jasa Konsultasi Bisnis',unit:'paket',price:25000000,acct:'5-1070',acctName:'Beban Konsultasi'},
+  {id:'P007',name:'Bahan Baku - Jagung Pipil',unit:'kg',price:2500,acct:'6-1000',acctName:'Beban Bahan Baku'},
+  {id:'P008',name:'Material Renovasi',unit:'paket',price:8500000,acct:'5-1000',acctName:'Beban Operasional'},
+];
+
+let activeId=null,sortCol='',sortDir='asc';
+let filterPay='',filterStatus='',filterVendor='',filterGrn='',filterFrom='',filterTo='';
+let currentDrawerBill=null,activeDTab='tab-detail';
+let rejectTargetId=null;
+let selectedIds=new Set();
+let pgPage=1,pgSize=50;let filterPayableApproved=false;
+let expScope='visible',expFile='xlsx';
+let prodTargetEl=null;
+let apCurrentStep=1;
+
+function daysOverdue(dueStr){
+  const d1=new Date(dueStr+'T00:00:00'),d2=new Date(TODAY+'T00:00:00');
+  return Math.round((d2-d1)/(1000*60*60*24));
+}
+
+function getPriceInsight(bill){
+  // Only show for non-paid bills; compare total vs most recent paid bill from same vendor
+  if(bill.pay==='paid') return null;
+  const samev=BILLS.filter(b=>b.vendor===bill.vendor&&b.id!==bill.id&&b.pay==='paid');
+  if(!samev.length) return null;
+  const ref=samev[samev.length-1];
+  const myTotal=bill.total;
+  const refTotal=ref.total;
+  if(refTotal===0) return null;
+  const pct=Math.round((myTotal-refTotal)/refTotal*100);
+  if(Math.abs(pct)<2) return null;
+  return{pct,dir:pct>0?'up':'down'};
+}
+
+function getFiltered(){
+  let list=[...BILLS];
+  const q=g('searchInput').value.toLowerCase();
+  if(q) list=list.filter(b=>b.id.toLowerCase().includes(q)||b.vendor.toLowerCase().includes(q)||b.invNo.toLowerCase().includes(q));
+  if(filterPay) list=list.filter(b=>b.pay===filterPay);
+  if(filterPayableApproved){list=list.filter(b=>b.approval==='approved'&&(b.pay==='overdue'||b.pay==='unpaid'));}
+  else if(filterStatus) list=list.filter(b=>b.approval===filterStatus);
+  if(filterVendor) list=list.filter(b=>b.vendor===filterVendor);
+  if(filterGrn) list=list.filter(b=>b.grn===filterGrn);
+  if(filterFrom) list=list.filter(b=>b.date>=filterFrom);
+  if(filterTo) list=list.filter(b=>b.date<=filterTo);
+  if(sortCol){
+    list.sort((a,b)=>{
+      let av=a[sortCol],bv=b[sortCol];
+      if(typeof av==='string') av=av.toLowerCase(),bv=bv.toLowerCase();
+      return sortDir==='asc'?(av>bv?1:-1):(av<bv?1:-1);
+    });
+  } else {
+    const ord=b=>{
+      if(b.pay==='overdue') return 0;
+      if(b.pay==='unpaid'&&b.approval==='review') return 1;
+      if(b.pay==='unpaid') return 2;
+      if(b.approval==='review') return 3;
+      if(b.approval==='draft') return 4;
+      return 5;
+    };
+    list.sort((a,b)=>ord(a)-ord(b)||(a.due>b.due?1:-1));
+  }
+  return list;
+}
+
+function setPayChip(el){
+  document.querySelectorAll('#payChips .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');filterPay=el.dataset.val;filterPayableApproved=false;pgPage=1;renderTable();
+}
+function filterOverdue(){
+  document.querySelectorAll('#payChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.val==='overdue'));
+  filterPay='overdue';pgPage=1;renderTable();
+}
+
+function renderTable(){
+  const list=getFiltered();
+  const start=(pgPage-1)*pgSize,end=Math.min(start+pgSize,list.length);
+  const page=list.slice(start,end);
+  const tbody=g('tblBody');
+  const overdueAmt=BILLS.filter(b=>b.pay==='overdue').reduce((s,b)=>s+b.sisa,0);
+  const unpaidAmt=BILLS.filter(b=>b.pay==='unpaid').reduce((s,b)=>s+b.sisa,0);
+  const outstanding=BILLS.filter(b=>b.pay!=='paid').reduce((s,b)=>s+b.sisa,0);
+  g('sb-total').textContent=BILLS.length+' item';
+  g('sb-shown').textContent=list.length+' dari '+BILLS.length;
+  g('sb-unpaid-amt').textContent='Rp '+fmt(unpaidAmt);
+  g('sb-overdue-amt').textContent='Rp '+fmt(overdueAmt);
+  g('apOutstandingAmt').textContent='Rp '+fmt(outstanding);
+  const totalPages=Math.max(1,Math.ceil(list.length/pgSize));
+  g('pgInfo').textContent=`${start+1}\u2013${Math.max(start+1,end)} dari ${list.length}`;
+  g('pgPrev').disabled=pgPage<=1;g('pgNext').disabled=pgPage>=totalPages;
+  if(!page.length){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--color-text-tertiary);font-size:12px">Tidak ada data yang sesuai filter</td></tr>';
+    renderAttnSection();return;
+  }
+  tbody.innerHTML=page.map(b=>{
+    const isOver=b.pay==='overdue',isDraft=b.approval==='draft';
+    let rc=isOver?'row-overdue':isDraft?'row-draft':'';
+    if(activeId===b.id) rc+=(rc?' ':'')+'sel';
+    const pi=getPriceInsight(b);
+    const piHtml=pi?`<span class="pi-badge ${pi.dir}"><svg viewBox="0 0 24 24"><polyline points="${pi.dir==='up'?'18 15 12 9 6 15':'18 9 12 15 6 9'}"/></svg>${Math.abs(pi.pct)}%</span>`:'';
+    const aB={draft:'<span class="badge badge-draft">Draft</span>',review:'<span class="badge badge-review">Review</span>',approved:'<span class="badge badge-approved">Disetujui</span>',rejected:'<span class="badge badge-rejected">Ditolak</span>'}[b.approval]||'';
+    const pB={paid:'<span class="pay-chip pay-paid"><span class="pay-dot"></span>Lunas</span>',unpaid:'<span class="pay-chip pay-unpaid"><span class="pay-dot"></span>Belum Bayar</span>',overdue:'<span class="pay-chip pay-overdue"><span class="pay-dot"></span>Jatuh Tempo</span>'}[b.pay]||'';
+    const vendorCodes={'PT Supplier Elektronik Indonesia':'VND-001','CV Toko Bangunan Jaya':'VND-002','PT Jasa Logistik Cepat':'VND-003','PT Penyedia Layanan Konsultasi':'VND-004','Koperasi Tani Sejahtera':'VND-005'};
+    const vCode=vendorCodes[b.vendor]||'VND-000';
+    const chk=selectedIds.has(b.id)?'checked':'';
+    return `<tr class="${rc}" id="row-${b.id}" onclick="openDrawerById('${b.id}')">
+      <td onclick="event.stopPropagation()"><input type="checkbox" ${chk} style="accent-color:var(--color-action)" onchange="toggleRow('${b.id}',this.checked)"></td>
+      <td class="mono">${b.id}</td>
+      <td><div style="font-size:12px;font-weight:500;color:var(--color-text-primary)">${b.vendor}</div><div style="font-family:var(--font-mono);font-size:10px;color:var(--color-text-tertiary);margin-top:1px">${vCode}</div></td>
+      <td style="font-size:12px;white-space:nowrap;${isOver?'color:var(--danger-text);font-weight:700':'color:var(--color-text-secondary)'}">${fmtDate(b.due)}${isOver?`<div style="font-size:10px;color:var(--danger-text);font-weight:600;margin-top:1px">Lewat ${daysOverdue(b.due)} hari</div>`:''}</td>
+      <td class="num" style="white-space:nowrap">Rp ${fmt(b.total)}${piHtml}</td>
+      <td>${aB}</td>
+      <td>${pB}</td>
+    </tr>`;
+  }).join('');
+  updateBulkBar();renderAttnSection();
+}
+
+function toggleRow(id,checked){if(checked)selectedIds.add(id);else selectedIds.delete(id);updateBulkBar();}
+function toggleAll(cb){const list=getFiltered().slice((pgPage-1)*pgSize,pgPage*pgSize);list.forEach(b=>{if(cb.checked)selectedIds.add(b.id);else selectedIds.delete(b.id);});renderTable();}
+function clearSelection(){selectedIds.clear();renderTable();}
+function updateBulkBar(){
+  const cnt=selectedIds.size;g('bulkBar').classList.toggle('show',cnt>0);g('bulkCount').textContent=cnt;
+  const sel=BILLS.filter(b=>selectedIds.has(b.id));
+  g('bulkApproveBtn').style.display=sel.some(b=>b.approval==='review')?'inline-flex':'none';
+  g('bulkPayBtn').style.display=sel.some(b=>b.approval==='approved'&&(b.pay==='overdue'||b.pay==='unpaid'))?'inline-flex':'none';
+}
+function bulkApprove(){
+  BILLS.filter(b=>selectedIds.has(b.id)&&b.approval==='review').forEach(b=>{b.approval='approved';b.pay='unpaid';b.audit.push({type:'approved',action:'Disetujui (Bulk)',by:'Budi Santoso',date:'19 Apr 2025',time:new Date().getHours()+':'+pad(new Date().getMinutes()),note:null});});
+  selectedIds.clear();renderTable();
+}
+function bulkPay(){
+  BILLS.filter(b=>selectedIds.has(b.id)&&b.approval==='approved'&&(b.pay==='overdue'||b.pay==='unpaid')).forEach(b=>{b.pay='paid';b.sisa=0;b.audit.push({type:'approved',action:'Pembayaran diproses (Bulk)',by:'Budi Santoso',date:'19 Apr 2025',time:new Date().getHours()+':'+pad(new Date().getMinutes()),note:null});});
+  selectedIds.clear();renderTable();
+}
+
+function toggleAttn(){const body=g('attnBody'),tog=g('attnToggle');const open=body.classList.toggle('open');tog.classList.toggle('open',open);}
+
+function renderAttnSection(){
+  const unpaidOverdue=BILLS.filter(b=>b.approval==='approved'&&(b.pay==='overdue'||b.pay==='unpaid'));
+  const pendingItems=BILLS.filter(b=>b.approval==='review');
+  const draftItems=BILLS.filter(b=>b.approval==='draft');
+  const allClear=unpaidOverdue.length===0&&pendingItems.length===0&&draftItems.length===0;
+  const sec=g('attnSection');
+  if(allClear){
+    sec.style.background='var(--success-surface)';sec.style.borderColor='var(--success-border)';
+    sec.innerHTML='<div class="attn-header" style="cursor:default;pointer-events:none"><div class="attn-icon" style="background:rgba(22,102,56,.12)"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--success-text);fill:none;stroke-width:2"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="attn-title" style="color:var(--success-text)">Semua item sudah aman</div><div class="attn-sub" style="color:var(--success-text);opacity:.7">Tidak ada tagihan yang perlu tindakan segera</div></div></div>';
+    return;
+  }
+  sec.style.background='';sec.style.borderColor='';
+  sec.innerHTML='<div class="attn-header" onclick="toggleAttn()"><div class="attn-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div><div class="attn-title">Beberapa hal memerlukan perhatianmu</div></div><div class="attn-toggle open" id="attnToggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div><div class="attn-body open" id="attnBody"><div class="attn-desc">Berdasarkan analisis cerdas, terdapat beberapa transaksi yang memerlukan tindakan segera untuk menjaga kesehatan arus kas dan hubungan vendor.</div><div id="attnChildren"></div></div>';
+  const ch=g('attnChildren');ch.innerHTML='';
+  const unpaidTotal=unpaidOverdue.reduce((s,b)=>s+b.sisa,0);
+  if(unpaidOverdue.length>0) ch.appendChild(buildChildAcc('unpaid','unpaid',
+    '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    'Tagihan perlu dibayar',unpaidOverdue.length,unpaidTotal,'danger',unpaidOverdue,function(b){
+      const over=b.pay==='overdue',days=over?daysOverdue(b.due):0;
+      return '<div class="attn-item'+(over?' overdue':'')+'">'+
+        '<div class="attn-item-info">'+
+        (over?'<div class="overdue-badge"><svg viewBox="0 0 24 24"><polyline points="12 6 12 12 16 14"/></svg>Jatuh tempo &middot; Lewat '+days+' hari</div>':'')+
+        '<div><span class="attn-item-id">'+b.id+'</span> &mdash; <span style="font-weight:500">'+b.vendor+'</span></div>'+
+        '<div class="attn-ctas" style="margin-top:5px">'+
+        '<button class="attn-cta ghost" onclick="scrollToRow(\''+b.id+'\')">Lihat item</button>'+
+        '<button class="attn-cta primary" onclick="payBill(\''+b.id+'\')">Bayar</button>'+
+        '</div></div>'+
+        '<span class="attn-item-amt">'+fmt(b.sisa)+'</span>'+
+        '</div>';
+    },'function(){filterByPayableApproved();}'));
+  if(pendingItems.length>0) ch.appendChild(buildChildAcc('pending','pending',
+    '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+    'Item dengan Status Pending',pendingItems.length,null,'warn',pendingItems,function(b){
+      const isOver=b.pay==='overdue',days=isOver?daysOverdue(b.due):0;
+      return '<div class="attn-item'+(isOver?' overdue':'')+'">'+
+        '<div class="attn-item-info">'+
+        (isOver?'<div class="overdue-badge"><svg viewBox="0 0 24 24"><polyline points="12 6 12 12 16 14"/></svg>Jatuh tempo &middot; Lewat '+days+' hari</div>':'')+
+        '<div><span class="attn-item-id">'+b.id+'</span> &mdash; <span style="font-weight:500">'+b.vendor+'</span></div>'+
+        '<div class="attn-ctas" style="margin-top:5px">'+
+        '<button class="attn-cta ghost" onclick="scrollToRow(\''+b.id+'\')">Lihat item</button>'+
+        '<button class="attn-cta danger" onclick="openRejectModal(\''+b.id+'\')">Tolak</button>'+
+        '<button class="attn-cta success" onclick="attnApprove(\''+b.id+'\')">Setujui</button>'+
+        '</div></div>'+
+        '<span class="attn-item-amt">'+fmt(b.total)+'</span>'+
+        '</div>';
+    },'function(){filterByPending();}'));
+  if(draftItems.length>0) ch.appendChild(buildChildAcc('draft','draft',
+    '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+    'Item dengan Status Draft',draftItems.length,null,'neutral',draftItems,function(b){
+      const isOver=b.pay==='overdue',days=isOver?daysOverdue(b.due):0;
+      return '<div class="attn-item'+(isOver?' overdue':'')+'">'+
+        '<div class="attn-item-info">'+
+        (isOver?'<div class="overdue-badge"><svg viewBox="0 0 24 24"><polyline points="12 6 12 12 16 14"/></svg>Jatuh tempo &middot; Lewat '+days+' hari</div>':'')+
+        '<div><span class="attn-item-id">'+b.id+'</span> &mdash; <span style="font-weight:500">'+b.vendor+'</span></div>'+
+        '<div class="attn-ctas" style="margin-top:5px">'+
+        '<button class="attn-cta ghost" onclick="scrollToRow(\''+b.id+'\')">Lihat item</button>'+
+        '<button class="attn-cta primary" onclick="attnSendApproval(\''+b.id+'\')">Kirim Approval</button>'+
+        '</div></div>'+
+        '<span class="attn-item-amt">'+fmt(b.total)+'</span>'+
+        '</div>';
+    },'function(){filterByDraft();}'));
+}
+
+function buildChildAcc(key,iconClass,iconSvg,title,count,amount,badgeClass,items,renderItem,onViewAll){
+  const div=document.createElement('div');div.className='child-acc';
+  const amtHtml=amount?`<span class="child-acc-amount">Rp ${fmt(amount)}</span>`:'';
+  const viewAllBtn=onViewAll&&items.length>0?`<button class="child-acc-view-all" onclick="event.stopPropagation();(${onViewAll})()">Lihat semua<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>`:'';
+  const bodyContent=items.length===0?'<div class="attn-empty"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Semua item sudah aman</div>':items.map(renderItem).join('');
+  div.innerHTML=`<div class="child-acc-header" onclick="toggleChildAcc('${key}')"><div class="child-acc-icon ${iconClass}">${iconSvg}</div><div class="child-acc-title">${title}</div>${amtHtml}${viewAllBtn}<span class="child-acc-badge ${badgeClass}">${count}</span><div class="child-acc-toggle" id="childtog-${key}"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div><div class="child-acc-body" id="childbody-${key}">${bodyContent}</div>`;
+  return div;
+}
+function toggleChildAcc(key){const body=g('childbody-'+key),tog=g('childtog-'+key);if(!body||!tog)return;const open=body.classList.toggle('open');tog.classList.toggle('open',open);}
+
+function scrollToRow(id){
+  const row=g('row-'+id);
+  if(!row){const allFiltered=getFiltered();const idx=allFiltered.findIndex(b=>b.id===id);if(idx>=0){pgPage=Math.floor(idx/pgSize)+1;renderTable();setTimeout(()=>doScrollToRow(id),100);}return;}
+  doScrollToRow(id);
+}
+function doScrollToRow(id){const row=g('row-'+id);if(!row)return;row.classList.add('row-highlight');row.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>row.classList.remove('row-highlight'),2500);}
+
+function payBill(id){
+  const b=BILLS.find(x=>x.id===id);if(!b)return;
+  b.pay='paid';b.sisa=0;b.audit.push({type:'approved',action:'Pembayaran diproses',by:'Budi Santoso',date:'19 Apr 2025',time:new Date().getHours()+':'+pad(new Date().getMinutes()),note:null});
+  if(currentDrawerBill&&currentDrawerBill.id===id){renderDrawerContent();renderDrawerFooter();g('d-badge-pay').innerHTML='<span class="badge badge-paid">Lunas</span>';}
+  renderTable();
+}
+function attnApprove(id){
+  const b=BILLS.find(x=>x.id===id);if(!b)return;
+  b.approval='approved';b.pay='unpaid';b.audit.push({type:'approved',action:'Disetujui',by:'Budi Santoso',date:'19 Apr 2025',time:new Date().getHours()+':'+pad(new Date().getMinutes()),note:null});
+  if(currentDrawerBill&&currentDrawerBill.id===id){renderDrawerContent();renderDrawerFooter();}renderTable();
+}
+function attnSendApproval(id){
+  const b=BILLS.find(x=>x.id===id);if(!b)return;
+  b.approval='review';b.audit.push({type:'submitted',action:'Dikirim ke review',by:'Budi Santoso',date:'19 Apr 2025',time:new Date().getHours()+':'+pad(new Date().getMinutes()),note:null});
+  if(currentDrawerBill&&currentDrawerBill.id===id){renderDrawerContent();renderDrawerFooter();}renderTable();
+}
+
+function openDrawerById(id){
+  const b=BILLS.find(x=>x.id===id);if(!b)return;
+  activeId=id;currentDrawerBill=b;
+  g('d-vendor-name').textContent=b.vendor;
+  g('d-vendor-sub').textContent=b.npwp!=='\u2014'?'NPWP: '+b.npwp:b.invNo;
+  g('d-ref').textContent=b.id;
+  const appr={draft:'badge-draft',review:'badge-review',approved:'badge-approved',rejected:'badge-rejected'};
+  g('d-badge-approval').innerHTML=`<span class="badge ${appr[b.approval]||''}">${{draft:'Draft',review:'Dalam Review',approved:'Disetujui',rejected:'Ditolak'}[b.approval]}</span>`;
+  const payL={paid:'badge-paid',unpaid:'badge-unpaid',overdue:'badge-overdue'};
+  g('d-badge-pay').innerHTML=`<span class="badge ${payL[b.pay]||''}">${{paid:'Lunas',unpaid:'Belum Bayar',overdue:'Jatuh Tempo'}[b.pay]}</span>`;
+  const grnCfg={matched:{cls:'matched',icon:'<polyline points="20 6 9 17 4 12"/>',txt:'GRN Matched \u2014 Barang/jasa sudah diterima dan terverifikasi'},pending:{cls:'pending',icon:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',txt:'GRN Pending \u2014 Menunggu konfirmasi penerimaan barang'},mismatch:{cls:'mismatch',icon:'<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',txt:'GRN Mismatch \u2014 Terdapat ketidaksesuaian antara PO dan invoice'}};
+  const gc=grnCfg[b.grn]||grnCfg.pending;
+  g('d-grn-banner').innerHTML=`<div class="grn-banner ${gc.cls}"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0">${gc.icon}</svg>${gc.txt}</div>`;
+  renderDrawerContent();renderDrawerFooter();
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.toggle('active',t.dataset.tab==='tab-detail'));
+  document.querySelectorAll('.dpane').forEach(p=>p.classList.toggle('active',p.id==='tab-detail'));
+  activeDTab='tab-detail';
+  g('drawer').classList.add('open');g('overlay').classList.add('open');renderTable();
+}
+
+function switchDTab(el){
+  const tab=el.dataset.tab;activeDTab=tab;
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  document.querySelectorAll('.dpane').forEach(p=>p.classList.toggle('active',p.id===tab));
+}
+
+function renderDrawerContent(){
+  const b=currentDrawerBill;if(!b)return;
+  let dHtml='';
+  if(b.isAI) dHtml+=`<div style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--ai-surface);border:1px solid var(--ai-border);border-radius:var(--radius-sm);margin-bottom:12px;font-size:11px;color:var(--color-action);font-weight:600"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Bill ini di-generate oleh AI \u2014 harap review sebelum disubmit</div>`;
+  dHtml+=`<div class="dsec"><div class="dlbl">Vendor</div><div onclick="alert('Membuka halaman Vendor...')" class="vendor-cta"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Lihat ${b.vendor}</div><div class="info-row"><label>NPWP</label><span>${b.npwp}</span></div></div>
+  <div class="dsec"><div class="dlbl">Informasi Tagihan</div>
+    <div class="info-row"><label>Nomor Invoice</label><span style="font-family:var(--font-mono);font-size:11px">${b.invNo}</span></div>
+    <div class="info-row"><label>Nomor PO</label><span style="font-family:var(--font-mono);font-size:11px">${b.poNo}</span></div>
+    <div class="info-row"><label>Tanggal Invoice</label><span>${fmtDate(b.date)}</span></div>
+    <div class="info-row"><label>Jatuh Tempo</label><span style="${b.pay==='overdue'?'color:var(--danger-text);font-weight:700':''}">${fmtDate(b.due)}${b.pay==='overdue'?` <span style="font-size:10px;background:var(--danger-text);color:#fff;padding:1px 6px;border-radius:9999px;margin-left:4px">Lewat ${daysOverdue(b.due)} hari</span>`:''}</span></div>
+    <div class="info-row"><label>Total Tagihan</label><span style="font-family:var(--font-mono);font-size:13px;font-weight:700">Rp ${fmt(b.total)}</span></div>
+    <div class="info-row"><label>Sisa Tagihan</label><span style="font-family:var(--font-mono);font-size:13px;font-weight:700;${b.sisa>0?'color:var(--danger-text)':'color:var(--success-text)'}">Rp ${fmt(b.sisa)}</span></div>
+  </div>`;
+  if(b.rejectionReason) dHtml+=`<div class="dsec"><div class="dlbl">Alasan Penolakan</div><div style="padding:10px;background:var(--danger-surface);border:1px solid var(--danger-border);border-radius:var(--radius-md);font-size:12px;color:var(--danger-text);line-height:1.5">${b.rejectionReason}</div></div>`;
+  dHtml+=`<div class="dsec"><div class="dlbl">Lampiran</div><div class="attach-list">${b.attachments.map(a=>`<div class="attach-item"><div class="attach-icon ${a.type}"><svg viewBox="0 0 24 24">${a.type==='pdf'?'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>':'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>'}</svg></div><div><div class="attach-name">${a.name}</div><div class="attach-size">${a.size}</div></div></div>`).join('')}</div></div>`;
+  g('tab-detail').innerHTML=dHtml;
+
+  const pi=getPriceInsight(b);
+  const piHtml=pi?`<span class="pi-badge ${pi.dir}" style="margin-left:6px"><svg viewBox="0 0 24 24"><polyline points="${pi.dir==='up'?'18 15 12 9 6 15':'18 9 12 15 6 9'}"/></svg>${Math.abs(pi.pct)}% vs sebelumnya</span>`:'';
+  const itemRows=b.items.map(it=>`<tr><td>${it.desc}</td><td class="r">${fmt(it.qty)}</td><td class="r">Rp ${fmt(it.price)}</td><td class="r">Rp ${fmt(it.subtotal)}</td><td style="font-size:11px;color:var(--color-text-tertiary)">${it.acctName}</td></tr>`).join('');
+  const jeRows=`<tr><td style="font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--color-text-tertiary)">6-1000</td><td style="font-size:11px;font-weight:600">Beban Pembelian</td><td class="r" style="font-family:var(--font-mono);font-size:11px;font-weight:600">Rp ${fmt(b.dpp)}</td><td class="r" style="color:var(--color-text-tertiary)">\u2014</td></tr>
+    <tr><td style="font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--color-text-tertiary)">1-1400</td><td style="font-size:11px;font-weight:600">PPN Masukan 11%</td><td class="r" style="font-family:var(--font-mono);font-size:11px;font-weight:600">Rp ${fmt(b.ppn)}</td><td class="r" style="color:var(--color-text-tertiary)">\u2014</td></tr>
+    <tr><td style="font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--color-text-tertiary)">2-1100</td><td style="font-size:11px;font-weight:600">Utang Usaha</td><td class="r" style="color:var(--color-text-tertiary)">\u2014</td><td class="r" style="font-family:var(--font-mono);font-size:11px;font-weight:600">Rp ${fmt(b.total)}</td></tr>`;
+  g('tab-items').innerHTML=`<div class="dsec"><div class="dlbl">Rincian Item${piHtml}</div>
+    <table class="d-tbl"><thead><tr><th>Deskripsi</th><th class="r">Qty</th><th class="r">Harga</th><th class="r">Subtotal</th><th>Akun</th></tr></thead><tbody>${itemRows}</tbody><tfoot><tr><td colspan="3" style="text-align:right;font-size:11px;color:var(--color-text-tertiary)">Total DPP</td><td class="r">Rp ${fmt(b.dpp)}</td><td></td></tr></tfoot></table>
+  </div>
+  <div class="dsec"><div class="dlbl">Ringkasan Pajak</div><div class="tax-box"><div class="tax-box-head"><span>Komponen Pajak</span><span style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary)">${b.id}</span></div>
+    <div class="tax-row"><div><div class="tax-row-lbl">DPP (Dasar Pengenaan Pajak)</div><div class="tax-row-sub">Nilai sebelum pajak</div></div><div class="tax-row-val">Rp ${fmt(b.dpp)}</div></div>
+    <div class="tax-row"><div><div class="tax-row-lbl">PPN Masukan (11%)</div><div class="tax-row-sub">Bisa dikreditkan</div></div><div class="tax-row-val pos">+ Rp ${fmt(b.ppn)}</div></div>
+    <div class="tax-row"><div><div class="tax-row-lbl">PPh Pasal 23</div><div class="tax-row-sub">${b.pph23>0?'Dipotong dari pembayaran':'Tidak dikenakan'}</div></div><div class="tax-row-val" style="${b.pph23>0?'color:var(--danger-text)':'color:var(--color-text-tertiary)'}">${b.pph23>0?'\u2212 Rp '+fmt(b.pph23):'\u2014'}</div></div>
+    <div class="tax-total-row"><div class="tax-total-lbl">Total Tagihan</div><div class="tax-total-val">Rp ${fmt(b.total)}</div></div>
+  </div></div>
+  <div class="dsec"><div class="dlbl" style="display:flex;align-items:center;gap:8px">List Jurnal <span class="ai-chip"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>AI Generated</span></div>
+    <table class="d-tbl"><thead><tr><th>Akun</th><th>Nama Akun</th><th class="r">Debit (Rp)</th><th class="r">Kredit (Rp)</th></tr></thead><tbody>${jeRows}</tbody><tfoot><tr><td colspan="2" style="text-align:right;font-size:10px;color:var(--color-text-tertiary)">Total</td><td class="r">Rp ${fmt(b.dpp+b.ppn)}</td><td class="r">Rp ${fmt(b.total)}</td></tr></tfoot></table>
+  </div>`;
+
+  const typeIcon={approved:'<polyline points="20 6 9 17 4 12"/>',rejected:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',created:'<circle cx="12" cy="12" r="3"/>',submitted:'<polyline points="22 2 15 22 11 13 2 9 22 2"/>'};
+  const audit=[...b.audit].reverse();
+  g('tab-audit').innerHTML=`<div class="dsec"><div class="audit-list">${audit.map(a=>`<div class="audit-item"><div class="audit-dot ${a.type}"><svg viewBox="0 0 24 24">${typeIcon[a.type]||'<circle cx="12" cy="12" r="3"/>'}</svg></div><div class="audit-content"><div class="audit-action">${a.action}</div><div class="audit-meta">${a.by} \u00b7 ${a.date} ${a.time}</div>${a.note?`<div class="audit-note">${a.note}</div>`:''}</div></div>`).join('')}</div></div>`;
+}
+
+function renderDrawerFooter(){
+  const b=currentDrawerBill;if(!b)return;
+  const isPayable=b.approval==='approved'&&(b.pay==='overdue'||b.pay==='unpaid');
+  let html='';
+  if(b.approval==='review'){
+    html=`<button class="btn-reject" onclick="openRejectModal('${b.id}')">Tolak</button><button class="btn-approve" onclick="approveBill('${b.id}')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Setujui</button>`;
+  } else if(b.approval==='rejected'){
+    html=`<button class="btn-reopen" onclick="reopenBill('${b.id}')">Buka Kembali ke Draft</button>`;
+  } else if(b.approval==='draft'){
+    html=`<button class="btn-send-approval" onclick="attnSendApproval('${b.id}')"><svg viewBox="0 0 24 24"><polyline points="22 2 15 22 11 13 2 9 22 2"/></svg>Kirim Approval</button>`;
+  } else if(b.approval==='approved'){
+    if(isPayable) html=`<button class="btn-pay-now" onclick="payBill('${b.id}')"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Proses Bayar</button>`;
+    else html='<div class="btn-readonly">Bill disetujui &middot; Lunas</div>';
+  }
+  g('dFooter').innerHTML=html;
+}
+
+function approveBill(id){
+  const b=BILLS.find(x=>x.id===id);if(!b)return;
+  b.approval='approved';b.pay='unpaid';b.audit.push({type:'approved',action:'Disetujui',by:'Budi Santoso',date:'19 Apr 2025',time:new Date().getHours()+':'+pad(new Date().getMinutes()),note:null});
+  renderDrawerContent();renderDrawerFooter();renderTable();
+  g('d-badge-approval').innerHTML='<span class="badge badge-approved">Disetujui</span>';
+}
+function reopenBill(id){
+  const b=BILLS.find(x=>x.id===id);if(!b)return;
+  b.approval='draft';b.audit.push({type:'created',action:'Dibuka kembali ke Draft',by:'Budi Santoso',date:'19 Apr 2025',time:new Date().getHours()+':'+pad(new Date().getMinutes()),note:null});
+  renderDrawerContent();renderDrawerFooter();renderTable();
+  g('d-badge-approval').innerHTML='<span class="badge badge-draft">Draft</span>';
+}
+
+function openRejectModal(id){rejectTargetId=id;g('rejectReason').value='';g('rejectModal').classList.add('open');}
+function closeRejectModal(){g('rejectModal').classList.remove('open');}
+function setPreset(el){g('rejectReason').value=el.textContent;}
+function confirmReject(){
+  const reason=g('rejectReason').value.trim();
+  if(!reason){g('rejectReason').style.borderColor='var(--danger-border)';return;}
+  const b=BILLS.find(x=>x.id===rejectTargetId);if(!b)return;
+  b.approval='rejected';b.rejectionReason=reason;b.audit.push({type:'rejected',action:'Ditolak',by:'Budi Santoso',date:'19 Apr 2025',time:new Date().getHours()+':'+pad(new Date().getMinutes()),note:reason});
+  closeRejectModal();
+  if(currentDrawerBill&&currentDrawerBill.id===rejectTargetId){renderDrawerContent();renderDrawerFooter();g('d-badge-approval').innerHTML='<span class="badge badge-rejected">Ditolak</span>';}
+  renderTable();
+}
+function closeDrawer(){activeId=null;currentDrawerBill=null;g('drawer').classList.remove('open');g('overlay').classList.remove('open');renderTable();}
+
+function openFilterDrawer(){g('filterDrawer').classList.add('open');g('filterOverlay').classList.add('open');}
+function closeFilterDrawer(){g('filterDrawer').classList.remove('open');g('filterOverlay').classList.remove('open');}
+function applyFilterDrawer(){
+  filterStatus=g('fdStatus').value;filterVendor=g('fdVendor').value;filterGrn=g('fdGrn').value;filterFrom=g('fdFrom').value;filterTo=g('fdTo').value;
+  const cnt=[filterStatus,filterVendor,filterGrn,filterFrom,filterTo].filter(Boolean).length;
+  g('filterCount').textContent=cnt;g('filterCount').classList.toggle('show',cnt>0);
+  closeFilterDrawer();pgPage=1;renderTable();
+}
+function clearFilters(){
+  g('fdStatus').value='';g('fdVendor').value='';g('fdGrn').value='';g('fdFrom').value='';g('fdTo').value='';
+  document.querySelectorAll('#fdShortcuts .fd-sc').forEach(s=>s.classList.remove('on'));
+  filterStatus='';filterVendor='';filterGrn='';filterFrom='';filterTo='';
+  g('filterCount').textContent='0';g('filterCount').classList.remove('show');renderTable();
+}
+function setDateSC(el){
+  document.querySelectorAll('#fdShortcuts .fd-sc').forEach(s=>s.classList.remove('on'));el.classList.add('on');
+  const r=el.dataset.r,t=TODAY,td=new Date(TODAY+'T00:00:00');
+  if(r==='today'){g('fdFrom').value=t;g('fdTo').value=t;}
+  else if(r==='thisweek'){const d=new Date(td);d.setDate(d.getDate()-7);g('fdFrom').value=d.toISOString().slice(0,10);g('fdTo').value=t;}
+  else if(r==='thismonth'){g('fdFrom').value='2025-04-01';g('fdTo').value=t;}
+  else if(r==='lastmonth'){g('fdFrom').value='2025-03-01';g('fdTo').value='2025-03-31';}
+  else if(r==='thisquarter'){g('fdFrom').value='2025-01-01';g('fdTo').value=t;}
+}
+
+function toggleExp(e){e.stopPropagation();g('expMenu').classList.toggle('open');}
+function setExpChip(type,el){
+  const grp=type==='scope'?'scopeChips':'fileChips';
+  g(grp).querySelectorAll('.em-chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');
+  if(type==='scope') expScope=el.dataset.v;else expFile=el.dataset.v;
+  const sc=g('scopeChips').querySelector('.on').textContent;const ff=g('fileChips').querySelector('.on').textContent;
+  g('emPreview').textContent=ff+' \u00b7 '+sc;
+}
+function doExport(){g('expMenu').classList.remove('open');const cnt=expScope==='visible'?getFiltered().length:BILLS.length;alert('Export '+expFile.toUpperCase()+' \u2014 '+cnt+' bill');}
+document.addEventListener('click',e=>{if(!e.target.closest('.head-right'))g('expMenu').classList.remove('open');});
+
+// toggleAPSummary removed
+function _noop(){
+  const el=g('apAISummary');const open=el.classList.toggle('open');
+  g('apSummaryLabel').textContent=open?'Sembunyikan summary':'Summary AI mengenai outstanding ini dan saldo bank saat ini';
+}
+
+const aiResp={
+  'Ringkasan AP outstanding saat ini':'Total AP outstanding saat ini adalah <b>Rp 107.335.000</b> dari 5 tagihan aktif. Dua tagihan telah melewati jatuh tempo: BILL006 (Rp 16.650.000, lewat 11 hari) dan BILL008 (Rp 9.435.000, lewat 2 hari). Saya rekomendasikan untuk memprioritaskan keduanya.',
+  'Bill mana yang perlu dibayar segera?':'Prioritas: <b>1.</b> BILL006 \u2014 PT Jasa Logistik Cepat (Rp 16.650.000, lewat 11 hari) <b>2.</b> BILL008 \u2014 CV Toko Bangunan Jaya (Rp 9.435.000, lewat 2 hari).',
+  'Analisis vendor dengan tagihan terbesar':'Vendor terbesar: PT Supplier Elektronik Indonesia (BILL007: Rp 49.500.000 \u2014 draft AI). Disusul PT Penyedia Layanan Konsultasi (BILL004: Rp 27.500.000).',
+  'Ada berapa bill yang butuh approval?':'Terdapat <b>2 bill</b> yang butuh approval: BILL005 (Rp 13.750.000) dan BILL008 (Rp 9.435.000 \u2014 sudah jatuh tempo).'
+};
+function openAIPanel(){g('aiPanel').classList.add('open');}
+function closeAIPanel(){g('aiPanel').classList.remove('open');}
+function sendAIMsg(preset){
+  const input=g('aiInput');const msg=preset||input.value.trim();if(!msg)return;
+  const chat=g('aiChat');
+  chat.innerHTML+=`<div class="ai-msg user">${msg}</div>`;input.value='';
+  setTimeout(()=>{
+    const resp=aiResp[msg]||'Berdasarkan data bill saat ini, saya dapat membantu menganalisis lebih lanjut. Apakah ada topik spesifik yang ingin Anda ketahui?';
+    chat.innerHTML+=`<div class="ai-msg ai">${resp}</div>`;chat.scrollTop=chat.scrollHeight;
+  },700);
+  chat.scrollTop=chat.scrollHeight;
+}
+
+function openCmdDropdown(){g('cmdDropdown').classList.add('open');g('tbSearchBox').classList.add('focused');}
+function closeCmdDropdown(){g('cmdDropdown').classList.remove('open');g('tbSearchBox').classList.remove('focused');}
+function filterCmdDropdown(v){}
+document.addEventListener('click',e=>{if(!e.target.closest('.tb-search-wrap'))closeCmdDropdown();});
+
+function prevPage(){if(pgPage>1){pgPage--;renderTable();}}
+function nextPage(){const tot=Math.ceil(getFiltered().length/pgSize);if(pgPage<tot){pgPage++;renderTable();}}
+function changePageSize(n){pgSize=n;pgPage=1;renderTable();}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('thead th.sortable').forEach(th=>{
+    th.addEventListener('click',()=>{
+      const col=th.dataset.col;
+      if(sortCol===col) sortDir=sortDir==='asc'?'desc':'asc';else{sortCol=col;sortDir='asc';}
+      document.querySelectorAll('thead th.sortable').forEach(t=>t.classList.remove('sort-asc','sort-desc'));
+      th.classList.add('sort-'+sortDir);renderTable();
+    });
+  });
+});
+
+function openAddPage(){apGoStep(1);g('addPage').classList.add('open');if(currentDrawerBill)closeDrawer();}
+function closeAddPage(){g('addPage').classList.remove('open');}
+function saveAsDraft(){alert('Bill disimpan sebagai draft.');closeAddPage();}
+function apGoStep(n){
+  apCurrentStep=n;
+  for(let i=1;i<=3;i++){
+    const panel=g('appanel-'+i);if(panel)panel.classList.toggle('active',i===n);
+    const step=g('apstep-'+i);const num=g('apnum-'+i);
+    if(step){step.classList.remove('active','done');if(i<n){step.classList.add('done');num.textContent='\u2713';}else if(i===n){step.classList.add('active');num.textContent=i;}else num.textContent=i;}
+    if(i<3){const line=g('apline-'+i);if(line)line.classList.toggle('done',i<n);}
+  }
+  const hints=['Pilih atau upload file invoice untuk diproses','AI memproses dokumen \u2014 klik Simulasi untuk lanjut','Periksa semua field sebelum menyimpan'];
+  g('apHint').textContent=hints[n-1]||'';g('apBtnBack').classList.toggle('show',n>1);g('apBtnDraft').classList.toggle('show',n>=2);
+  const next=g('apBtnNext');
+  if(n===2){startScanSimulation();}if(n===3){next.innerHTML='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Kirim Approval';next.onclick=()=>{closeAddPage();alert('Bill berhasil disubmit untuk approval!');};}
+  else{next.innerHTML='Lanjut <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';next.onclick=apNextStep;}
+}
+function filterByPayableApproved(){
+  // Tagihan perlu dibayar: approved + unpaid/overdue
+  document.querySelectorAll('#payChips .chip').forEach(c=>c.classList.remove('on'));
+  filterPay=''; filterStatus='approved';
+  // Show both unpaid and overdue - remove pay filter, set status to approved
+  // Actually use a special combo: reset pay filter, set approval filter
+  filterPay='';filterStatus='approved';
+  // We need to filter: approved AND (unpaid OR overdue) - but filterPay only allows one value
+  // Use a special flag
+  filterPayableApproved=true;
+  pgPage=1;renderTable();
+  // Scroll to table
+  document.getElementById('scrollArea').scrollTop=document.querySelector('.tbl-wrap').offsetTop-10;
+}
+function filterByPending(){
+  document.querySelectorAll('#payChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.val===''));
+  filterPay='';filterStatus='review';filterPayableApproved=false;
+  g('fdStatus').value='review';
+  pgPage=1;renderTable();
+  document.getElementById('scrollArea').scrollTop=document.querySelector('.tbl-wrap').offsetTop-10;
+}
+function filterByDraft(){
+  document.querySelectorAll('#payChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.val===''));
+  filterPay='';filterStatus='draft';filterPayableApproved=false;
+  g('fdStatus').value='draft';
+  pgPage=1;renderTable();
+  document.getElementById('scrollArea').scrollTop=document.querySelector('.tbl-wrap').offsetTop-10;
+}
+
+function apNextStep(){if(apCurrentStep<3)apGoStep(apCurrentStep+1);}
+let scanTimer1=null,scanTimer2=null;
+function startScanSimulation(){
+  if(scanTimer1)clearTimeout(scanTimer1);if(scanTimer2)clearTimeout(scanTimer2);
+  const stepEls=document.querySelectorAll('#appanel-2 .scan-step-item');
+  if(!stepEls[2])return;
+  // Reset step 3 to waiting
+  stepEls[2].querySelector('.scan-step-icon').className='scan-step-icon active';
+  stepEls[2].querySelector('.scan-step-status').className='scan-step-status sss-active';
+  stepEls[2].querySelector('.scan-step-status').textContent='Berjalan…';
+  if(stepEls[3]){stepEls[3].querySelector('.scan-step-icon').className='scan-step-icon wait';stepEls[3].querySelector('.scan-step-status').className='scan-step-status sss-wait';stepEls[3].querySelector('.scan-step-status').textContent='Menunggu';}
+  scanTimer1=setTimeout(()=>{
+    if(apCurrentStep!==2)return;
+    const icon2=stepEls[2].querySelector('.scan-step-icon');
+    icon2.className='scan-step-icon done';icon2.innerHTML='<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+    stepEls[2].querySelector('.scan-step-status').className='scan-step-status sss-done';stepEls[2].querySelector('.scan-step-status').textContent='Selesai';
+    if(stepEls[3]){stepEls[3].querySelector('.scan-step-icon').className='scan-step-icon active';stepEls[3].querySelector('.scan-step-status').className='scan-step-status sss-active';stepEls[3].querySelector('.scan-step-status').textContent='Berjalan…';}
+  },3000);
+  scanTimer2=setTimeout(()=>{if(apCurrentStep===2)apGoStep(3);},6000);
+}
+
+function openProdDrawer(el){prodTargetEl=el;renderProdList('');g('pdSearch').value='';g('prodDrawer').classList.add('open');g('prodOverlay').classList.add('open');}
+function closeProdDrawer(){g('prodDrawer').classList.remove('open');g('prodOverlay').classList.remove('open');}
+function renderProdList(q){
+  const filtered=PRODUCTS.filter(p=>!q||p.name.toLowerCase().includes(q.toLowerCase()));
+  g('pdList').innerHTML=filtered.map(p=>`<div class="pd-item" onclick="selectProd('${p.id}')"><div><div class="pd-item-name">${p.name}</div><div class="pd-item-unit">${p.unit} &middot; ${p.acctName}</div></div><div><div class="pd-item-price">Rp ${fmt(p.price)}</div><div class="pd-item-acct">${p.acct}</div></div></div>`).join('');
+}
+function selectProd(id){
+  const p=PRODUCTS.find(x=>x.id===id);if(!p||!prodTargetEl)return;
+  prodTargetEl.textContent=p.name;
+  const row=prodTargetEl.closest('tr');
+  if(row){const inputs=row.querySelectorAll('input');if(inputs[1])inputs[1].value=fmt(p.price);const sel=row.querySelector('select');if(sel)sel.innerHTML=`<option value="${p.acct}">${p.acct} \u2014 ${p.acctName}</option>`;}
+  closeProdDrawer();
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeRejectModal();closeDrawer();closeAddPage();closeFilterDrawer();closeAIPanel();closeProdDrawer();}});
+apGoStep(1);
+renderTable();
+</script>
+</body>
+</html>

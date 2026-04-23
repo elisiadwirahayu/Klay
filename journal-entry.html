@@ -1171,7 +1171,7 @@ let anomalyMode=false;
 const TODAY_D = new Date(TODAY+'T00:00:00');
 
 function srcOf(r){ if(r.src==='invoice') return 'invoice'; if(r.src==='bill') return 'bill'; return 'je'; }
-function isOverdue(r){ if(r.status!=='draft') return false; const c=new Date(r.createdDate+'T00:00:00'); return (TODAY_D-c)>=48*3600000; }
+function isOverdue(r){ if(r.status!=='draft'&&r.status!=='pending') return false; const c=new Date(r.createdDate+'T00:00:00'); return (TODAY_D-c)>=48*3600000; }
 
 function getFiltered(){
   return JE_DATA.filter(r=>{
@@ -1346,6 +1346,7 @@ function renderAnomalyTxSection(){
     const activeItems=ATX_ITEMS[s.key].filter(it=>!it.resolved);
     const count=activeItems.length;
     const canPost=(s.key==='pending'||s.key==='draft');
+    const filterStatus=s.key==='pending'?'pending':'draft';
     return `<div class="atx-item-card" style="background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);overflow:hidden">
       <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none" onclick="toggleAtxSection(this)">
         <div style="width:28px;height:28px;background:var(--color-surface-sunken);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
@@ -1353,14 +1354,16 @@ function renderAnomalyTxSection(){
           <div style="font-size:13px;font-weight:700;color:var(--color-text-primary)">${s.label}</div>
           <div style="font-size:12px;color:var(--color-text-tertiary);margin-top:2px">${s.subFn(count)}</div>
         </div>
+        ${canPost?`<button class="atx-btn view" style="font-size:11px;white-space:nowrap;flex-shrink:0" onclick="event.stopPropagation();setStatusFilter('${filterStatus}')">Lihat semua item</button>`:''}
         <span style="font-size:11px;font-weight:700;min-width:22px;height:22px;background:#E8C870;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;color:#7A4D00;padding:0 6px;flex-shrink:0">${count}</span>
         <svg class="atx-sec-chevron" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;flex-shrink:0;transition:transform .2s ease;transform:rotate(180deg)"><polyline points="18 15 12 9 6 15"/></svg>
       </div>
       <div class="atx-sec-body" style="border-top:1px solid var(--color-border-default);padding:10px 14px;display:none;flex-direction:column;gap:7px">
         ${activeItems.map(it=>{
           const aiBadge=it.aiAcc?`<span class="ai-badge" style="margin-right:5px">✦ AI ${it.aiAcc}%</span>`:'';
-          return `<div style="padding:9px 11px;border-radius:var(--radius-sm);border:1px solid;${it.bgCls}">
-            <div style="font-size:12px;color:var(--color-text-primary);margin-bottom:7px;display:flex;align-items:center;flex-wrap:wrap;gap:4px">${aiBadge}<span style="font-family:var(--font-mono);font-weight:700">${it.ref}</span> <span style="color:var(--color-text-secondary)">— ${it.desc}</span> <span style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary);margin-left:auto">Rp ${it.amt}</span></div>
+          const jeRef=JE_DATA.find(j=>j.id===it.ref);
+          const overdueBadge=(jeRef&&isOverdue(jeRef))?`<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--danger-text);background:var(--danger-surface);border:1px solid var(--danger-border);border-radius:var(--radius-full);padding:2px 7px"><svg viewBox="0 0 24 24" style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>&gt;48 jam</span>`:'';          return `<div style="padding:9px 11px;border-radius:var(--radius-sm);border:1px solid;${it.bgCls}">
+            <div style="font-size:12px;color:var(--color-text-primary);margin-bottom:7px;display:flex;align-items:center;flex-wrap:wrap;gap:4px">${aiBadge}<span style="font-family:var(--font-mono);font-weight:700">${it.ref}</span>${overdueBadge} <span style="color:var(--color-text-secondary)">— ${it.desc}</span> <span style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary);margin-left:auto">Rp ${it.amt}</span></div>
             <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
               <button class="atx-btn view" onclick="focusRow('${it.ref}')">Lihat item</button>
               ${canPost?`<button style="font-family:var(--font-sans);font-size:11px;font-weight:700;padding:4px 12px;border-radius:var(--radius-sm);cursor:pointer;background:var(--color-action);color:#fff;border:none;transition:background var(--transition-fast)" onmouseover="this.style.background='var(--color-action-hover)'" onmouseout="this.style.background='var(--color-action)'" onclick="atxPostItem('${s.key}','${it.ref}')"><svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.5;vertical-align:middle;margin-right:3px"><polyline points="20 6 9 17 4 12"/></svg>Post Jurnal</button>`:''}
