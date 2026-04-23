@@ -103,7 +103,9 @@ body{font-family:var(--font-sans);background:var(--color-surface-base);color:var
 .ap-outstanding-ai{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--color-action);font-weight:500;background:var(--ai-surface);border:1px solid var(--ai-border);border-radius:var(--radius-full);padding:3px 10px;cursor:pointer;transition:background var(--transition-fast)}
 .ap-outstanding-ai:hover{background:#dde8fc}
 .ap-outstanding-ai svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
-.ap-outstanding-amount{font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--color-text-primary);letter-spacing:-.02em;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.ap-outstanding-amount{font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--color-text-primary);letter-spacing:-.02em;white-space:nowrap}
+.ap-outstanding-delta-up{color:var(--danger-text)}
+.ap-outstanding-delta-down{color:var(--success-text)}
 .ap-ai-summary{background:var(--ai-surface);border:1px solid var(--ai-border);border-radius:var(--radius-md);padding:10px 14px;font-size:12px;color:var(--color-text-secondary);line-height:1.6}
 
 .ap-ai-summary strong{color:var(--color-text-primary);font-weight:600}
@@ -653,7 +655,7 @@ td.num-ok{text-align:right;font-family:var(--font-mono);font-size:12px;font-weig
           Saldo bank Anda saat ini <strong>Rp 485.000.000</strong> cukup untuk menutup seluruh hutang outstanding, namun terdapat kenaikan biaya utilitas sebesar <strong>15%</strong> bulan ini. Disarankan untuk memprioritaskan tagihan dengan diskon pembayaran awal &mdash; <strong>BILL006</strong> dan <strong>BILL008</strong> telah melewati jatuh tempo dan perlu segera dibayar.
         </div>
       </div>
-      <div class="ap-outstanding-amount" id="apOutstandingAmt">Rp &mdash;</div>
+      <div><div class="ap-outstanding-amount" id="apOutstandingAmt">Rp &mdash;</div><div id="apOutstandingDelta" style="font-size:11px;font-weight:600;margin-top:3px;text-align:right"></div></div>
     </div>
 
     <div class="attn-section" id="attnSection">
@@ -1150,6 +1152,23 @@ function renderTable(){
   g('sb-unpaid-amt').textContent='Rp '+fmt(unpaidAmt);
   g('sb-overdue-amt').textContent='Rp '+fmt(overdueAmt);
   g('apOutstandingAmt').textContent='Rp '+fmt(outstanding);
+  // Calculate last month's outstanding for comparison
+  const prevMonthBills=BILLS.filter(b=>{
+    const d=new Date(b.date+'T00:00:00');
+    return d.getFullYear()===2025&&d.getMonth()===2; // March 2025
+  });
+  const prevOutstanding=prevMonthBills.filter(b=>b.pay!=='paid').reduce((s,b)=>s+b.sisa,0);
+  const deltaEl=g('apOutstandingDelta');
+  if(prevOutstanding>0&&outstanding!==prevOutstanding){
+    const pct=Math.round((outstanding-prevOutstanding)/prevOutstanding*100);
+    const up=pct>0;
+    const arrow=up?'↑':'↓';
+    const cls=up?'ap-outstanding-delta-up':'ap-outstanding-delta-down';
+    deltaEl.className=cls;
+    deltaEl.textContent=arrow+' '+Math.abs(pct)+'% dari bulan lalu';
+  } else {
+    deltaEl.textContent='';
+  }
   const totalPages=Math.max(1,Math.ceil(list.length/pgSize));
   g('pgInfo').textContent=`${start+1}\u2013${Math.max(start+1,end)} dari ${list.length}`;
   g('pgPrev').disabled=pgPage<=1;g('pgNext').disabled=pgPage>=totalPages;
