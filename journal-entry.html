@@ -170,7 +170,18 @@ body{font-family:var(--font-sans);background:var(--color-surface-base);color:var
 @keyframes spin{to{transform:rotate(360deg)}}
 .dl-text{font-size:11px;color:var(--warning-text);font-weight:500}
 
-/* ANOMALI TRANSAKSI SECTION */
+/* BULK ACTION BAR */
+.bulk-bar{display:flex;align-items:center;gap:10px;background:var(--color-surface-deep);border-radius:var(--radius-md);padding:9px 14px;margin-bottom:8px;animation:slideDown .15s ease}
+@keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.bulk-count{font-size:12px;font-weight:700;color:rgba(255,255,255,.9);flex-shrink:0}
+.bulk-actions{display:flex;gap:6px;flex:1}
+.bulk-btn{font-family:var(--font-sans);font-size:12px;font-weight:600;padding:5px 14px;border-radius:var(--radius-sm);cursor:pointer;border:none;transition:all var(--transition-fast)}
+.bulk-btn.primary{background:var(--color-action);color:#fff}
+.bulk-btn.primary:hover{background:var(--color-action-hover)}
+.bulk-btn.ghost{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.15)}
+.bulk-btn.ghost:hover{background:rgba(255,255,255,.18)}
+.bulk-cancel{font-family:var(--font-sans);font-size:12px;font-weight:500;padding:5px 12px;border-radius:var(--radius-sm);background:transparent;color:rgba(255,255,255,.5);border:none;cursor:pointer;transition:color var(--transition-fast)}
+.bulk-cancel:hover{color:rgba(255,255,255,.85)}
 .anomaly-tx-section{background:var(--color-surface-raised);border:1px solid var(--warning-border);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden;border-left:4px solid #E8A020}
 .atx-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 18px 12px;border-bottom:1px solid var(--warning-border);background:linear-gradient(135deg,#FDF3E0,#FFF8F0)}
 .atx-header-left{display:flex;align-items:flex-start;gap:12px;flex:1;min-width:0}
@@ -506,6 +517,8 @@ td{padding:10px 14px;vertical-align:middle}
 .audit-dot.created{background:var(--color-surface-sunken);border:1.5px solid var(--color-border-default)}
 .audit-dot.created svg{width:8px;height:8px;stroke:var(--color-text-tertiary);fill:currentColor}
 .audit-dot.void{background:var(--danger-surface);border:1.5px solid var(--danger-border)}
+.audit-dot.submitted{background:var(--ai-surface);border:1.5px solid var(--ai-border)}
+.audit-dot.submitted svg{width:10px;height:10px;stroke:var(--color-action);fill:none;stroke-width:1.5}
 .audit-dot.void svg{width:10px;height:10px;stroke:var(--danger-text);fill:none;stroke-width:2}
 .audit-action{font-size:12px;font-weight:600;color:var(--color-text-primary)}
 .audit-meta{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
@@ -808,11 +821,19 @@ td{padding:10px 14px;vertical-align:middle}
           </div>
         </div>
 
+        <!-- BULK ACTION BAR -->
+        <div class="bulk-bar" id="bulkBar" style="display:none">
+          <span class="bulk-count" id="bulkCount">0 item dipilih</span>
+          <div class="bulk-actions" id="bulkActions"></div>
+          <button class="bulk-cancel" onclick="clearBulkSelection()">Batal</button>
+        </div>
+
         <!-- TABLE -->
         <div class="table-wrap">
           <div class="tbl-scroll">
             <table id="jeTable">
               <thead><tr>
+                <th style="width:36px;padding:10px 0 10px 14px"><input type="checkbox" id="checkAll" onclick="toggleCheckAll(this)" style="width:14px;height:14px;cursor:pointer;accent-color:var(--color-action)"></th>
                 <th class="sortable" data-col="date">Tanggal<span class="sa"></span></th>
                 <th class="sortable" data-col="ref">No. Referensi<span class="sa"></span></th>
                 <th class="sortable" data-col="memo">Keterangan<span class="sa"></span></th>
@@ -1015,6 +1036,7 @@ td{padding:10px 14px;vertical-align:middle}
     <div class="modal-icon" id="modalIcon"><svg id="modalIconSvg" viewBox="0 0 24 24"></svg></div>
     <div class="modal-title" id="modalTitle"></div>
     <div class="modal-desc" id="modalDesc"></div>
+    <div id="modalShortcuts" style="display:none;flex-wrap:wrap;gap:5px;margin-bottom:12px"></div>
     <div class="modal-reversal-preview" id="modalReversalPreview" style="display:none">
       <div class="modal-reversal-title">✓ Jurnal pembalik akan dibuat otomatis</div>
       <div class="modal-reversal-detail" id="modalReversalDetail">—</div>
@@ -1146,9 +1168,9 @@ const JE_DATA = [
   // Draft — overdue (created 2025-04-14, >48h ago from today 2025-04-19)
   {id:'JE-2025-012',date:'2025-04-14',src:'je',srcRef:null,srcLabel:null,memo:'Koreksi pencatatan beban operasional Maret 2025 — perlu konfirmasi departemen',status:'draft',type:'manual',isAI:false,createdBy:'Rina Kusuma',createdDate:'2025-04-14',postedBy:null,postedDate:null,voidedBy:null,voidReason:null,dims:{dept:'Operations',proj:''},coaFlag:false,lines:[{acct:'5-1000',acctName:'Beban Operasional',debit:5200000,credit:0,desc:'Koreksi beban'},{acct:'1-1100',acctName:'Kas & Bank',debit:0,credit:5200000,desc:'Kas keluar'}],totalDebit:5200000,totalCredit:5200000},
   // Pending — awaiting approval (manual, CoA flagged as anomali)
-  {id:'JE-2025-013',date:'2025-04-17',src:'je',srcRef:null,srcLabel:null,memo:'Perbaikan peralatan kantor — biaya dibebankan ke pendapatan diterima dimuka',status:'pending',type:'manual',isAI:false,createdBy:'Budi Santoso',createdDate:'2025-04-17',postedBy:null,postedDate:null,voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},coaFlag:true,lines:[{acct:'5-1080',acctName:'Biaya Perbaikan',debit:3200000,credit:0,desc:'Perbaikan AC kantor'},{acct:'2-1400',acctName:'Pendapatan Diterima Dimuka',debit:0,credit:3200000,desc:'Offset tidak lazim'}],totalDebit:3200000,totalCredit:3200000},
+  {id:'JE-2025-013',date:'2025-04-17',src:'je',srcRef:null,srcLabel:null,memo:'Perbaikan peralatan kantor — biaya dibebankan ke pendapatan diterima dimuka',status:'pending',type:'manual',isAI:false,createdBy:'Budi Santoso',createdDate:'2025-04-17',submittedBy:'Budi Santoso',submittedDate:'2025-04-17',postedBy:null,postedDate:null,voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},coaFlag:true,lines:[{acct:'5-1080',acctName:'Biaya Perbaikan',debit:3200000,credit:0,desc:'Perbaikan AC kantor'},{acct:'2-1400',acctName:'Pendapatan Diterima Dimuka',debit:0,credit:3200000,desc:'Offset tidak lazim'}],totalDebit:3200000,totalCredit:3200000},
   // Pending — AI generated, needs approval
-  {id:'JE-2025-014',date:'2025-04-18',src:'je',srcRef:null,srcLabel:null,memo:'Penyesuaian penyusutan aset tetap — High-Value asset category',status:'pending',type:'adj',isAI:true,aiAcc:88,createdBy:'Sistem AI',createdDate:'2025-04-18',postedBy:null,postedDate:null,voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},coaFlag:false,lines:[{acct:'5-1040',acctName:'Beban Penyusutan',debit:8500000,credit:0,desc:'Penyusutan aset High-Value'},{acct:'1-2110',acctName:'Akum. Penyusutan Peralatan',debit:0,credit:8500000,desc:'Akumulasi penyusutan'}],totalDebit:8500000,totalCredit:8500000},
+  {id:'JE-2025-014',date:'2025-04-18',src:'je',srcRef:null,srcLabel:null,memo:'Penyesuaian penyusutan aset tetap — High-Value asset category',status:'pending',type:'adj',isAI:true,aiAcc:88,createdBy:'Sistem AI',createdDate:'2025-04-18',submittedBy:'Sarah Wijaya',submittedDate:'2025-04-18',postedBy:null,postedDate:null,voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},coaFlag:false,lines:[{acct:'5-1040',acctName:'Beban Penyusutan',debit:8500000,credit:0,desc:'Penyusutan aset High-Value'},{acct:'1-2110',acctName:'Akum. Penyusutan Peralatan',debit:0,credit:8500000,desc:'Akumulasi penyusutan'}],totalDebit:8500000,totalCredit:8500000},
   // Reversal — auto-created jurnal pembalik
   {id:'JE-2025-008-R',date:'2025-02-13',src:'je',srcRef:'JE-2025-008',srcLabel:null,memo:'[Pembalik] Penerimaan piutang PT Ritel Utama — jurnal pembalik otomatis',status:'reversal',type:'reversal',isAI:false,createdBy:'Sistem',createdDate:'2025-02-13',postedBy:'Sarah Wijaya',postedDate:'2025-02-13',voidedBy:null,voidReason:null,dims:{dept:'Finance',proj:''},coaFlag:false,lines:[{acct:'1-1200',acctName:'Piutang Usaha',debit:33000000,credit:0,desc:'Pembalik: pelunasan piutang'},{acct:'1-1100',acctName:'Kas & Bank',debit:0,credit:33000000,desc:'Pembalik: kas masuk'}],totalDebit:33000000,totalCredit:33000000},
 ];
@@ -1220,6 +1242,7 @@ function renderTable(){
     empty.style.display='none';
     tbody.innerHTML=pageRows.map(r=>{
       const ov=isOverdue(r);
+      const isBulkable=r.status==='pending'||r.status==='draft';
       let rowCls='';
       if(r.status==='void') rowCls='row-void';
       else if(r.status==='reversal') rowCls='row-reversal';
@@ -1234,9 +1257,12 @@ function renderTable(){
       const coaBadge=r.coaFlag?`<span class="coa-flag"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>CoA Flag</span>`:'';
       const statusLabel={posted:'Posted',draft:'Draft',void:'Void',pending:'Pending',reversal:'Reversal'}[r.status]||r.status;
       const statusBadge=`<span class="status-badge ${r.status}">${statusLabel}</span>`;
-      // Numbers without Rp prefix, bold via td-num class
       const fmtNum = n => n ? Math.abs(n).toLocaleString('id-ID') : '–';
+      const chk=isBulkable
+        ?`<td style="padding:0 0 0 14px;width:36px" onclick="event.stopPropagation()"><input type="checkbox" class="row-chk" data-id="${r.id}" data-status="${r.status}" onchange="onRowCheck()" style="width:14px;height:14px;cursor:pointer;accent-color:var(--color-action)"></td>`
+        :`<td style="padding:0 0 0 14px;width:36px"></td>`;
       return `<tr class="${rowCls.trim()}" onclick="openDrawer('${r.id}')">
+        ${chk}
         <td class="td-date">${fmtDate(r.date)}</td>
         <td><span class="td-ref">${r.id}</span></td>
         <td class="td-memo">${srcBadge}<span class="td-memo-text">${r.memo}</span>${aiBadge}${ovBadge}${coaBadge}</td>
@@ -1247,6 +1273,9 @@ function renderTable(){
       </tr>`;
     }).join('');
   }
+
+  // Bulk bar
+  updateBulkBar();
 
   // Status bar
   const allD=filtered.reduce((s,r)=>s+r.totalDebit,0), allC=filtered.reduce((s,r)=>s+r.totalCredit,0);
@@ -1313,7 +1342,8 @@ function toggleAtx(){
 
 function renderAnomalyTxSection(){
   const sec=g('anomalyTxSection');
-  const allResolved=ATX_SECTIONS.every(s=>ATX_ITEMS[s.key].every(it=>it.resolved));
+  const allResolved=ATX_SECTIONS.every(s=>ATX_ITEMS[s.key].every(it=>it.resolved))
+    || (!JE_DATA.some(j=>j.status==='pending'||j.status==='draft') && ATX_ITEMS.coa.every(it=>it.resolved));
 
   if(allResolved){
     // All-safe state — success green, matches screenshot
@@ -1340,7 +1370,14 @@ function renderAnomalyTxSection(){
 
   g('atxItems').style.display=atxOpen?'block':'none';
 
-  const sections=ATX_SECTIONS.filter(s=>!ATX_ITEMS[s.key].every(it=>it.resolved));
+  const sections=ATX_SECTIONS.filter(s=>{
+    if(ATX_ITEMS[s.key].every(it=>it.resolved)) return false;
+    // Extra: hide "pending" section if no JE with pending status remains
+    if(s.key==='pending' && !JE_DATA.some(j=>j.status==='pending')) return false;
+    // Extra: hide "draft" section if no JE with draft status remains
+    if(s.key==='draft' && !JE_DATA.some(j=>j.status==='draft')) return false;
+    return true;
+  });
 
   g('atxItems').innerHTML=`<div style="padding:0 18px 14px;display:flex;flex-direction:column;gap:8px">${sections.map(s=>{
     const activeItems=ATX_ITEMS[s.key].filter(it=>!it.resolved);
@@ -1378,13 +1415,17 @@ function renderAnomalyTxSection(){
 }
 
 function atxPostItem(sKey, ref){
-  // Post the journal entry
   const je=JE_DATA.find(j=>j.id===ref);
   if(je){ je.status='posted'; je.postedBy='Sarah Wijaya'; je.postedDate=TODAY; }
-  // Resolve in ALL sections that contain this ref
-  Object.keys(ATX_ITEMS).forEach(key=>{
-    ATX_ITEMS[key].forEach(it=>{ if(it.ref===ref) it.resolved=true; });
-  });
+  // Only resolve ATX items if no CoA flag on this entry
+  if(!je||!je.coaFlag){
+    Object.keys(ATX_ITEMS).forEach(key=>{
+      ATX_ITEMS[key].forEach(it=>{ if(it.ref===ref) it.resolved=true; });
+    });
+  } else {
+    // CoA flag: only resolve the current section's item (pending/draft), NOT the coa section
+    ATX_ITEMS[sKey].forEach(it=>{ if(it.ref===ref) it.resolved=true; });
+  }
   showToast(ref+' berhasil di-post ✓');
   renderAnomalyTxSection(); renderTable();
 }
@@ -1424,11 +1465,95 @@ function focusRow(id){
   setTimeout(()=>{
     activeId=id; renderTable();
     const el=g('jeBody').querySelector('tr.active-row');
-    if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+    if(el){
+      el.scrollIntoView({behavior:'smooth',block:'center'});
+      // Flash blue outline
+      el.style.outline='2px solid var(--color-action)';
+      el.style.outlineOffset='-2px';
+      setTimeout(()=>{ el.style.outline=''; el.style.outlineOffset=''; },2000);
+    }
   },100);
 }
 
-// ── EXPORT SCOPE ──
+// ── BULK SELECTION ──
+function getChecked(){ return [...document.querySelectorAll('.row-chk:checked')].map(c=>({id:c.dataset.id,status:c.dataset.status})); }
+
+function onRowCheck(){
+  const checked=getChecked();
+  const checkAll=g('checkAll');
+  const allChks=document.querySelectorAll('.row-chk');
+  checkAll.checked=allChks.length>0&&[...allChks].every(c=>c.checked);
+  checkAll.indeterminate=checked.length>0&&checked.length<allChks.length;
+  updateBulkBar();
+}
+
+function toggleCheckAll(el){
+  document.querySelectorAll('.row-chk').forEach(c=>{ c.checked=el.checked; });
+  updateBulkBar();
+}
+
+function updateBulkBar(){
+  const checked=getChecked();
+  const bar=g('bulkBar');
+  if(!checked.length){ bar.style.display='none'; return; }
+  bar.style.display='flex';
+  g('bulkCount').textContent=checked.length+' item dipilih';
+
+  const pendingIds=checked.filter(c=>c.status==='pending').map(c=>c.id);
+  const draftIds=checked.filter(c=>c.status==='draft').map(c=>c.id);
+  const acts=g('bulkActions');
+  acts.innerHTML='';
+  if(pendingIds.length){
+    const b=document.createElement('button');
+    b.className='bulk-btn primary';
+    b.innerHTML=`<svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.5;vertical-align:middle;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>Post ${pendingIds.length} Jurnal Pending`;
+    b.onclick=()=>bulkPost(pendingIds);
+    acts.appendChild(b);
+  }
+  if(draftIds.length){
+    const b=document.createElement('button');
+    b.className='bulk-btn ghost';
+    b.innerHTML=`<svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5;vertical-align:middle;margin-right:4px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Kirim ${draftIds.length} Draft untuk Approval`;
+    b.onclick=()=>bulkSendApproval(draftIds);
+    acts.appendChild(b);
+  }
+}
+
+function bulkPost(ids){
+  ids.forEach(id=>{
+    const je=JE_DATA.find(j=>j.id===id); if(!je) return;
+    je.status='posted'; je.postedBy='Sarah Wijaya'; je.postedDate=TODAY;
+    // Only resolve ATX items if no CoA flag
+    if(!je.coaFlag){
+      Object.keys(ATX_ITEMS).forEach(key=>{
+        ATX_ITEMS[key].forEach(it=>{ if(it.ref===id) it.resolved=true; });
+      });
+    }
+  });
+  clearBulkSelection();
+  showToast(ids.length+' jurnal berhasil di-post ✓');
+  renderAnomalyTxSection(); renderTable();
+}
+
+function bulkSendApproval(ids){
+  ids.forEach(id=>{
+    const je=JE_DATA.find(j=>j.id===id); if(!je) return;
+    je.status='pending'; je.submittedBy='Sarah Wijaya'; je.submittedDate=TODAY;
+    // Resolve draft ATX items
+    Object.keys(ATX_ITEMS).forEach(key=>{
+      ATX_ITEMS[key].forEach(it=>{ if(it.ref===id) it.resolved=true; });
+    });
+  });
+  clearBulkSelection();
+  showToast(ids.length+' draft dikirim untuk approval ✓');
+  renderAnomalyTxSection(); renderTable();
+}
+
+function clearBulkSelection(){
+  document.querySelectorAll('.row-chk').forEach(c=>c.checked=false);
+  const ca=g('checkAll'); if(ca){ca.checked=false;ca.indeterminate=false;}
+  g('bulkBar').style.display='none';
+}
 let expScope='visible';
 function setExpScope(v,el){ expScope=v; document.querySelectorAll('.exp-scope-btn').forEach(b=>b.classList.remove('on')); el.classList.add('on'); }
 function openAnomalyDrawer(){ g('anomalyDrawer').classList.add('open');g('anomalyDrawerOverlay').classList.add('open'); }
@@ -1522,10 +1647,11 @@ function openDrawer(id){
   const auditItems=[];
   if(je.voidedBy) auditItems.push({type:'void',action:'Di-void',by:je.voidedBy,when:fmtDate(je.createdDate),reason:je.voidReason});
   if(je.postedBy) auditItems.push({type:'posted',action:'Di-post',by:je.postedBy,when:je.postedDate?fmtDate(je.postedDate):'—'});
+  if(je.submittedBy) auditItems.push({type:'submitted',action:'Dikirim untuk approval',by:je.submittedBy,when:je.submittedDate?fmtDate(je.submittedDate):'—'});
   auditItems.push({type:'created',action:je.isAI?'Di-generate AI':'Dibuat',by:je.createdBy,when:fmtDate(je.createdDate)});
   g('dPane2').innerHTML=`<div class="dsec"><div class="dlbl">Audit Trail</div><div class="audit-list">
     ${auditItems.map(a=>`<div class="audit-item">
-      <div class="audit-dot ${a.type}">${a.type==='posted'?'<svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/></svg>':a.type==='void'?'<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>':'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>'}</div>
+      <div class="audit-dot ${a.type}">${a.type==='posted'?'<svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/></svg>':a.type==='void'?'<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>':a.type==='submitted'?'<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>':'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>'}</div>
       <div class="audit-content"><div class="audit-action">${a.action}</div><div class="audit-meta">oleh <strong>${a.by}</strong> · ${a.when}</div>${a.reason?`<div class="audit-reason">"${a.reason}"</div>`:''}</div>
     </div>`).join('')}
   </div></div>`;
@@ -1553,8 +1679,9 @@ function openDrawer(id){
     // Pending: Tolak (pink/left) | Post Jurnal (blue/right)
     ctaArea.innerHTML=`<button style="background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border);border-radius:var(--radius-md);padding:10px;font-family:var(--font-sans);font-size:13px;font-weight:600;cursor:pointer;width:100%;transition:all var(--transition-fast)" onmouseover="this.style.background='#f5e0e0'" onmouseout="this.style.background='var(--danger-surface)'" onclick="openRejectModal('${je.id}')">Tolak</button><button class="btn-primary" onclick="approveAndPost('${je.id}')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Post Jurnal</button>`;
   } else if(je.status==='draft'){
-    // Draft: Edit (white/left) | Post Jurnal (blue/right)
-    ctaArea.innerHTML=`<button style="background:var(--color-surface-raised);color:var(--color-text-primary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:10px;font-family:var(--font-sans);font-size:13px;font-weight:600;cursor:pointer;width:100%;transition:background var(--transition-fast)" onmouseover="this.style.background='var(--color-surface-sunken)'" onmouseout="this.style.background='var(--color-surface-raised)'" onclick="openAddJE('${je.id}')">Edit</button><button class="btn-primary" onclick="approveAndPost('${je.id}')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Post Jurnal</button>`;
+    // Draft: Edit | Kirim Approval | Post Jurnal
+    ctaArea.style.display='grid';ctaArea.style.gridTemplateColumns='1fr 1fr';ctaArea.style.gap='8px';
+    ctaArea.innerHTML=`<button style="background:var(--color-surface-raised);color:var(--color-text-primary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:10px;font-family:var(--font-sans);font-size:13px;font-weight:600;cursor:pointer;transition:background var(--transition-fast)" onmouseover="this.style.background='var(--color-surface-sunken)'" onmouseout="this.style.background='var(--color-surface-raised)'" onclick="openAddJE('${je.id}')">Edit</button><button style="background:transparent;color:var(--color-action);border:1px solid var(--color-action);border-radius:var(--radius-md);padding:10px;font-family:var(--font-sans);font-size:13px;font-weight:600;cursor:pointer;transition:all var(--transition-fast);grid-column:1/-1" onmouseover="this.style.background='var(--ai-surface)'" onmouseout="this.style.background='transparent'" onclick="drawerSendApproval('${je.id}')"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;vertical-align:middle;margin-right:4px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Kirim Approval</button><button class="btn-primary" style="grid-column:1/-1" onclick="approveAndPost('${je.id}')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Post Jurnal</button>`;
   }
 
   switchDTab(0, document.querySelector('.d-tab'));
@@ -1570,6 +1697,7 @@ function switchDTab(idx){ document.querySelectorAll('.d-tab').forEach((t,i)=>t.c
 let modalCb=null;
 function openVoidModal(id){
   const je=JE_DATA.find(j=>j.id===id); if(!je) return;
+  g('modalShortcuts').style.display='none';
   g('modalIcon').className='modal-icon danger';
   g('modalIconSvg').setAttribute('viewBox','0 0 24 24');
   g('modalIconSvg').innerHTML='<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
@@ -1598,8 +1726,12 @@ function openRejectModal(id){
   g('modalIcon').className='modal-icon warn';
   g('modalIconSvg').setAttribute('viewBox','0 0 24 24');
   g('modalIconSvg').innerHTML='<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
-  g('modalTitle').textContent='Tolak Draft AI';
+  g('modalTitle').textContent='Tolak jurnal ini?';
   g('modalDesc').textContent='Draft yang ditolak akan dihapus dari daftar. Alasan penolakan bersifat opsional.';
+  // Shortcut chips
+  const shortcuts=['Nominal tidak sesuai','Akun salah','Duplikat transaksi','Perlu revisi dokumen'];
+  g('modalShortcuts').style.display='flex';
+  g('modalShortcuts').innerHTML=shortcuts.map(s=>`<button onclick="setRejectShortcut(this,'${s}')" style="font-family:var(--font-sans);font-size:11px;font-weight:500;padding:4px 10px;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-secondary);cursor:pointer;transition:all var(--transition-fast)" onmouseover="this.style.background='var(--color-surface-sunken)'" onmouseout="if(!this.classList.contains('sel'))this.style.background='var(--color-surface-raised)'">${s}</button>`).join('');
   g('modalFieldWrap').style.display='block';
   g('modalFieldLabel').textContent='Alasan penolakan (opsional)';
   g('modalReason').placeholder='Misalnya: nominal tidak sesuai, akun salah…';
@@ -1608,12 +1740,18 @@ function openRejectModal(id){
   g('modalConfirmBtn').disabled=false;
   g('modalConfirmIcon').innerHTML='<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
   g('modalConfirmLabel').textContent='Tolak Draft';
-  modalCb=()=>{ const idx=JE_DATA.findIndex(j=>j.id===id); if(idx>=0)JE_DATA.splice(idx,1); closeModal(); closeDrawer(); showToast('Draft '+id+' berhasil ditolak'); taskDone[1]=true; renderTable(); };
+  modalCb=()=>{ const idx=JE_DATA.findIndex(j=>j.id===id); if(idx>=0)JE_DATA.splice(idx,1); closeModal(); closeDrawer(); showToast('Draft '+id+' berhasil ditolak'); renderTable(); };
   g('modalBd').classList.add('open');
+}
+function setRejectShortcut(el,val){
+  document.querySelectorAll('#modalShortcuts button').forEach(b=>{b.classList.remove('sel');b.style.background='var(--color-surface-raised)';b.style.borderColor='var(--color-border-default)';b.style.color='var(--color-text-secondary)';});
+  el.classList.add('sel');el.style.background='var(--warning-surface)';el.style.borderColor='var(--warning-border)';el.style.color='var(--warning-text)';
+  g('modalReason').value=val; g('modalChar').textContent=val.length+'/200';
 }
 function openDeleteModal(id){
   const je=JE_DATA.find(j=>j.id===id); if(!je) return;
   g('modalReversalPreview').style.display='none';
+  g('modalShortcuts').style.display='none';
   g('modalIcon').className='modal-icon danger';
   g('modalIconSvg').setAttribute('viewBox','0 0 24 24');
   g('modalIconSvg').innerHTML='<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>';
@@ -1634,10 +1772,12 @@ function confirmModal(){ if(modalCb) modalCb(); }
 function approveAndPost(id){
   const je=JE_DATA.find(j=>j.id===id); if(!je) return;
   je.status='posted'; je.postedBy='Sarah Wijaya'; je.postedDate=TODAY;
-  // Sync: resolve any ATX_ITEMS referencing this id
-  Object.keys(ATX_ITEMS).forEach(key=>{
-    ATX_ITEMS[key].forEach(it=>{ if(it.ref===id) it.resolved=true; });
-  });
+  // Only sync ATX items if no CoA flag
+  if(!je.coaFlag){
+    Object.keys(ATX_ITEMS).forEach(key=>{
+      ATX_ITEMS[key].forEach(it=>{ if(it.ref===id) it.resolved=true; });
+    });
+  }
   closeDrawer(); showToast(id+' berhasil di-post ✓'); renderAnomalyTxSection(); renderTable();
 }
 function openReversalFlow(id){
@@ -1722,6 +1862,16 @@ function ajeUpdateImpact(){
   } else {
     imp.innerHTML=`Entri ini akan mempengaruhi saldo <strong>[${drName}]</strong> (Debit) dan <strong>[${crName}]</strong> (Kredit). Dampak terhadap rasio keuangan tergantung pada klasifikasi akun final.`;
   }
+}
+
+function drawerSendApproval(id){
+  const je=JE_DATA.find(j=>j.id===id); if(!je) return;
+  je.status='pending'; je.submittedBy='Sarah Wijaya'; je.submittedDate=TODAY;
+  // Resolve draft ATX items for this entry
+  Object.keys(ATX_ITEMS).forEach(key=>{
+    ATX_ITEMS[key].forEach(it=>{ if(it.ref===id) it.resolved=true; });
+  });
+  closeDrawer(); showToast(id+' dikirim untuk approval ✓'); renderAnomalyTxSection(); renderTable();
 }
 
 function sendForApproval(){
