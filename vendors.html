@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vendors — Klay</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Inconsolata:wght@400;600&family=Playfair+Display:wght@900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-brand:#B83D08;--color-brand-hover:#A03206;
+  --color-action:#1A46C8;--color-action-hover:#1338A8;
+  --color-text-primary:#080706;--color-text-secondary:#2E2B27;--color-text-tertiary:#8C857C;
+  --color-surface-base:#FBF8F5;--color-surface-raised:#FFFFFF;--color-surface-sunken:#F4F0EB;--color-surface-deep:#080706;
+  --color-border-default:#E2DDD7;
+  --success-text:#166638;--success-border:#A8D9BC;--success-surface:#E8F5EE;
+  --warning-text:#7A4D00;--warning-border:#E8C870;--warning-surface:#FDF3E0;
+  --danger-text:#A02020;--danger-border:#EAB8B8;--danger-surface:#FBF0F0;
+  --ai-surface:#EBF0FD;--ai-border:#C8D8FA;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-full:9999px;
+  --transition-fast:0.1s ease;--transition-base:0.15s ease;--transition-slow:0.2s ease;
+  --font-sans:'Manrope',sans-serif;--font-mono:'Inconsolata',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-surface-base);color:var(--color-text-primary);-webkit-font-smoothing:antialiased;font-size:13px;height:100vh;overflow:hidden}
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sb{width:196px;flex-shrink:0;background:var(--color-surface-raised);border-right:1px solid var(--color-border-default);display:flex;flex-direction:column;overflow-y:auto}
+.sb-top{padding:0 16px;height:52px;display:flex;align-items:center;border-bottom:1px solid var(--color-border-default);gap:8px;flex-shrink:0}
+.sb-logomark{width:26px;height:26px;background:var(--color-brand);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logomark svg{width:12px;height:12px;fill:#fff}
+.sb-brand{font-size:14px;font-weight:700;letter-spacing:-.02em}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-border-default);padding:16px 16px 6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 12px;margin:1px 6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:400;color:var(--color-text-tertiary);text-decoration:none;transition:background var(--transition-fast),color var(--transition-fast)}
+.sb-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.sb-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+.sb-item.active{background:var(--color-surface-sunken);color:var(--color-text-primary);font-weight:600;border-left:2px solid var(--color-brand);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-left:0;padding-left:14px}
+.sb-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--color-surface-sunken)}
+.sb-footer-item{display:flex;align-items:center;gap:8px;padding:6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--color-text-tertiary)}
+.sb-footer-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+.sb-footer-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh;overflow:hidden}
+.topbar{height:52px;flex-shrink:0;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 20px;gap:12px;z-index:10}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 12px;width:220px;cursor:text}
+.tb-search svg{width:13px;height:13px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.tb-search span{font-size:12px;color:var(--color-text-tertiary)}
+.tb-kbd{font-size:10px;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:4px;padding:1px 5px;font-family:var(--font-mono)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-notif{width:30px;height:30px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.tb-notif svg{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--color-brand);border-radius:50%;border:1.5px solid var(--color-surface-raised)}
+.tb-org{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);cursor:pointer}
+.tb-org-name{font-size:12px;font-weight:500;color:var(--color-text-secondary)}
+.tb-av{width:24px;height:24px;border-radius:var(--radius-sm);background:var(--color-action);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tb-caret{width:11px;height:11px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;stroke-linecap:round}
+
+/* SCROLL AREA */
+.scroll-area{flex:1;overflow-y:auto;padding:20px 24px 0;position:relative}
+
+/* PAGE HEAD */
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.page-title{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.page-sub{font-size:12px;color:var(--color-text-tertiary);margin-top:2px}
+.btn-primary{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:8px 16px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base)}
+.btn-primary:hover{background:var(--color-action-hover)}
+.btn-primary svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
+
+/* ATTENTION SECTION */
+.attn-wrap{background:var(--warning-surface);border:1px solid var(--warning-border);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:14px}
+.attn-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;user-select:none}
+.attn-hd-icon{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--warning-border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.attn-hd-icon svg{width:11px;height:11px;stroke:var(--warning-text);fill:none;stroke-width:2;stroke-linecap:round}
+.attn-hd-title{font-size:13px;font-weight:600;color:var(--warning-text);flex:1}
+.attn-hd-chev{width:14px;height:14px;stroke:var(--warning-text);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.6;flex-shrink:0;transition:transform var(--transition-fast)}
+.attn-hd-chev.collapsed{transform:rotate(180deg)}
+.attn-desc{font-size:12px;color:var(--warning-text);opacity:.8;margin-bottom:14px;line-height:1.5}
+.attn-body{}
+
+/* accordion rows */
+.acc{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);margin-bottom:8px;overflow:hidden}
+.acc:last-child{margin-bottom:0}
+.acc-hd{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;user-select:none}
+.acc-icon{width:26px;height:26px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.acc-icon.red{background:var(--danger-surface)}
+.acc-icon.red svg{stroke:var(--danger-text)}
+.acc-icon.amber{background:var(--warning-surface)}
+.acc-icon.amber svg{stroke:var(--warning-text)}
+.acc-icon svg{width:12px;height:12px;fill:none;stroke-width:1.5;stroke-linecap:round}
+.acc-label{font-size:12px;font-weight:600;color:var(--color-text-primary);flex:1}
+.acc-amt{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--danger-text);margin-right:4px}
+.acc-lihat{font-size:11px;font-weight:500;color:var(--color-action);background:var(--ai-surface);border:1px solid var(--ai-border);border-radius:var(--radius-full);padding:3px 10px;white-space:nowrap;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.acc-lihat svg{width:10px;height:10px;stroke:var(--color-action);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.acc-badge{width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.acc-badge.red{background:var(--danger-border);color:var(--danger-text)}
+.acc-badge.amber{background:var(--warning-border);color:var(--warning-text)}
+.acc-chev{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.4;flex-shrink:0;transition:transform var(--transition-fast)}
+.acc-chev.open{transform:rotate(180deg)}
+
+/* accordion body */
+.acc-body{border-top:1px solid var(--color-border-default);background:var(--color-surface-sunken);padding:8px}
+.acc-body-inner{display:flex;flex-direction:column;gap:6px}
+
+/* item card inside accordion */
+.item-card{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:12px 14px}
+.item-card.overdue{background:var(--danger-surface);border-color:var(--danger-border)}
+.overdue-pill{display:inline-flex;align-items:center;gap:4px;background:var(--danger-text);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--radius-sm);margin-bottom:6px}
+.overdue-pill svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round}
+.item-ref{font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--color-action)}
+.item-name{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.item-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:3px;line-height:1.4}
+.item-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}
+.item-actions{display:flex;gap:6px}
+.item-amt{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--danger-text)}
+.btn-sm{font-size:11px;font-weight:600;padding:5px 12px;border-radius:var(--radius-sm);cursor:pointer;border:1px solid;white-space:nowrap;font-family:var(--font-sans)}
+.btn-pay{background:var(--success-surface);color:var(--success-text);border-color:var(--success-border)}
+.btn-bill{background:var(--ai-surface);color:var(--color-action);border-color:var(--ai-border)}
+.btn-deact{background:var(--color-surface-raised);color:var(--color-text-tertiary);border-color:var(--color-border-default)}
+
+/* FILTER BAR */
+.filter-bar{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.f-search{display:flex;align-items:center;gap:7px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:6px 10px;width:200px;flex-shrink:0;transition:border-color var(--transition-fast),box-shadow var(--transition-fast)}
+.f-search:focus-within{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.f-search svg{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.f-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.f-search input::placeholder{color:var(--color-text-tertiary)}
+.fsep{width:1px;height:18px;background:var(--color-border-default);flex-shrink:0;margin:0 2px}
+.chip-grp{display:flex;gap:3px}
+.chip{font-family:var(--font-sans);font-size:11px;font-weight:500;padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-tertiary);cursor:pointer;transition:all var(--transition-fast);white-space:nowrap}
+.chip:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.chip.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.f-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.f-filter-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:6px 11px;cursor:pointer;transition:all var(--transition-fast)}
+.f-filter-btn:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.f-filter-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5}
+.f-filter-count{background:var(--color-action);color:#fff;border-radius:var(--radius-full);font-size:9px;font-weight:700;padding:1px 5px;margin-left:2px;display:none}
+.f-filter-count.show{display:inline}
+
+/* TABLE */
+.tbl-wrap{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:8px}
+.tbl-wrap table{width:100%;border-collapse:collapse;table-layout:fixed}
+.tbl-wrap thead tr{background:var(--color-surface-sunken);border-bottom:1px solid var(--color-border-default)}
+.tbl-wrap thead th{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);padding:10px 12px;text-align:left;white-space:nowrap;user-select:none}
+.tbl-wrap thead th.r{text-align:right}
+.tbl-wrap thead th.sortable{cursor:pointer;transition:color var(--transition-fast)}
+.tbl-wrap thead th.sortable:hover{color:var(--color-text-primary)}
+.sort-arrow::after{content:'↕';margin-left:3px;font-size:9px;color:var(--color-border-default)}
+.sort-asc .sort-arrow::after{content:'↑';color:var(--color-action)}
+.sort-desc .sort-arrow::after{content:'↓';color:var(--color-action)}
+.tbl-wrap tbody tr{border-bottom:1px solid var(--color-surface-sunken);cursor:pointer;transition:background var(--transition-fast)}
+.tbl-wrap tbody tr:last-child{border-bottom:none}
+.tbl-wrap tbody tr:hover{background:#FAFAF9}
+.tbl-wrap tbody tr.sel{background:var(--ai-surface);border-left:3px solid var(--color-action)}
+.tbl-wrap tbody tr.inactive-row{background:#F7F5F2;opacity:.7}
+.tbl-wrap tbody tr.inactive-row:hover{background:#F0EDE8;opacity:1}
+.tbl-wrap tbody td{padding:9px 12px;font-size:12px;color:var(--color-text-secondary);vertical-align:middle}
+.vn-name{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.inactive-row .vn-name{color:var(--color-text-tertiary)}
+.vn-code{font-size:10px;font-family:var(--font-mono);color:var(--color-text-tertiary);margin-top:1px}
+td.num-warn{text-align:right;font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--warning-text);white-space:nowrap}
+td.num-dim{text-align:right;font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--color-text-tertiary);opacity:.5;white-space:nowrap}
+.cat-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--radius-sm);white-space:nowrap;border:1px solid}
+.cat-badge.inventory{background:var(--danger-surface);color:var(--color-brand);border-color:#EDD5C4}
+.cat-badge.expense{background:var(--ai-surface);color:var(--color-action);border-color:var(--ai-border)}
+.cat-badge.service{background:var(--success-surface);color:var(--success-text);border-color:var(--success-border)}
+.inactive-row .cat-badge{filter:grayscale(.7);opacity:.6}
+.last-tx-stale{font-size:11px;color:var(--danger-text);font-weight:600}
+.last-tx-ok{font-size:11px;color:var(--color-text-tertiary)}
+
+/* status badge with tooltip */
+.status-badge-wrap{position:relative;display:inline-block}
+.status-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:.04em;padding:2px 9px;border-radius:var(--radius-full);border:1px solid;cursor:default;text-transform:uppercase}
+.status-badge.active{background:var(--success-surface);color:var(--success-text);border-color:var(--success-border)}
+.status-badge.inactive{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border-color:var(--color-border-default)}
+.status-tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--color-surface-deep);color:rgba(255,255,255,.9);font-size:11px;font-weight:400;padding:7px 10px;border-radius:var(--radius-sm);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity var(--transition-fast);z-index:100;line-height:1.4}
+.status-badge-wrap:hover .status-tooltip{opacity:1}
+
+/* STICKY STATUS BAR */
+.sticky-bar{position:sticky;bottom:0;background:var(--color-surface-deep);padding:9px 12px;display:flex;align-items:center;gap:20px;border-top:1px solid rgba(255,255,255,.06);border-radius:0 0 var(--radius-lg) var(--radius-lg);z-index:5}
+.sb-stat{display:flex;align-items:center;gap:5px}
+.sb-stat-lbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.sb-stat-val{font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(255,255,255,.85)}
+.sb-stat-val.warn{color:#FCD97A}
+.sb-sep{width:1px;height:14px;background:rgba(255,255,255,.12)}
+.sb-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+
+/* PAGINATION */
+.pagination-wrap{display:flex;align-items:center;justify-content:space-between;padding:10px 4px 20px;flex-shrink:0}
+.page-size-wrap{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--color-text-tertiary)}
+.page-size-select{font-family:var(--font-sans);font-size:11px;color:var(--color-text-secondary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;outline:none}
+.page-btns{display:flex;align-items:center;gap:4px}
+.page-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;border-radius:var(--radius-sm);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-secondary);cursor:pointer;transition:all var(--transition-fast)}
+.page-btn:hover{border-color:#c8c2ba;color:var(--color-text-primary)}
+.page-btn.active{background:var(--color-action);border-color:var(--color-action);color:#fff}
+.page-btn.arrow svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.page-btn:disabled,.page-btn[disabled]{opacity:.3;cursor:default;pointer-events:none}
+.page-info{font-size:11px;color:var(--color-text-tertiary)}
+
+/* DETAIL DRAWER */
+.drawer-overlay{position:fixed;inset:0;background:rgba(8,7,6,.35);z-index:40;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:400px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow);box-shadow:-4px 0 24px rgba(8,7,6,.1)}
+.drawer.open{transform:translateX(0)}
+.dh{padding:16px 18px;border-bottom:1px solid var(--color-border-default);flex-shrink:0}
+.dh-top{display:flex;align-items:flex-start;gap:12px}
+.dh-avatar{width:40px;height:40px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden}
+.dh-avatar img{width:100%;height:100%;object-fit:cover}
+.dh-info{flex:1;min-width:0}
+.dh-name{font-size:15px;font-weight:700;color:var(--color-text-primary);line-height:1.2}
+.dh-meta{font-size:11px;color:var(--color-text-tertiary);margin-top:3px}
+.dclose{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:transparent;color:var(--color-text-tertiary);flex-shrink:0;transition:background var(--transition-fast);margin-top:2px}
+.dclose:hover{background:var(--color-surface-sunken);color:var(--color-text-primary)}
+.dclose svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.dtab-bar{display:flex;border-bottom:1px solid var(--color-border-default);flex-shrink:0;padding:0 18px}
+.dtab{padding:10px 0;margin-right:18px;font-size:12px;font-weight:500;color:var(--color-text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--transition-fast);white-space:nowrap}
+.dtab:hover{color:var(--color-text-secondary)}
+.dtab.active{color:var(--color-action);border-bottom-color:var(--color-action);font-weight:600}
+.dbody{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-height:0}
+.dpane{display:none;padding:16px 18px}
+.dpane.active{display:block}
+.dsec{margin-bottom:18px}
+.dlbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:10px}
+.info-row{display:flex;align-items:flex-start;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--color-surface-sunken);gap:12px}
+.info-row:last-child{border-bottom:none}
+.info-row label{font-size:11px;color:var(--color-text-tertiary);flex-shrink:0;padding-top:1px}
+.info-row span{font-size:12px;font-weight:500;color:var(--color-text-primary);text-align:right}
+.ap-strip{background:var(--warning-surface);border:1px solid var(--warning-border);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.ap-strip-lbl{font-size:11px;font-weight:600;color:var(--warning-text);flex:1}
+.ap-strip-amt{font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--warning-text)}
+.vendor-id-card{background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.vid-avatar{width:34px;height:34px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;font-family:var(--font-mono);overflow:hidden}
+.vid-info{flex:1;min-width:0}
+.vid-name{font-size:12px;font-weight:700;color:var(--color-text-primary)}
+.vid-code{font-size:10px;font-family:var(--font-mono);color:var(--color-text-tertiary);margin-top:1px}
+.wa-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--color-text-primary);text-decoration:none;transition:color var(--transition-fast)}
+.wa-link:hover{color:#25D366}
+.wa-icon{width:15px;height:15px;flex-shrink:0}
+.bank-card{background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:8px}
+.bank-card-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.bank-card-name{font-size:12px;font-weight:700;color:var(--color-text-primary);flex:1}
+.bank-default{font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border);border-radius:var(--radius-sm);padding:1px 6px}
+.bank-row{display:flex;gap:6px;font-size:11px;color:var(--color-text-tertiary);margin-top:3px}
+.bank-row .val{color:var(--color-text-secondary);font-weight:500;font-family:var(--font-mono)}
+.bill-card{background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:11px 13px;margin-bottom:8px;cursor:pointer;transition:all var(--transition-fast)}
+.bill-card:hover{border-color:var(--color-action);background:var(--ai-surface)}
+.bill-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px}
+.bill-card-ref{font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--color-text-tertiary)}
+.bill-card-arrow{width:20px;height:20px;border-radius:var(--radius-sm);background:var(--color-surface-raised);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bill-card-arrow svg{width:10px;height:10px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.bill-card-desc{font-size:11px;color:var(--color-text-secondary);margin-bottom:8px;line-height:1.4}
+.bill-card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.bill-card-date{font-size:10px;color:var(--color-text-tertiary)}
+.bill-card-amt{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--color-text-primary)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:var(--radius-full);white-space:nowrap;border:1px solid}
+.badge-paid{background:var(--success-surface);color:var(--success-text);border-color:var(--success-border)}
+.badge-unpaid{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border-color:var(--color-border-default)}
+.badge-overdue{background:var(--danger-text);color:#fff;border-color:var(--danger-text)}
+.badge-partial{background:var(--warning-surface);color:var(--warning-text);border-color:var(--warning-border)}
+.d-footer{padding:14px 18px;border-top:1px solid var(--color-border-default);flex-shrink:0;background:var(--color-surface-raised);display:flex;gap:8px}
+.btn-edit{flex:1;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px;background:var(--color-surface-raised);color:var(--color-text-secondary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-fast);display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-edit:hover{background:var(--color-surface-sunken)}
+.btn-edit svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+.btn-new-bill{flex:2;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base);display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-new-bill:hover{background:var(--color-action-hover)}
+.btn-new-bill svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round}
+.btn-toggle-status{font-family:var(--font-sans);font-size:12px;font-weight:600;padding:7px 12px;border-radius:var(--radius-sm);cursor:pointer;border:1px solid;transition:all var(--transition-fast);display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.btn-toggle-status.deactivate{background:var(--color-surface-raised);color:var(--danger-text);border-color:var(--danger-border)}
+.btn-toggle-status.deactivate:hover{background:var(--danger-surface)}
+.btn-toggle-status.activate{background:var(--success-surface);color:var(--success-text);border-color:var(--success-border)}
+.btn-toggle-status.activate:hover{background:#d4eddf}
+.btn-toggle-status svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
+
+/* FILTER DRAWER */
+.fdrawer{position:fixed;top:0;right:0;height:100vh;width:320px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:60;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow)}
+.fdrawer.open{transform:translateX(0)}
+.fd-head{height:52px;display:flex;align-items:center;padding:0 18px;border-bottom:1px solid var(--color-border-default);flex-shrink:0;gap:10px}
+.fd-title{font-size:14px;font-weight:700;flex:1}
+.fd-body{flex:1;overflow-y:auto;padding:16px 18px}
+.fd-group{margin-bottom:20px}
+.fd-group-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:8px}
+.fd-select{font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:8px 10px;width:100%;outline:none;cursor:pointer;transition:border-color var(--transition-fast);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238C857C' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.fd-select:focus{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.fd-input{font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:7px 10px;width:100%;outline:none;transition:border-color var(--transition-fast)}
+.fd-input:focus{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.fd-date-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.fd-shortcuts{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.fd-shortcut{font-size:11px;font-weight:500;padding:3px 10px;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-tertiary);cursor:pointer;transition:all var(--transition-fast)}
+.fd-shortcut:hover{border-color:var(--color-action);color:var(--color-action)}
+.fd-shortcut.on{background:var(--color-action);border-color:var(--color-action);color:#fff}
+.fd-foot{padding:14px 18px;border-top:1px solid var(--color-border-default);display:flex;gap:8px;flex-shrink:0}
+.fd-apply{flex:1;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base)}
+.fd-apply:hover{background:var(--color-action-hover)}
+.fd-cancel{font-family:var(--font-sans);font-size:13px;font-weight:500;padding:9px 14px;background:var(--color-surface-raised);color:var(--color-text-tertiary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;transition:all var(--transition-fast)}
+.fd-cancel:hover{background:var(--color-surface-sunken)}
+
+/* AI PANEL */
+.ai-panel{position:fixed;top:0;right:0;height:100vh;width:420px;background:var(--color-surface-raised);border-left:1px solid var(--ai-border);z-index:70;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow)}
+.ai-panel.open{transform:translateX(0)}
+.aip-head{padding:16px 18px;border-bottom:1px solid var(--ai-border);flex-shrink:0;display:flex;align-items:center;gap:10px}
+.aip-icon{width:30px;height:30px;border-radius:var(--radius-md);background:linear-gradient(135deg,#1A46C8,#7C3AED);display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:aiPulse 3s ease-in-out infinite}
+@keyframes aiPulse{0%,100%{box-shadow:0 0 0 0 rgba(26,70,200,.3)}50%{box-shadow:0 0 0 5px rgba(26,70,200,0)}}
+.aip-icon svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:1.5}
+.aip-title{font-size:14px;font-weight:700;color:var(--color-text-primary);flex:1}
+.aip-body{flex:1;overflow-y:auto;padding:16px 18px}
+.aip-intro{background:var(--ai-surface);border:1px solid var(--ai-border);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.aip-anomaly{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);margin-bottom:8px;overflow:hidden}
+.aip-anomaly-head{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--color-border-default)}
+.aip-sev{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.aip-sev.high{background:var(--danger-text)}
+.aip-sev.med{background:var(--warning-text)}
+.aip-anomaly-title{font-size:12px;font-weight:600;color:var(--color-text-primary);flex:1}
+.aip-anomaly-vendor{font-size:10px;font-family:var(--font-mono);color:var(--color-text-tertiary);background:var(--color-surface-sunken);padding:2px 7px;border-radius:var(--radius-sm)}
+.aip-anomaly-body{padding:11px 14px;font-size:11px;color:var(--color-text-secondary);line-height:1.55}
+.aip-anomaly-actions{display:flex;gap:6px;margin-top:8px}
+.aip-btn-ok{font-size:11px;font-weight:600;padding:5px 12px;background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border);border-radius:var(--radius-sm);cursor:pointer}
+.aip-btn-flag{font-size:11px;font-weight:600;padding:5px 12px;background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border);border-radius:var(--radius-sm);cursor:pointer}
+.aip-section-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-tertiary);margin:16px 0 8px}
+
+/* CONFIRM DIALOG */
+.dialog-overlay{position:fixed;inset:0;background:rgba(8,7,6,.45);z-index:200;display:none;align-items:center;justify-content:center}
+.dialog-overlay.open{display:flex}
+.dialog{background:var(--color-surface-raised);border-radius:var(--radius-lg);padding:24px;width:400px;max-width:90vw;box-shadow:0 8px 40px rgba(8,7,6,.2)}
+.dialog-title{font-size:15px;font-weight:700;color:var(--color-text-primary);margin-bottom:8px}
+.dialog-body{font-size:13px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:20px}
+.dialog-body strong{font-weight:700;color:var(--color-text-primary)}
+.dialog-actions{display:flex;gap:8px;justify-content:flex-end}
+.btn-dialog-cancel{font-family:var(--font-sans);font-size:13px;font-weight:500;padding:9px 16px;background:var(--color-surface-raised);color:var(--color-text-tertiary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer}
+.btn-dialog-cancel:hover{background:var(--color-surface-sunken)}
+.btn-dialog-confirm{font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px 16px;background:var(--danger-text);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer}
+.btn-dialog-confirm.activate{background:var(--success-text)}
+
+/* ADD/EDIT FULL PAGE */
+.addpage{position:fixed;inset:0;background:var(--color-surface-base);z-index:80;display:none;flex-direction:column}
+.addpage.open{display:flex}
+.ap-head{height:52px;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0}
+.ap-back{width:30px;height:30px;border-radius:var(--radius-sm);border:1px solid var(--color-border-default);background:var(--color-surface-raised);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-tertiary);transition:all var(--transition-fast)}
+.ap-back:hover{background:var(--color-surface-sunken);color:var(--color-text-primary)}
+.ap-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.ap-head-title{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.ap-head-sub{font-size:11px;color:var(--color-text-tertiary);margin-left:4px}
+.ap-body{flex:1;overflow-y:auto;padding:32px 0}
+.ap-inner{max-width:680px;margin:0 auto;padding:0 24px}
+.ap-section{margin-bottom:28px}
+.ap-section-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ap-section-lbl::after{content:'';flex:1;height:1px;background:var(--color-border-default)}
+.ap-grid{display:grid;gap:12px;margin-bottom:12px}
+.ap-2{grid-template-columns:1fr 1fr}
+.ap-1{grid-template-columns:1fr}
+.ap-field{display:flex;flex-direction:column;gap:5px}
+.ap-field label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary)}
+.ap-field label .req{color:var(--danger-text);margin-left:2px}
+.ap-field input,.ap-field select,.ap-field textarea{font-family:var(--font-sans);font-size:13px;color:var(--color-text-primary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:9px 12px;outline:none;transition:border-color var(--transition-fast),box-shadow var(--transition-fast);width:100%}
+.ap-field input:focus,.ap-field select:focus,.ap-field textarea:focus{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.ap-field input::placeholder,.ap-field textarea::placeholder{color:var(--color-text-tertiary)}
+.ap-field textarea{resize:vertical;min-height:64px;line-height:1.55}
+.ap-field select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238C857C' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.ap-hint{font-size:10px;color:var(--color-text-tertiary);margin-top:2px}
+.ap-foot{height:60px;flex-shrink:0;background:var(--color-surface-raised);border-top:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 24px;gap:10px}
+.ap-foot-hint{font-size:11px;color:var(--color-text-tertiary);flex:1}
+.btn-secondary{font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px 18px;background:var(--color-surface-raised);color:var(--color-text-secondary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base);display:inline-flex;align-items:center;gap:6px}
+.btn-secondary:hover{background:var(--color-surface-sunken)}
+.photo-upload{display:flex;align-items:center;gap:16px;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);padding:16px;margin-bottom:4px}
+.photo-preview{width:56px;height:56px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1.5px dashed var(--color-border-default);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;cursor:pointer;transition:all var(--transition-fast)}
+.photo-preview:hover{border-color:var(--color-action);background:var(--ai-surface)}
+.photo-preview img{width:100%;height:100%;object-fit:cover;display:none}
+.photo-preview svg{width:20px;height:20px;stroke:var(--color-border-default);fill:none;stroke-width:1.5}
+.photo-upload-info{flex:1;min-width:0}
+.photo-upload-title{font-size:12px;font-weight:600;color:var(--color-text-primary);margin-bottom:3px}
+.photo-upload-sub{font-size:11px;color:var(--color-text-tertiary);line-height:1.4}
+.photo-upload-btn{font-family:var(--font-sans);font-size:11px;font-weight:600;padding:6px 12px;background:var(--color-surface-sunken);color:var(--color-text-secondary);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);cursor:pointer;transition:all var(--transition-fast);white-space:nowrap}
+.pkp-radio-group{display:flex;flex-direction:column;gap:8px}
+.pkp-opt{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;transition:all var(--transition-fast);background:var(--color-surface-raised)}
+.pkp-opt:hover{border-color:#c8c2ba;background:var(--color-surface-sunken)}
+.pkp-opt.selected{border-color:var(--color-action);background:var(--ai-surface)}
+.pkp-opt input[type=radio]{display:none}
+.pkp-dot{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all var(--transition-fast)}
+.pkp-opt.selected .pkp-dot{border-color:var(--color-action);background:var(--color-action)}
+.pkp-dot-inner{width:6px;height:6px;border-radius:50%;background:#fff;display:none}
+.pkp-opt.selected .pkp-dot-inner{display:block}
+.pkp-text{flex:1;min-width:0}
+.pkp-label{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.pkp-desc{font-size:11px;color:var(--color-text-tertiary);margin-top:2px;line-height:1.45}
+.bank-repeater{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+.bank-entry{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:14px}
+.bank-entry-head{display:flex;align-items:center;margin-bottom:10px;gap:8px}
+.bank-entry-num{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--color-text-tertiary)}
+.btn-del-bank{margin-left:auto;width:26px;height:26px;border-radius:var(--radius-sm);border:1px solid transparent;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--transition-fast)}
+.btn-del-bank:hover{background:var(--danger-surface);border-color:var(--danger-border)}
+.btn-del-bank svg{width:13px;height:13px;stroke:var(--color-border-default);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.btn-del-bank:hover svg{stroke:var(--danger-text)}
+.btn-add-bank{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1.5px dashed var(--color-border-default);border-radius:var(--radius-md);padding:10px 14px;cursor:pointer;transition:all var(--transition-fast);width:100%;justify-content:center}
+.btn-add-bank:hover{border-color:var(--color-action);color:var(--color-action);background:var(--ai-surface)}
+.btn-add-bank svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--color-surface-deep);color:#fff;font-size:12px;font-weight:600;padding:10px 18px;border-radius:var(--radius-md);opacity:0;pointer-events:none;transition:all var(--transition-slow);z-index:999;white-space:nowrap;border:1px solid rgba(255,255,255,.08)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.empty-state{padding:48px 24px;text-align:center;color:var(--color-text-tertiary)}
+.empty-icon{width:44px;height:44px;background:var(--color-surface-sunken);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.empty-icon svg{width:20px;height:20px;stroke:var(--color-border-default);fill:none;stroke-width:1.5}
+.empty-title{font-size:13px;font-weight:600;color:var(--color-text-tertiary);margin-bottom:4px}
+.empty-sub{font-size:11px;color:var(--color-border-default)}
+
+/* EXPORT */
+.exp-wrap{position:relative;display:inline-block}
+.btn-export{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:8px 14px;background:var(--color-surface-raised);color:var(--color-text-secondary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;transition:all var(--transition-fast)}
+.btn-export:hover{background:var(--color-surface-sunken);border-color:#c8c2ba}
+.btn-export svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
+.exp-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);box-shadow:0 6px 24px rgba(8,7,6,.1);min-width:210px;z-index:30;display:none;overflow:hidden}
+.exp-menu.open{display:block}
+.exp-grp-lbl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);padding:10px 14px 5px}
+.exp-item{display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;font-size:12px;font-weight:500;color:var(--color-text-secondary);transition:background var(--transition-fast)}
+.exp-item:hover{background:var(--color-surface-sunken)}
+.exp-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.exp-item-lbl{flex:1}
+.exp-item-ext{font-size:10px;font-weight:700;padding:1px 6px;border-radius:var(--radius-full);background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+.exp-divider{height:1px;background:var(--color-border-default);margin:3px 0}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sb">
+  <div class="sb-top">
+    <div class="sb-logomark"><svg viewBox="0 0 16 16"><path d="M3 12L8 4l5 8H3z"/></svg></div>
+    <span class="sb-brand">Klay</span>
+  </div>
+  <div class="sb-section">Transactions</div>
+  <a class="sb-item"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>General Ledger</a>
+  <a class="sb-item"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Journal Entry</a>
+  <div class="sb-section">Accounts Payable</div>
+  <a class="sb-item"><svg viewBox="0 0 24 24"><path d="M9 14l-4-4 4-4"/><path d="M5 10h11a4 4 0 010 8h-1"/></svg>Bills</a>
+  <a class="sb-item active"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>Vendors</a>
+  <a class="sb-item"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>AP Aging</a>
+  <div class="sb-section">Accounts Receivable</div>
+  <a class="sb-item"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Invoices</a>
+  <a class="sb-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Customers</a>
+  <div class="sb-footer">
+    <div class="sb-footer-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Michael Andreas</div>
+    <div class="sb-footer-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span>Cari vendor, kode…</span>
+      <span class="tb-kbd">⌘K</span>
+    </div>
+    <div class="tb-right">
+      <div class="tb-notif"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="notif-dot"></span></div>
+      <div class="tb-org">
+        <div class="tb-av">PT</div>
+        <span class="tb-org-name">PT Sejahtera Makmur</span>
+        <svg class="tb-caret" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-area" id="scrollArea">
+    <div class="page-head">
+      <div>
+        <div class="page-title">Vendors</div>
+        <div class="page-sub">Master data pemasok — basis semua transaksi AP</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="exp-wrap">
+          <button class="btn-export" onclick="toggleExpMenu()">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+            <svg viewBox="0 0 24 24" style="width:10px;height:10px"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="exp-menu" id="expMenu">
+            <div class="exp-grp-lbl">Yang terlihat saja</div>
+            <div class="exp-item" onclick="doExport('visible','xlsx')">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span class="exp-item-lbl">Excel (.xlsx)</span>
+              <span class="exp-item-ext">XLSX</span>
+            </div>
+            <div class="exp-item" onclick="doExport('visible','csv')">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span class="exp-item-lbl">CSV (.csv)</span>
+              <span class="exp-item-ext">CSV</span>
+            </div>
+            <div class="exp-divider"></div>
+            <div class="exp-grp-lbl">Semua vendor</div>
+            <div class="exp-item" onclick="doExport('all','xlsx')">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span class="exp-item-lbl">Excel (.xlsx)</span>
+              <span class="exp-item-ext">XLSX</span>
+            </div>
+            <div class="exp-item" onclick="doExport('all','csv')">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span class="exp-item-lbl">CSV (.csv)</span>
+              <span class="exp-item-ext">CSV</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="openAddVendor(false)">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Tambah Vendor
+      </button>
+      </div>
+    </div>
+
+    <!-- ATTENTION SECTION -->
+    <div class="attn-wrap" id="attnWrap">
+      <div class="attn-hd" onclick="toggleAttn()">
+        <div class="attn-hd-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <span class="attn-hd-title">Beberapa hal memerlukan perhatianmu</span>
+        <svg class="attn-hd-chev" id="attnChev" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+      </div>
+      <div id="attnBody">
+        <div class="attn-desc">Berdasarkan analisis cerdas, terdapat kondisi vendor yang memerlukan tindakan segera untuk menjaga kesehatan arus kas dan hubungan pemasok.</div>
+
+        <!-- ACCORDION 1: Overdue -->
+        <div class="acc">
+          <div class="acc-hd" onclick="toggleAcc('accOverdue')">
+            <div class="acc-icon red"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+            <span class="acc-label">Tagihan vendor jatuh tempo & belum dibayar</span>
+            <span class="acc-amt">Rp 13.750.000</span>
+            <span class="acc-lihat" onclick="event.stopPropagation()">Lihat semua <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+            <span class="acc-badge red">1</span>
+            <svg class="acc-chev" id="chevOverdue" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="acc-body" id="accOverdue" style="display:none">
+            <div class="acc-body-inner">
+              <div class="item-card overdue">
+                <div class="overdue-pill"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Jatuh tempo · Lewat 9 hari</div>
+                <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">
+                  <span class="item-ref">BILL005</span>
+                  <span style="font-size:11px;color:var(--color-text-tertiary)">—</span>
+                  <span class="item-name">Koperasi Tani Sejahtera</span>
+                </div>
+                <div class="item-sub">Bahan Baku — Jagung Pipil Premium · Due 14 Mei 2025</div>
+                <div class="item-foot">
+                  <div class="item-actions">
+                    <button class="btn-sm btn-pay">Bayar Sekarang</button>
+                    <button class="btn-sm btn-deact">Abaikan</button>
+                  </div>
+                  <span class="item-amt">13.750.000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACCORDION 2: Dormant -->
+        <div class="acc">
+          <div class="acc-hd" onclick="toggleAcc('accDormant')">
+            <div class="acc-icon amber"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <span class="acc-label">Vendor tanpa transaksi 90+ hari</span>
+            <span class="acc-lihat" style="margin-left:auto" onclick="event.stopPropagation()">Lihat semua <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+            <span class="acc-badge amber">2</span>
+            <svg class="acc-chev" id="chevDormant" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="acc-body" id="accDormant" style="display:none">
+            <div class="acc-body-inner">
+              <div class="item-card">
+                <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">
+                  <span class="item-ref">V-002</span>
+                  <span style="font-size:11px;color:var(--color-text-tertiary)">—</span>
+                  <span class="item-name">CV Toko Bangunan Jaya</span>
+                </div>
+                <div class="item-sub">Terakhir transaksi: 4 Feb 2025 · 78 hari tidak ada aktivitas</div>
+                <div class="item-foot">
+                  <div class="item-actions">
+                    <button class="btn-sm btn-bill">Buat Bill</button>
+                    <button class="btn-sm btn-deact" onclick="confirmDeactivate('V002')">Nonaktifkan Vendor</button>
+                  </div>
+                </div>
+              </div>
+              <div class="item-card">
+                <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">
+                  <span class="item-ref">V-004</span>
+                  <span style="font-size:11px;color:var(--color-text-tertiary)">—</span>
+                  <span class="item-name">PT Penyedia Layanan Konsultasi</span>
+                </div>
+                <div class="item-sub">Terakhir transaksi: 10 Apr 2025 · 13 hari tidak ada aktivitas</div>
+                <div class="item-foot">
+                  <div class="item-actions">
+                    <button class="btn-sm btn-bill">Buat Bill</button>
+                    <button class="btn-sm btn-deact" onclick="confirmDeactivate('V004')">Nonaktifkan Vendor</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <div class="f-search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Cari nama vendor atau kode…" oninput="renderTable()">
+      </div>
+      <div class="fsep"></div>
+      <div class="chip-grp" id="catChips">
+        <div class="chip on" onclick="setCat(this,'')">Semua</div>
+        <div class="chip" onclick="setCat(this,'inventory')">Inventory</div>
+        <div class="chip" onclick="setCat(this,'expense')">Expense</div>
+        <div class="chip" onclick="setCat(this,'service')">Service</div>
+      </div>
+      <div class="f-right">
+        <button class="f-filter-btn" onclick="openFilterDrawer()">
+          <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          Filter
+          <span class="f-filter-count" id="filterCount">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:240px" class="sortable sort-arrow" id="th-name" onclick="sortCol('name')">Vendor</th>
+            <th style="width:100px">Kategori</th>
+            <th style="width:80px">Status</th>
+            <th style="width:110px">Payment Term</th>
+            <th style="width:130px" class="sortable sort-arrow" id="th-lasttx" onclick="sortCol('lasttx')">Transaksi Terakhir</th>
+            <th style="width:140px" class="r sortable sort-arrow" id="th-balance" onclick="sortCol('balance')">AP Balance (Rp)</th>
+          </tr>
+        </thead>
+        <tbody id="vendorTbody"></tbody>
+      </table>
+      <div id="emptyState" style="display:none" class="empty-state">
+        <div class="empty-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></div>
+        <div class="empty-title">Tidak ada vendor ditemukan</div>
+        <div class="empty-sub">Coba ubah filter atau kata kunci pencarian</div>
+      </div>
+
+      <!-- STICKY STATUS BAR -->
+      <div class="sticky-bar">
+        <div class="sb-stat"><span class="sb-stat-lbl">Total</span><span class="sb-stat-val" id="stat-total">—</span></div>
+        <div class="sb-sep"></div>
+        <div class="sb-stat"><span class="sb-stat-lbl">Ditampilkan</span><span class="sb-stat-val" id="stat-shown">—</span></div>
+        <div class="sb-right">
+          <div class="sb-stat"><span class="sb-stat-lbl">Aktif</span><span class="sb-stat-val" id="stat-active">—</span></div>
+          <div class="sb-sep"></div>
+          <div class="sb-stat"><span class="sb-stat-lbl">Total AP</span><span class="sb-stat-val warn" id="stat-ap">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination-wrap">
+      <div class="page-size-wrap">
+        <span>Tampilkan</span>
+        <select class="page-size-select" id="pageSizeSelect" onchange="changePageSize()">
+          <option value="20">20</option>
+          <option value="50" selected>50</option>
+          <option value="100">100</option>
+        </select>
+        <span>per halaman</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="page-info" id="pageInfo">—</span>
+        <div class="page-btns" id="pageBtns"></div>
+      </div>
+    </div>
+
+  </div><!-- /scroll-area -->
+</div><!-- /main -->
+
+<!-- DETAIL DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="dh">
+    <div class="dh-top">
+      <div class="dh-avatar" id="dAvatar"></div>
+      <div class="dh-info">
+        <div class="dh-name" id="dName">—</div>
+        <div class="dh-meta" id="dMeta">—</div>
+      </div>
+      <button class="dclose" onclick="closeDrawer()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="dtab-bar">
+    <div class="dtab active" onclick="switchTab('info')">Info</div>
+    <div class="dtab" onclick="switchTab('bank')">Bank</div>
+    <div class="dtab" onclick="switchTab('bills')">Bills</div>
+    <div class="dtab" onclick="switchTab('pajak')">Pajak</div>
+  </div>
+  <div class="dbody">
+    <div class="dpane active" id="tab-info">
+      <div id="dApStrip"></div>
+      <div class="dsec">
+        <div class="dlbl">Identitas</div>
+        <div class="vendor-id-card">
+          <div class="vid-avatar" id="dVidAvatar"></div>
+          <div class="vid-info">
+            <div class="vid-name" id="dVidName">—</div>
+            <div class="vid-code" id="dVidCode">—</div>
+          </div>
+        </div>
+        <div id="dIdentRows"></div>
+      </div>
+      <div class="dsec">
+        <div class="dlbl">Akuntansi</div>
+        <div id="dAcctRows"></div>
+      </div>
+    </div>
+    <div class="dpane" id="tab-bank"><div id="dBankCards"></div></div>
+    <div class="dpane" id="tab-bills"><div id="dBillCards"></div></div>
+    <div class="dpane" id="tab-pajak"><div id="dPajakRows"></div></div>
+  </div>
+  <div class="d-footer" id="dFooter">
+    <button class="btn-edit" onclick="openEditVendor()">
+      <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Edit
+    </button>
+    <button class="btn-toggle-status" id="btnToggleStatus" onclick="handleToggleStatus()"></button>
+    <button class="btn-new-bill" id="btnNewBill">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Buat Bill
+    </button>
+  </div>
+</div>
+
+<!-- FILTER DRAWER -->
+<div class="drawer-overlay" id="fdOverlay" style="z-index:55" onclick="closeFilterDrawer()"></div>
+<div class="fdrawer" id="fdrawer">
+  <div class="fd-head">
+    <span class="fd-title">Filter Vendor</span>
+    <button class="dclose" onclick="closeFilterDrawer()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="fd-body">
+    <div class="fd-group">
+      <div class="fd-group-lbl">Status PKP</div>
+      <select class="fd-select" id="fdPkp" onchange="updateFilterCount()">
+        <option value="">Semua</option>
+        <option value="PKP">PKP — Pengusaha Kena Pajak</option>
+        <option value="NON_PKP">Non-PKP</option>
+      </select>
+    </div>
+    <div class="fd-group">
+      <div class="fd-group-lbl">Payment Term</div>
+      <select class="fd-select" id="fdTerm" onchange="updateFilterCount()">
+        <option value="">Semua</option>
+        <option value="NET 7">NET 7 hari</option>
+        <option value="NET 15">NET 15 hari</option>
+        <option value="NET 30">NET 30 hari</option>
+        <option value="NET 45">NET 45 hari</option>
+        <option value="NET 60">NET 60 hari</option>
+      </select>
+    </div>
+    <div class="fd-group">
+      <div class="fd-group-lbl">Tanggal Transaksi</div>
+      <div class="fd-shortcuts">
+        <div class="fd-shortcut" onclick="setDateShortcut(this,'today')">Hari ini</div>
+        <div class="fd-shortcut" onclick="setDateShortcut(this,'week')">Minggu ini</div>
+        <div class="fd-shortcut" onclick="setDateShortcut(this,'month')">Bulan ini</div>
+        <div class="fd-shortcut" onclick="setDateShortcut(this,'quarter')">Kuartal ini</div>
+      </div>
+      <div class="fd-date-row">
+        <div><div style="font-size:10px;color:var(--color-text-tertiary);margin-bottom:4px">Dari</div><input type="date" class="fd-input" id="fdDateFrom" onchange="clearDateShortcuts()"></div>
+        <div><div style="font-size:10px;color:var(--color-text-tertiary);margin-bottom:4px">Sampai</div><input type="date" class="fd-input" id="fdDateTo" onchange="clearDateShortcuts()"></div>
+      </div>
+    </div>
+  </div>
+  <div class="fd-foot">
+    <button class="fd-cancel" onclick="resetFilters()">Reset</button>
+    <button class="fd-apply" onclick="applyFilters()">Terapkan</button>
+  </div>
+</div>
+
+<!-- AI PANEL -->
+<div class="drawer-overlay" id="aiOverlay" style="z-index:65" onclick="closeAIPanel()"></div>
+<div class="ai-panel" id="aiPanel">
+  <div class="aip-head">
+    <div class="aip-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <span class="aip-title">Deteksi Anomali AP</span>
+    <button class="dclose" onclick="closeAIPanel()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="aip-body">
+    <div class="aip-intro">AI mendeteksi <strong>3 anomali</strong> pada data AP Vendors.</div>
+    <div class="aip-section-lbl">Temuan</div>
+    <div class="aip-anomaly">
+      <div class="aip-anomaly-head"><div class="aip-sev high"></div><div class="aip-anomaly-title">Bill melewati jatuh tempo</div><div class="aip-anomaly-vendor">V-005</div></div>
+      <div class="aip-anomaly-body">BILL005 dari Koperasi Tani Sejahtera (Rp 13.750.000) telah jatuh tempo sejak 14 Mei 2025.<div class="aip-anomaly-actions"><button class="aip-btn-ok">Tandai Diketahui</button><button class="aip-btn-flag">Eskalasi</button></div></div>
+    </div>
+    <div class="aip-anomaly">
+      <div class="aip-anomaly-head"><div class="aip-sev med"></div><div class="aip-anomaly-title">Vendor tanpa transaksi 90 hari</div><div class="aip-anomaly-vendor">V-002</div></div>
+      <div class="aip-anomaly-body">CV Toko Bangunan Jaya tidak memiliki bill aktif dalam 90 hari terakhir.<div class="aip-anomaly-actions"><button class="aip-btn-ok">Tandai Diketahui</button><button class="aip-btn-flag">Review Vendor</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="dialog-overlay" id="dialogOverlay">
+  <div class="dialog">
+    <div class="dialog-title" id="dialogTitle">Nonaktifkan Vendor?</div>
+    <div class="dialog-body" id="dialogBody">—</div>
+    <div class="dialog-actions">
+      <button class="btn-dialog-cancel" onclick="closeDialog()">Batal</button>
+      <button class="btn-dialog-confirm" id="dialogConfirmBtn" onclick="executeStatusChange()">Nonaktifkan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT VENDOR PAGE -->
+<div class="addpage" id="addPage">
+  <div class="ap-head">
+    <button class="ap-back" onclick="closeAddPage()"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+    <span class="ap-head-title" id="apPageTitle">Tambah Vendor Baru</span>
+    <span class="ap-head-sub" id="apPageSub">— Field bertanda * wajib diisi</span>
+  </div>
+  <div class="ap-body">
+    <div class="ap-inner">
+      <div class="ap-section" style="margin-bottom:20px">
+        <div class="photo-upload">
+          <div class="photo-preview" id="photoPreview" onclick="triggerPhotoUpload()">
+            <img id="photoPreviewImg" src="" alt="">
+            <svg id="photoPlaceholderIcon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="photo-upload-info">
+            <div class="photo-upload-title">Foto Vendor <span style="font-size:10px;font-weight:400;color:var(--color-text-tertiary)">(opsional)</span></div>
+            <div class="photo-upload-sub">Logo atau foto kantor vendor. JPG, PNG, maks. 2 MB.</div>
+          </div>
+          <button class="photo-upload-btn" onclick="triggerPhotoUpload()">Pilih Foto</button>
+          <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
+        </div>
+      </div>
+      <div class="ap-section">
+        <div class="ap-section-lbl">Identitas Vendor</div>
+        <div class="ap-grid ap-2">
+          <div class="ap-field"><label>Kode Vendor</label><input type="text" id="fCode" placeholder="V-006" style="font-family:var(--font-mono);font-weight:600"><span class="ap-hint">Kosongkan untuk auto-generate</span></div>
+          <div class="ap-field"><label>Kategori <span class="req">*</span></label><select id="fCategory"><option value="">Pilih kategori…</option><option value="inventory">Inventory — pembelian barang dagang</option><option value="expense">Expense — beban operasional</option><option value="service">Service — jasa profesional</option></select></div>
+        </div>
+        <div class="ap-grid ap-1"><div class="ap-field"><label>Nama Vendor <span class="req">*</span></label><input type="text" id="fName" placeholder="Contoh: PT Maju Teknologi Indonesia"></div></div>
+        <div class="ap-grid ap-2">
+          <div class="ap-field"><label>Tipe Entitas</label><select id="fType"><option value="company">Badan Usaha (PT/CV/UD)</option><option value="individual">Individu / Perorangan</option><option value="government">Instansi Pemerintah</option><option value="cooperative">Koperasi</option></select></div>
+          <div class="ap-field"><label>Payment Term</label><select id="fTerm"><option value="NET 7">NET 7 hari</option><option value="NET 15">NET 15 hari</option><option value="NET 30" selected>NET 30 hari</option><option value="NET 45">NET 45 hari</option><option value="NET 60">NET 60 hari</option></select></div>
+        </div>
+        <div class="ap-grid ap-1"><div class="ap-field"><label>Alamat</label><textarea id="fAddress" placeholder="Jl. Sudirman No. 123, Jakarta Selatan 12190"></textarea></div></div>
+        <div class="ap-grid ap-2">
+          <div class="ap-field"><label>Nomor Telepon</label><input type="text" id="fPhone" placeholder="+62-21-1234-5678"></div>
+          <div class="ap-field"><label>Email</label><input type="email" id="fEmail" placeholder="ap@vendor.com"></div>
+        </div>
+        <div class="ap-grid ap-2">
+          <div class="ap-field"><label>Contact Person</label><input type="text" id="fContact" placeholder="Nama PIC"></div>
+          <div class="ap-field"><label>NPWP</label><input type="text" id="fNpwp" placeholder="12.345.678.9-001.000" style="font-family:var(--font-mono)"></div>
+        </div>
+      </div>
+      <div class="ap-section">
+        <div class="ap-section-lbl">Perpajakan</div>
+        <div class="ap-field" style="margin-bottom:14px">
+          <label style="margin-bottom:8px;display:block">Status PKP <span class="req">*</span></label>
+          <div class="pkp-radio-group">
+            <label class="pkp-opt selected" id="pkpOptPKP" onclick="selectPKP('PKP')">
+              <input type="radio" name="pkp_status" value="PKP" checked>
+              <div class="pkp-dot"><div class="pkp-dot-inner"></div></div>
+              <div class="pkp-text"><div class="pkp-label">PKP — Pengusaha Kena Pajak</div><div class="pkp-desc">Vendor terdaftar sebagai PKP. Transaksi dikenai PPN dan dapat menerbitkan Faktur Pajak.</div></div>
+            </label>
+            <label class="pkp-opt" id="pkpOptNON" onclick="selectPKP('NON_PKP')">
+              <input type="radio" name="pkp_status" value="NON_PKP">
+              <div class="pkp-dot"><div class="pkp-dot-inner"></div></div>
+              <div class="pkp-text"><div class="pkp-label">Non-PKP</div><div class="pkp-desc">Vendor tidak memiliki NPKP. Tidak ada PPN pada transaksi. Umumnya koperasi, individu, atau usaha kecil di bawah threshold.</div></div>
+            </label>
+          </div>
+        </div>
+        <div class="ap-grid ap-1"><div class="ap-field"><label>Pemotongan PPh</label><select id="fPph"><option value="none">Tidak ada pemotongan PPh</option><option value="pph23_2">PPh 23 — 2% (jasa, sewa, royalti)</option><option value="pph23_15">PPh 23 — 15% (dividen, bunga)</option><option value="pph4_final">PPh 4(2) Final — jasa konstruksi</option><option value="pph21">PPh 21 — individu / tenaga ahli</option></select></div></div>
+      </div>
+      <div class="ap-section">
+        <div class="ap-section-lbl">Rekening Bank</div>
+        <div class="bank-repeater" id="bankRepeater"></div>
+        <button class="btn-add-bank" onclick="addBankEntry()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Tambah Rekening Bank</button>
+      </div>
+      <div class="ap-section">
+        <div class="ap-section-lbl">Default Akuntansi <span style="font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--color-text-tertiary)"> — opsional</span></div>
+        <div class="ap-grid ap-2">
+          <div class="ap-field"><label>Akun Beban Default</label><select id="fAcct"><option value="">— Pilih akun —</option><option value="5-1000">5-1000 · Beban Operasional</option><option value="5-1070">5-1070 · Biaya Konsultan</option><option value="6-1000">6-1000 · Biaya Pokok Penjualan</option></select></div>
+          <div class="ap-field"><label>Kode Pajak Default</label><select id="fDefTax"><option value="">— Tidak ada —</option><option value="ppn_masukan">PPN Masukan 11%</option><option value="bebas">Bebas Pajak</option></select></div>
+        </div>
+        <div class="ap-grid ap-1"><div class="ap-field"><label>Catatan Internal</label><textarea id="fNotes" placeholder="Kontrak, PIC, syarat pembayaran khusus…"></textarea></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ap-foot">
+    <span class="ap-foot-hint" id="apFootHint">Vendor akan langsung aktif setelah disimpan.</span>
+    <button class="btn-secondary" onclick="closeAddPage()">Batal</button>
+    <button class="btn-primary" onclick="saveVendor()"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span id="apSaveLabel">Simpan Vendor</span></button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const VENDORS = [
+  {id:'V001',code:'V-001',name:'PT Supplier Elektronik Indonesia',contact_person:'Suko Wijaya',phone:'+62-274-555-8821',email:'suko@supplierelektronik.id',address:'Jl. Gatot Subroto No. 123, Yogyakarta 55281',tax_id:'12.987.654.3-123.000',payment_terms:'NET 30',pkp:'PKP',pph:'none',category:'inventory',type:'company',status:'active',lastTx:'2025-01-15',notes:'Supplier komponen elektronik utama.',acct:'6-1000',defTax:'ppn_masukan',banks:[{name:'BCA',branch:'KCU Yogyakarta',acc:'123-456-7890',holder:'PT Supplier Elektronik Indonesia',isDefault:true}],bills:['BILL001']},
+  {id:'V002',code:'V-002',name:'CV Toko Bangunan Jaya',contact_person:'Bambang Kristianto',phone:'+62-21-7654-3210',email:'info@tokobangunan.id',address:'Jl. Diponegoro 456, Jakarta 12170',tax_id:'11.234.567.8-987.000',payment_terms:'NET 15',pkp:'PKP',pph:'none',category:'expense',type:'company',status:'active',lastTx:'2025-02-04',notes:'Perlengkapan kantor & renovasi. Min. order Rp 5 jt.',acct:'5-1000',defTax:'ppn_masukan',banks:[{name:'Mandiri',branch:'KCP Diponegoro',acc:'110-009-876543',holder:'CV Toko Bangunan Jaya',isDefault:true}],bills:['BILL002']},
+  {id:'V003',code:'V-003',name:'PT Jasa Logistik Cepat',contact_person:'Endra Susanto',phone:'+62-31-5555-2222',email:'operasional@jasalogistik.id',address:'Jl. Ahmad Yani 789, Surabaya 60100',tax_id:'12.345.678.9-456.000',payment_terms:'NET 7',pkp:'PKP',pph:'pph23_2',category:'service',type:'company',status:'active',lastTx:'2025-02-15',notes:'Jasa pengiriman bulanan. Coverage Jabodetabek & Surabaya.',acct:'5-1000',defTax:'ppn_masukan',banks:[{name:'BNI',branch:'KCU Surabaya',acc:'0987-654-321',holder:'PT Jasa Logistik Cepat',isDefault:true}],bills:['BILL003']},
+  {id:'V004',code:'V-004',name:'PT Penyedia Layanan Konsultasi',contact_person:'Dr. Prasetyo Utomo',phone:'+62-62-789-1234',email:'admin@konsultanpro.id',address:'Jl. Sudirman Plaza, Bandung 40123',tax_id:'13.456.789.0-321.000',payment_terms:'NET 45',pkp:'PKP',pph:'pph23_2',category:'service',type:'company',status:'active',lastTx:'2025-04-10',notes:'Konsultasi audit internal & proses. Kontrak per proyek.',acct:'5-1070',defTax:'ppn_masukan',banks:[{name:'BCA',branch:'KCU Bandung',acc:'456-789-0123',holder:'PT Penyedia Layanan Konsultasi',isDefault:true}],bills:['BILL004']},
+  {id:'V005',code:'V-005',name:'Koperasi Tani Sejahtera',contact_person:'Hendra Santoso',phone:'+62-274-888-9999',email:'supply@kopersitani.id',address:'Jl. Magelang KM 12, Yogyakarta 55593',tax_id:'14.567.890.1-654.000',payment_terms:'NET 60',pkp:'NON_PKP',pph:'none',category:'inventory',type:'cooperative',status:'active',lastTx:'2025-03-15',notes:'Supplier bahan baku pertanian. MOQ 1000 kg.',acct:'6-1000',defTax:'bebas',banks:[{name:'BRI',branch:'KCP Magelang',acc:'0034-567-890123',holder:'Koperasi Tani Sejahtera',isDefault:true}],bills:['BILL005']},
+  // Extended dummy data for pagination
+  {id:'V006',code:'V-006',name:'PT Kemasan Nusantara',contact_person:'Rina Pratiwi',phone:'+62-21-8844-5566',email:'order@kemasannusantara.id',address:'Kawasan Industri Cibitung, Bekasi 17520',tax_id:'15.678.901.2-001.000',payment_terms:'NET 30',pkp:'PKP',pph:'none',category:'inventory',type:'company',status:'active',lastTx:'2025-03-20',notes:'Supplier kemasan primer & sekunder.',acct:'6-1000',defTax:'ppn_masukan',banks:[{name:'BCA',branch:'KCP Cibitung',acc:'234-567-8901',isDefault:true,holder:'PT Kemasan Nusantara'}],bills:[]},
+  {id:'V007',code:'V-007',name:'CV Percetakan Maju',contact_person:'Dodi Kusuma',phone:'+62-22-4455-6677',email:'cetak@percetakanmaju.id',address:'Jl. Soekarno Hatta No. 88, Bandung 40183',tax_id:'16.789.012.3-002.000',payment_terms:'NET 14',pkp:'PKP',pph:'none',category:'expense',type:'company',status:'active',lastTx:'2025-04-01',notes:'Percetakan marketing material & packaging.',acct:'5-1000',defTax:'ppn_masukan',banks:[{name:'BNI',branch:'KCU Bandung',acc:'345-678-9012',isDefault:true,holder:'CV Percetakan Maju'}],bills:[]},
+  {id:'V008',code:'V-008',name:'PT Teknologi Solusi Digital',contact_person:'Fajar Nugroho',phone:'+62-21-3344-5566',email:'support@teksoldigital.id',address:'Gedung iGrow Lt. 5, Jl. TB Simatupang, Jakarta 12560',tax_id:'17.890.123.4-003.000',payment_terms:'NET 30',pkp:'PKP',pph:'pph23_2',category:'service',type:'company',status:'active',lastTx:'2025-04-15',notes:'Software maintenance & IT support.',acct:'5-1070',defTax:'ppn_masukan',banks:[{name:'BCA',branch:'KCU TB Simatupang',acc:'456-789-0123',isDefault:true,holder:'PT Teknologi Solusi Digital'}],bills:[]},
+  {id:'V009',code:'V-009',name:'UD Karya Tani Makmur',contact_person:'Sutrisno',phone:'+62-274-777-8888',email:'karya.tani@gmail.com',address:'Jl. Magelang KM 8, Sleman, DIY 55512',tax_id:'18.901.234.5-004.000',payment_terms:'NET 60',pkp:'NON_PKP',pph:'none',category:'inventory',type:'individual',status:'inactive',lastTx:'2024-11-30',notes:'Pemasok beras & palawija lokal.',acct:'6-1000',defTax:'bebas',banks:[{name:'BRI',branch:'KCU Sleman',acc:'567-890-1234',isDefault:true,holder:'Sutrisno'}],bills:[]},
+  {id:'V010',code:'V-010',name:'PT Asuransi Mitra Utama',contact_person:'Dewi Lestari',phone:'+62-21-5566-7788',email:'klaim@amutama.co.id',address:'Menara Asuransi Lt. 12, Jl. Gatot Subroto, Jakarta 12870',tax_id:'19.012.345.6-005.000',payment_terms:'NET 30',pkp:'PKP',pph:'none',category:'expense',type:'company',status:'active',lastTx:'2025-01-31',notes:'Asuransi aset & kendaraan operasional.',acct:'5-1000',defTax:'ppn_masukan',banks:[{name:'Mandiri',branch:'KCU Gatot Subroto',acc:'678-901-2345',isDefault:true,holder:'PT Asuransi Mitra Utama'}],bills:[]},
+  {id:'V011',code:'V-011',name:'PT Forklift Andalan',contact_person:'Bram Setiawan',phone:'+62-21-6677-8899',email:'rental@forkliftandalan.id',address:'Jl. Raya Bekasi KM 23, Bekasi 17132',tax_id:'20.123.456.7-006.000',payment_terms:'NET 15',pkp:'PKP',pph:'pph23_2',category:'service',type:'company',status:'active',lastTx:'2025-03-31',notes:'Sewa forklift & alat berat per bulan.',acct:'5-1000',defTax:'ppn_masukan',banks:[{name:'BCA',branch:'KCP Bekasi Timur',acc:'789-012-3456',isDefault:true,holder:'PT Forklift Andalan'}],bills:[]},
+  {id:'V012',code:'V-012',name:'CV Jaya Office Supplies',contact_person:'Hesti Wulandari',phone:'+62-21-7788-9900',email:'order@jayaoffice.id',address:'Ruko Grand Depok City Blok A5, Depok 16412',tax_id:'21.234.567.8-007.000',payment_terms:'NET 14',pkp:'NON_PKP',pph:'none',category:'expense',type:'company',status:'active',lastTx:'2025-04-10',notes:'ATK & perlengkapan kantor.',acct:'5-1000',defTax:'bebas',banks:[{name:'BNI',branch:'KCP Depok',acc:'890-123-4567',isDefault:true,holder:'CV Jaya Office Supplies'}],bills:[]},
+  {id:'V013',code:'V-013',name:'PT Pengiriman Ekspres Indonesia',contact_person:'Agus Hartono',phone:'+62-21-8899-0011',email:'corp@pei.co.id',address:'Jl. Yos Sudarso No. 45, Jakarta Utara 14350',tax_id:'22.345.678.9-008.000',payment_terms:'NET 7',pkp:'PKP',pph:'pph23_2',category:'service',type:'company',status:'active',lastTx:'2025-04-20',notes:'Kurir same-day & next-day Jabodetabek.',acct:'5-1000',defTax:'ppn_masukan',banks:[{name:'Mandiri',branch:'KCU Tanjung Priok',acc:'901-234-5678',isDefault:true,holder:'PT Pengiriman Ekspres Indonesia'}],bills:[]},
+  {id:'V014',code:'V-014',name:'CV Bumi Agro Mandiri',contact_person:'Pak Slamet',phone:'+62-271-555-1234',email:'agro@bumiagro.id',address:'Jl. Solo-Yogya KM 45, Klaten 57416',tax_id:'23.456.789.0-009.000',payment_terms:'NET 60',pkp:'NON_PKP',pph:'none',category:'inventory',type:'company',status:'inactive',lastTx:'2024-10-15',notes:'Pemasok rempah & bahan herbal.',acct:'6-1000',defTax:'bebas',banks:[{name:'BRI',branch:'KCU Klaten',acc:'012-345-6789',isDefault:true,holder:'CV Bumi Agro Mandiri'}],bills:[]},
+  {id:'V015',code:'V-015',name:'PT Konsultansi Hukum Persada',contact_person:'Advokat Yusuf, SH',phone:'+62-21-9900-1122',email:'office@khpersada.com',address:'Menara Sudirman Lt. 18, Jl. Sudirman Kav. 60, Jakarta 12190',tax_id:'24.567.890.1-010.000',payment_terms:'NET 30',pkp:'PKP',pph:'pph23_2',category:'service',type:'company',status:'active',lastTx:'2025-02-28',notes:'Konsultasi hukum bisnis & ketenagakerjaan.',acct:'5-1070',defTax:'ppn_masukan',banks:[{name:'BCA',branch:'KCU Sudirman',acc:'123-456-0001',isDefault:true,holder:'PT Konsultansi Hukum Persada'}],bills:[]},
+  {id:'V016',code:'V-016',name:'PT Servis AC Nusantara',contact_person:'Rudi Hermawan',phone:'+62-21-1122-3344',email:'servis@acnusantara.id',address:'Jl. Pasar Minggu Raya No. 12, Jakarta Selatan 12740',tax_id:'25.678.901.2-011.000',payment_terms:'NET 14',pkp:'PKP',pph:'pph23_2',category:'service',type:'company',status:'active',lastTx:'2025-03-05',notes:'Servis & maintenance HVAC gedung kantor.',acct:'5-1000',defTax:'ppn_masukan',banks:[{name:'BNI',branch:'KCP Pasar Minggu',acc:'234-567-0002',isDefault:true,holder:'PT Servis AC Nusantara'}],bills:[]},
+  {id:'V017',code:'V-017',name:'Koperasi Nelayan Samudra',contact_person:'Pak Haji Ruslan',phone:'+62-231-555-9876',email:'koperasi.nelayan@gmail.com',address:'Pelabuhan Perikanan Nusantara, Brondong, Lamongan 62263',tax_id:'26.789.012.3-012.000',payment_terms:'NET 60',pkp:'NON_PKP',pph:'none',category:'inventory',type:'cooperative',status:'active',lastTx:'2025-01-20',notes:'Pemasok produk laut segar.',acct:'6-1000',defTax:'bebas',banks:[{name:'BRI',branch:'KCU Lamongan',acc:'345-678-0003',isDefault:true,holder:'Koperasi Nelayan Samudra'}],bills:[]},
+  {id:'V018',code:'V-018',name:'PT Cloud Infrastruktur Asia',contact_person:'Kevin Tanoto',phone:'+62-21-2233-4455',email:'billing@cia.co.id',address:'AXA Tower Lt. 37, Jl. Prof. Dr. Satrio, Jakarta 12940',tax_id:'27.890.123.4-013.000',payment_terms:'NET 30',pkp:'PKP',pph:'pph23_2',category:'service',type:'company',status:'active',lastTx:'2025-04-01',notes:'Cloud hosting & CDN. Billing bulanan otomatis.',acct:'5-1070',defTax:'ppn_masukan',banks:[{name:'BCA',branch:'KCU Kuningan',acc:'456-789-0004',isDefault:true,holder:'PT Cloud Infrastruktur Asia'}],bills:[]},
+  {id:'V019',code:'V-019',name:'CV Prima Plastik',contact_person:'Yanto Susilo',phone:'+62-21-3344-5566',email:'sales@primaPlastik.id',address:'Jl. Industri Raya No. 78, Tangerang 15820',tax_id:'28.901.234.5-014.000',payment_terms:'NET 30',pkp:'PKP',pph:'none',category:'inventory',type:'company',status:'active',lastTx:'2025-02-10',notes:'Supplier bahan baku plastik & resin.',acct:'6-1000',defTax:'ppn_masukan',banks:[{name:'Mandiri',branch:'KCP Tangerang Industri',acc:'567-890-0005',isDefault:true,holder:'CV Prima Plastik'}],bills:[]},
+  {id:'V020',code:'V-020',name:'PT Keamanan Andalan',contact_person:'Mayor (Purn.) Santoso',phone:'+62-21-4455-6677',email:'tender@keamananandalan.id',address:'Jl. Raya Pasar Jumat No. 55, Jakarta Selatan 12450',tax_id:'29.012.345.6-015.000',payment_terms:'NET 30',pkp:'PKP',pph:'pph23_2',category:'service',type:'company',status:'active',lastTx:'2025-04-30',notes:'Jasa keamanan gedung kantor. Kontrak tahunan.',acct:'5-1000',defTax:'ppn_masukan',banks:[{name:'BCA',branch:'KCU Cilandak',acc:'678-901-0006',isDefault:true,holder:'PT Keamanan Andalan'}],bills:[]},
+  {id:'V021',code:'V-021',name:'PT Furnitur Kantoran Modern',contact_person:'Melissa Gunawan',phone:'+62-21-5566-7788',email:'b2b@furniturmodern.id',address:'Jl. Mangga Dua Raya No. 100, Jakarta Utara 14430',tax_id:'30.123.456.7-016.000',payment_terms:'NET 45',pkp:'PKP',pph:'none',category:'expense',type:'company',status:'active',lastTx:'2024-12-20',notes:'Pengadaan furnitur & interior kantor.',acct:'5-1000',defTax:'ppn_masukan',banks:[{name:'BNI',branch:'KCU Mangga Dua',acc:'789-012-0007',isDefault:true,holder:'PT Furnitur Kantoran Modern'}],bills:[]},
+  {id:'V022',code:'V-022',name:'CV Sumber Energi Hijau',contact_person:'Wahyu Priyadi',phone:'+62-274-666-7777',email:'info@sumberenergihijau.id',address:'Jl. Palagan Tentara Pelajar KM 7, Sleman 55581',tax_id:'31.234.567.8-017.000',payment_terms:'NET 30',pkp:'PKP',pph:'pph23_2',category:'service',type:'company',status:'inactive',lastTx:'2024-09-30',notes:'Konsultansi & instalasi panel surya.',acct:'5-1070',defTax:'ppn_masukan',banks:[{name:'BCA',branch:'KCP Sleman',acc:'890-123-0008',isDefault:true,holder:'CV Sumber Energi Hijau'}],bills:[]},
+  {id:'V023',code:'V-023',name:'PT Laboratorium Analitik',contact_person:'Dr. Citra Nirmala',phone:'+62-21-6677-8899',email:'lab@analitiklab.co.id',address:'Kawasan Riset Serpong, Tangerang Selatan 15314',tax_id:'32.345.678.9-018.000',payment_terms:'NET 30',pkp:'PKP',pph:'pph23_2',category:'service',type:'company',status:'active',lastTx:'2025-03-10',notes:'Uji mutu bahan baku & produk jadi.',acct:'5-1070',defTax:'ppn_masukan',banks:[{name:'Mandiri',branch:'KCU Serpong',acc:'901-234-0009',isDefault:true,holder:'PT Laboratorium Analitik'}],bills:[]},
+  {id:'V024',code:'V-024',name:'UD Warung Katering Berkah',contact_person:'Ibu Sari',phone:'+62-812-3456-7890',email:'katering.berkah@gmail.com',address:'Jl. Kebun Jeruk Raya No. 22, Jakarta Barat 11530',tax_id:'',payment_terms:'NET 7',pkp:'NON_PKP',pph:'none',category:'expense',type:'individual',status:'active',lastTx:'2025-04-22',notes:'Katering makan siang karyawan. PIC: Ibu Sari.',acct:'5-1000',defTax:'bebas',banks:[{name:'BRI',branch:'KCP Kebun Jeruk',acc:'012-345-0010',isDefault:true,holder:'Sari Wahyuni'}],bills:[]},
+  {id:'V025',code:'V-025',name:'PT Distribusi Farmasi Mandiri',contact_person:'apt. Yunita Setiawan',phone:'+62-21-7788-9900',email:'distribusi@dfmandiri.id',address:'Jl. Pangeran Jayakarta No. 55, Jakarta 10730',tax_id:'33.456.789.0-019.000',payment_terms:'NET 30',pkp:'PKP',pph:'none',category:'inventory',type:'company',status:'active',lastTx:'2025-04-05',notes:'Distributor alat kesehatan & farmasi.',acct:'6-1000',defTax:'ppn_masukan',banks:[{name:'BCA',branch:'KCU Pangeran Jayakarta',acc:'123-456-0011',isDefault:true,holder:'PT Distribusi Farmasi Mandiri'}],bills:[]},
+];
+
+const BILLS={
+  BILL001:{ref:'BILL001',bill_number:'INV-V001-20250115',desc:'Komponen Elektronik - Panel LCD 24 inch (50 unit)',date:'15 Jan 2025',due:'14 Feb 2025',amount:82500000,subtotal:75000000,tax:7500000,status:'paid'},
+  BILL002:{ref:'BILL002',bill_number:'INV-V002-20250120',desc:'Perlengkapan Kantor (Meja + Kursi)',date:'20 Jan 2025',due:'4 Feb 2025',amount:21120000,subtotal:19200000,tax:1920000,status:'paid'},
+  BILL003:{ref:'BILL003',bill_number:'INV-V003-20250208',desc:'Jasa Pengiriman & Logistik — Februari 2025',date:'8 Feb 2025',due:'15 Feb 2025',amount:13750000,subtotal:12500000,tax:1250000,status:'paid'},
+  BILL004:{ref:'BILL004',bill_number:'INV-V004-20250315',desc:'Jasa Konsultasi — Audit Internal',date:'15 Mar 2025',due:'29 Apr 2025',amount:27500000,subtotal:25000000,tax:2500000,status:'paid'},
+  BILL005:{ref:'BILL005',bill_number:'INV-V005-20250315',desc:'Bahan Baku — Jagung Pipil Premium 5000 kg',date:'15 Mar 2025',due:'14 Mei 2025',amount:13750000,subtotal:12500000,tax:1250000,status:'overdue'},
+};
+
+const AP_BALANCE={V001:0,V002:0,V003:0,V004:0,V005:13750000};
+const CAT_COLORS={inventory:'#B83D08',service:'#1A46C8',expense:'#166638',cooperative:'#7A4D00',individual:'#8C857C'};
+const CAT_LABELS={inventory:'Inventory',service:'Service',expense:'Expense',cooperative:'Koperasi',individual:'Individu'};
+const PPH_LABELS={none:'Tidak ada pemotongan',pph23_2:'PPh 23 — 2% (jasa/sewa)',pph23_15:'PPh 23 — 15% (dividen/bunga)',pph4_final:'PPh 4(2) Final — konstruksi',pph21:'PPh 21 — individu'};
+const ACCT_LABELS={'6-1000':'6-1000 · Biaya Pokok Penjualan','5-1000':'5-1000 · Beban Operasional','5-1070':'5-1070 · Biaya Konsultan'};
+const DEFTAX_LABELS={ppn_masukan:'PPN Masukan 11%',bebas:'Bebas Pajak'};
+
+// State
+let activeVendorId=null, catFilter='', sortKey='name', sortDir=1, bankIdx=0;
+let currentPage=1, pageSize=50;
+let pendingStatusAction=null; // {id, newStatus}
+
+// Utils
+function fmt(n){if(!n||n===0)return'—';return'Rp '+n.toLocaleString('id-ID')}
+function initials(name){return name.trim().split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
+function isWA(p){return p&&(p.startsWith('+62')||p.startsWith('08'))}
+function toWALink(p){return'https://wa.me/'+p.replace(/[-\s()]/g,'').replace(/^\+/,'')}
+function daysSince(dateStr){
+  if(!dateStr)return 9999;
+  const d=new Date(dateStr),now=new Date('2025-04-23');
+  return Math.floor((now-d)/(1000*60*60*24));
+}
+function fmtLastTx(dateStr){
+  if(!dateStr)return{text:'Belum ada',stale:false};
+  const days=daysSince(dateStr);
+  const d=new Date(dateStr);
+  const fmt=d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+  if(days>60)return{text:`${fmt} · ${days} hari lalu`,stale:true};
+  return{text:fmt,stale:false};
+}
+
+// ── TABLE ─────────────────────────────────────────────────────────────────────
+function getFilteredSorted(){
+  const q=(document.getElementById('searchInput').value||'').toLowerCase();
+  let rows=VENDORS.filter(v=>{
+    if(catFilter&&v.category!==catFilter)return false;
+    if(q&&!(v.name.toLowerCase().includes(q)||v.code.toLowerCase().includes(q)))return false;
+    return true;
+  });
+  rows.sort((a,b)=>{
+    let va,vb;
+    if(sortKey==='balance'){va=AP_BALANCE[a.id]||0;vb=AP_BALANCE[b.id]||0;}
+    else if(sortKey==='lasttx'){va=a.lastTx||'';vb=b.lastTx||'';}
+    else{va=a.name.toLowerCase();vb=b.name.toLowerCase();}
+    if(va<vb)return-sortDir;
+    if(va>vb)return sortDir;
+    return 0;
+  });
+  return rows;
+}
+
+function renderTable(){
+  const rows=getFilteredSorted();
+  const total=VENDORS.length;
+  const activeCount=VENDORS.filter(v=>v.status==='active').length;
+  const totalAP=VENDORS.reduce((s,v)=>s+(AP_BALANCE[v.id]||0),0);
+
+  // pagination
+  const totalPages=Math.max(1,Math.ceil(rows.length/pageSize));
+  if(currentPage>totalPages)currentPage=1;
+  const start=(currentPage-1)*pageSize;
+  const pageRows=rows.slice(start,start+pageSize);
+
+  const tbody=document.getElementById('vendorTbody');
+  const empty=document.getElementById('emptyState');
+
+  if(!rows.length){tbody.innerHTML='';empty.style.display='block';}
+  else{
+    empty.style.display='none';
+    tbody.innerHTML=pageRows.map(v=>{
+      const bal=AP_BALANCE[v.id]||0;
+      const isInactive=v.status==='inactive';
+      const ltx=fmtLastTx(v.lastTx);
+      const tooltipText=isInactive
+        ?'Non-aktif: tidak dapat menerima transaksi baru'
+        :'Aktif: dapat menerima bill baru';
+      return`<tr class="${activeVendorId===v.id?'sel':''}${isInactive?' inactive-row':''}" onclick="openDrawer('${v.id}')">
+        <td>
+          <div class="vn-name">${v.name}</div>
+          <div class="vn-code">${v.code}</div>
+        </td>
+        <td><span class="cat-badge ${v.category}">${CAT_LABELS[v.category]||v.category}</span></td>
+        <td>
+          <div class="status-badge-wrap">
+            <span class="status-badge ${v.status==='active'?'active':'inactive'}">${v.status==='active'?'Aktif':'Non-aktif'}</span>
+            <div class="status-tooltip">${tooltipText}</div>
+          </div>
+        </td>
+        <td style="font-size:11px;color:var(--color-text-tertiary)">${v.payment_terms}</td>
+        <td><span class="${ltx.stale?'last-tx-stale':'last-tx-ok'}">${ltx.text}</span></td>
+        <td class="${bal>0?'num-warn':'num-dim'}">${bal>0?bal.toLocaleString('id-ID'):'—'}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // status bar
+  document.getElementById('stat-total').textContent=total;
+  document.getElementById('stat-shown').textContent=rows.length+' dari '+total;
+  document.getElementById('stat-active').textContent=activeCount;
+  document.getElementById('stat-ap').textContent=totalAP>0?totalAP.toLocaleString('id-ID'):'—';
+
+  // page info
+  document.getElementById('pageInfo').textContent=rows.length>0
+    ?`${start+1}–${Math.min(start+pageSize,rows.length)} dari ${rows.length}`:'';
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages){
+  const btns=document.getElementById('pageBtns');
+  if(totalPages<=1){btns.innerHTML='';return;}
+  let html='';
+  // prev
+  html+=`<button class="page-btn arrow" ${currentPage===1?'disabled':''} onclick="goPage(${currentPage-1})"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>`;
+  // pages
+  const pages=[];
+  if(totalPages<=7){for(let i=1;i<=totalPages;i++)pages.push(i);}
+  else{
+    pages.push(1);
+    if(currentPage>3)pages.push('…');
+    for(let i=Math.max(2,currentPage-1);i<=Math.min(totalPages-1,currentPage+1);i++)pages.push(i);
+    if(currentPage<totalPages-2)pages.push('…');
+    pages.push(totalPages);
+  }
+  pages.forEach(p=>{
+    if(p==='…')html+=`<button class="page-btn" disabled style="opacity:.3;cursor:default">…</button>`;
+    else html+=`<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
+  });
+  // next
+  html+=`<button class="page-btn arrow" ${currentPage===totalPages?'disabled':''} onclick="goPage(${currentPage+1})"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>`;
+  btns.innerHTML=html;
+}
+
+function goPage(p){currentPage=p;renderTable();}
+function changePageSize(){pageSize=parseInt(document.getElementById('pageSizeSelect').value);currentPage=1;renderTable();}
+function sortCol(key){
+  document.querySelectorAll('thead th').forEach(th=>th.classList.remove('sort-asc','sort-desc'));
+  if(sortKey===key)sortDir*=-1;else{sortKey=key;sortDir=1;}
+  const map={name:'th-name',lasttx:'th-lasttx',balance:'th-balance'};
+  if(map[key]){const el=document.getElementById(map[key]);if(el)el.classList.add(sortDir===1?'sort-asc':'sort-desc');}
+  currentPage=1;renderTable();
+}
+function setCat(el,cat){catFilter=cat;document.querySelectorAll('#catChips .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');currentPage=1;renderTable();}
+
+// ── DRAWER ────────────────────────────────────────────────────────────────────
+function openDrawer(id){
+  activeVendorId=id;
+  const v=VENDORS.find(x=>x.id===id);
+  if(!v)return;
+  renderTable();
+  const col=CAT_COLORS[v.category]||'#8C857C';
+  const ini=initials(v.name);
+
+  document.getElementById('dAvatar').style.cssText=`background:${col};font-size:14px`;
+  document.getElementById('dAvatar').textContent=ini;
+  document.getElementById('dName').textContent=v.name;
+  document.getElementById('dMeta').textContent=`${v.code} · ${CAT_LABELS[v.category]||''} · ${v.payment_terms}`;
+
+  document.getElementById('dVidAvatar').style.cssText=`background:${col}`;
+  document.getElementById('dVidAvatar').textContent=ini;
+  document.getElementById('dVidName').textContent=v.name;
+  document.getElementById('dVidCode').textContent=`${v.code} · ${v.contact_person}`;
+
+  const bal=AP_BALANCE[id]||0;
+  document.getElementById('dApStrip').innerHTML=bal>0
+    ?`<div class="ap-strip"><span class="ap-strip-lbl">AP Outstanding</span><span class="ap-strip-amt">${fmt(bal)}</span></div>`:'';
+
+  const phoneHTML=v.phone&&isWA(v.phone)
+    ?`<a class="wa-link" href="${toWALink(v.phone)}" target="_blank"><svg class="wa-icon" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke="#25D366" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${v.phone}</a>`
+    :`<span>${v.phone||'—'}</span>`;
+
+  const typeLabels={company:'Badan Usaha',individual:'Individu',government:'Instansi Pemerintah',cooperative:'Koperasi'};
+  document.getElementById('dIdentRows').innerHTML=`
+    <div class="info-row"><label>Tipe</label><span>${typeLabels[v.type]||v.type}</span></div>
+    <div class="info-row"><label>Telepon</label>${phoneHTML}</div>
+    <div class="info-row"><label>Email</label><span>${v.email||'—'}</span></div>
+    <div class="info-row"><label>NPWP</label><span style="font-family:var(--font-mono);font-size:11px">${v.tax_id||'—'}</span></div>
+    <div class="info-row"><label>Alamat</label><span style="text-align:right;max-width:200px;line-height:1.4;font-size:11px">${v.address||'—'}</span></div>
+    ${v.notes?`<div class="info-row"><label>Catatan</label><span style="text-align:right;max-width:200px;line-height:1.4;font-size:11px;color:var(--color-text-tertiary)">${v.notes}</span></div>`:''}
+  `;
+
+  const bills=v.bills.map(b=>BILLS[b]).filter(Boolean);
+  const totalBill=bills.reduce((s,b)=>s+b.amount,0);
+  const totalPaid=bills.filter(b=>b.status==='paid').reduce((s,b)=>s+b.amount,0);
+  document.getElementById('dAcctRows').innerHTML=`
+    <div class="info-row"><label>Akun AP</label><span style="font-family:var(--font-mono);font-size:11px">2-1100 · Utang Usaha</span></div>
+    <div class="info-row"><label>Akun Beban Default</label><span style="font-size:11px">${ACCT_LABELS[v.acct]||v.acct||'—'}</span></div>
+    <div class="info-row"><label>Kode Pajak Default</label><span>${DEFTAX_LABELS[v.defTax]||'—'}</span></div>
+    <div class="info-row"><label>Total Transaksi</label><span>${bills.length} bill</span></div>
+    <div class="info-row"><label>Total Nilai</label><span style="font-family:var(--font-mono);font-size:11px">${fmt(totalBill)}</span></div>
+    ${totalPaid?`<div class="info-row"><label>Sudah Dibayar</label><span style="font-family:var(--font-mono);font-size:11px;color:var(--success-text)">${fmt(totalPaid)}</span></div>`:''}
+    ${bal?`<div class="info-row"><label>AP Outstanding</label><span style="font-family:var(--font-mono);font-size:11px;color:var(--warning-text)">${fmt(bal)}</span></div>`:''}
+  `;
+
+  // Bank tab
+  let bankHTML='';
+  if(v.banks&&v.banks.length){v.banks.forEach(b=>{bankHTML+=`<div class="bank-card"><div class="bank-card-head"><span class="bank-card-name">${b.name}${b.branch?' — '+b.branch:''}</span>${b.isDefault?'<span class="bank-default">Utama</span>':''}</div><div class="bank-row"><span>No. Rekening:</span><span class="val">${b.acc}</span></div><div class="bank-row"><span>Atas Nama:</span><span class="val">${b.holder}</span></div></div>`;});}
+  else bankHTML='<div style="text-align:center;padding:32px;font-size:12px;color:var(--color-text-tertiary)">Belum ada rekening bank</div>';
+  document.getElementById('dBankCards').innerHTML=bankHTML;
+
+  // Bills tab
+  const stMap={paid:'badge-paid',overdue:'badge-overdue',unpaid:'badge-unpaid',partial:'badge-partial'};
+  const stLabel={paid:'Lunas',overdue:'Jatuh Tempo',unpaid:'Belum Bayar',partial:'Bayar Sebagian'};
+  let billHTML='';
+  if(bills.length){bills.forEach(b=>{billHTML+=`<div class="bill-card"><div class="bill-card-top"><div class="bill-card-ref">${b.bill_number}</div><div class="bill-card-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div></div><div class="bill-card-desc">${b.desc}</div><div class="bill-card-foot"><div style="display:flex;align-items:center;gap:6px"><span class="badge ${stMap[b.status]||'badge-unpaid'}">${stLabel[b.status]||b.status}</span><span class="bill-card-date">Due: ${b.due}</span></div><span class="bill-card-amt">${fmt(b.amount)}</span></div></div>`;});}
+  else billHTML='<div style="text-align:center;padding:32px;font-size:12px;color:var(--color-text-tertiary)">Belum ada bill</div>';
+  document.getElementById('dBillCards').innerHTML=billHTML;
+
+  // Pajak tab
+  document.getElementById('dPajakRows').innerHTML=`
+    <div class="dsec"><div class="dlbl">Status Perpajakan</div>
+    <div class="info-row"><label>NPWP</label><span style="font-family:var(--font-mono);font-size:11px">${v.tax_id||'—'}</span></div>
+    <div class="info-row"><label>Status PKP</label><span><span class="badge ${v.pkp==='PKP'?'badge-paid':'badge-unpaid'}">${v.pkp}</span></span></div>
+    <div class="info-row"><label>Pemotongan PPh</label><span style="font-size:11px">${PPH_LABELS[v.pph]||'—'}</span></div>
+    </div>
+    ${v.notes?`<div class="dsec"><div class="dlbl">Catatan Internal</div><div style="font-size:12px;color:var(--color-text-secondary);line-height:1.6;background:var(--color-surface-sunken);border-radius:var(--radius-sm);padding:10px 12px">${v.notes}</div></div>`:''}
+  `;
+
+  // Footer: toggle status button
+  const toggleBtn=document.getElementById('btnToggleStatus');
+  const newBillBtn=document.getElementById('btnNewBill');
+  if(v.status==='active'){
+    toggleBtn.className='btn-toggle-status deactivate';
+    toggleBtn.innerHTML=`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Nonaktifkan`;
+    newBillBtn.style.display='';
+  } else {
+    toggleBtn.className='btn-toggle-status activate';
+    toggleBtn.innerHTML=`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Aktifkan`;
+    newBillBtn.style.display='none';
+  }
+
+  switchTab('info');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+}
+
+function closeDrawer(){
+  activeVendorId=null;
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+  renderTable();
+}
+
+function switchTab(tab){
+  const tabs=['info','bank','bills','pajak'];
+  document.querySelectorAll('.dtab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===tab));
+  document.querySelectorAll('.dpane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+// ── STATUS TOGGLE ─────────────────────────────────────────────────────────────
+function handleToggleStatus(){
+  if(!activeVendorId)return;
+  confirmDeactivate(activeVendorId);
+}
+
+function confirmDeactivate(id){
+  const v=VENDORS.find(x=>x.id===id);
+  if(!v)return;
+  const isDeactivating=v.status==='active';
+  pendingStatusAction={id,newStatus:isDeactivating?'inactive':'active'};
+  document.getElementById('dialogTitle').textContent=isDeactivating?'Nonaktifkan Vendor?':'Aktifkan Vendor Kembali?';
+  document.getElementById('dialogBody').innerHTML=isDeactivating
+    ?`Menonaktifkan <strong>${v.name}</strong> akan mencegah pembuatan bill baru dari vendor ini. Bill yang sudah ada tidak terpengaruh. Lanjutkan?`
+    :`Mengaktifkan kembali <strong>${v.name}</strong> memungkinkan pembuatan bill baru dari vendor ini. Lanjutkan?`;
+  const confirmBtn=document.getElementById('dialogConfirmBtn');
+  confirmBtn.textContent=isDeactivating?'Nonaktifkan':'Aktifkan';
+  confirmBtn.className='btn-dialog-confirm'+(isDeactivating?'':' activate');
+  document.getElementById('dialogOverlay').classList.add('open');
+}
+
+function executeStatusChange(){
+  if(!pendingStatusAction)return;
+  const v=VENDORS.find(x=>x.id===pendingStatusAction.id);
+  if(v){
+    v.status=pendingStatusAction.newStatus;
+    showToast(v.status==='active'?`${v.name} diaktifkan kembali`:`${v.name} dinonaktifkan`);
+    closeDialog();
+    if(activeVendorId===v.id)openDrawer(v.id);
+    else renderTable();
+  }
+}
+
+function closeDialog(){document.getElementById('dialogOverlay').classList.remove('open');pendingStatusAction=null;}
+
+// ── ATTENTION SECTION ─────────────────────────────────────────────────────────
+function toggleAttn(){
+  const body=document.getElementById('attnBody');
+  const chev=document.getElementById('attnChev');
+  const open=body.style.display!=='none';
+  body.style.display=open?'none':'block';
+  chev.classList.toggle('collapsed',open);
+}
+function toggleAcc(id){
+  const body=document.getElementById(id);
+  const chevId='chev'+id.charAt(0).toUpperCase()+id.slice(1).replace('acc','');
+  const chevEl=document.getElementById('chev'+id.charAt(3).toUpperCase()+id.slice(4));
+  const open=body.style.display==='block';
+  body.style.display=open?'none':'block';
+  const chevs={accOverdue:'chevOverdue',accDormant:'chevDormant'};
+  const c=document.getElementById(chevs[id]);
+  if(c)c.classList.toggle('open',!open);
+}
+
+// ── FILTER DRAWER ─────────────────────────────────────────────────────────────
+function openFilterDrawer(){document.getElementById('fdOverlay').classList.add('open');document.getElementById('fdrawer').classList.add('open');}
+function closeFilterDrawer(){document.getElementById('fdOverlay').classList.remove('open');document.getElementById('fdrawer').classList.remove('open');}
+function updateFilterCount(){
+  const pkp=document.getElementById('fdPkp').value;
+  const term=document.getElementById('fdTerm').value;
+  const df=document.getElementById('fdDateFrom').value,dt=document.getElementById('fdDateTo').value;
+  const n=(pkp?1:0)+(term?1:0)+((df||dt)?1:0);
+  const el=document.getElementById('filterCount');
+  el.textContent=n;el.classList.toggle('show',n>0);
+}
+function setDateShortcut(el,type){
+  document.querySelectorAll('.fd-shortcut').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+  const now=new Date('2025-04-23');
+  let from,to=now.toISOString().slice(0,10);
+  if(type==='today'){from=to;}
+  else if(type==='week'){const d=new Date(now);d.setDate(now.getDate()-now.getDay());from=d.toISOString().slice(0,10);}
+  else if(type==='month'){from=new Date(now.getFullYear(),now.getMonth(),1).toISOString().slice(0,10);}
+  else if(type==='quarter'){const q=Math.floor(now.getMonth()/3);from=new Date(now.getFullYear(),q*3,1).toISOString().slice(0,10);}
+  document.getElementById('fdDateFrom').value=from;
+  document.getElementById('fdDateTo').value=to;
+  updateFilterCount();
+}
+function clearDateShortcuts(){document.querySelectorAll('.fd-shortcut').forEach(s=>s.classList.remove('on'));updateFilterCount();}
+function applyFilters(){closeFilterDrawer();renderTable();}
+function resetFilters(){
+  document.getElementById('fdPkp').value='';
+  document.getElementById('fdTerm').value='';
+  document.getElementById('fdDateFrom').value='';
+  document.getElementById('fdDateTo').value='';
+  document.querySelectorAll('.fd-shortcut').forEach(s=>s.classList.remove('on'));
+  updateFilterCount();
+}
+
+// ── AI PANEL ──────────────────────────────────────────────────────────────────
+function openAIPanel(){document.getElementById('aiOverlay').classList.add('open');document.getElementById('aiPanel').classList.add('open');}
+function closeAIPanel(){document.getElementById('aiOverlay').classList.remove('open');document.getElementById('aiPanel').classList.remove('open');}
+
+// ── ADD/EDIT PAGE ─────────────────────────────────────────────────────────────
+function openAddVendor(isEdit,vid){
+  document.getElementById('apPageTitle').textContent=isEdit?'Edit Vendor':'Tambah Vendor Baru';
+  document.getElementById('apPageSub').textContent=isEdit?'— Perubahan akan langsung tersimpan':'— Field bertanda * wajib diisi';
+  document.getElementById('apSaveLabel').textContent=isEdit?'Simpan Perubahan':'Simpan Vendor';
+  document.getElementById('apFootHint').textContent=isEdit?'Perubahan akan diaplikasikan ke semua transaksi terkait.':'Vendor akan langsung aktif setelah disimpan.';
+  document.getElementById('photoPreviewImg').style.display='none';
+  document.getElementById('photoPlaceholderIcon').style.display='block';
+  document.getElementById('bankRepeater').innerHTML='';
+  bankIdx=0;
+  if(isEdit&&vid){
+    const v=VENDORS.find(x=>x.id===vid);
+    if(v){
+      document.getElementById('fCode').value=v.code;
+      document.getElementById('fCategory').value=v.category;
+      document.getElementById('fName').value=v.name;
+      document.getElementById('fType').value=v.type;
+      document.getElementById('fTerm').value=v.payment_terms;
+      document.getElementById('fAddress').value=v.address;
+      document.getElementById('fPhone').value=v.phone;
+      document.getElementById('fEmail').value=v.email;
+      document.getElementById('fContact').value=v.contact_person;
+      document.getElementById('fNpwp').value=v.tax_id;
+      selectPKP(v.pkp);
+      document.getElementById('fPph').value=v.pph;
+      document.getElementById('fAcct').value=v.acct||'';
+      document.getElementById('fDefTax').value=v.defTax||'';
+      document.getElementById('fNotes').value=v.notes||'';
+      if(v.banks)v.banks.forEach(b=>addBankEntry(b));
+    }
+  } else {
+    ['fCode','fName','fAddress','fPhone','fEmail','fContact','fNpwp','fNotes'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('fCategory').value='';
+    document.getElementById('fType').value='company';
+    document.getElementById('fTerm').value='NET 30';
+    document.getElementById('fAcct').value='';
+    document.getElementById('fDefTax').value='';
+    document.getElementById('fPph').value='none';
+    selectPKP('PKP');
+  }
+  document.getElementById('addPage').classList.add('open');
+}
+function openEditVendor(){if(activeVendorId)openAddVendor(true,activeVendorId);}
+function closeAddPage(){document.getElementById('addPage').classList.remove('open');}
+function saveVendor(){
+  if(!document.getElementById('fName').value.trim()){showToast('Nama vendor wajib diisi');return;}
+  closeAddPage();
+  showToast('Vendor berhasil disimpan');
+}
+function selectPKP(val){
+  document.getElementById('pkpOptPKP').classList.toggle('selected',val==='PKP');
+  document.getElementById('pkpOptNON').classList.toggle('selected',val==='NON_PKP');
+}
+function addBankEntry(prefill){
+  bankIdx++;
+  const wrap=document.getElementById('bankRepeater');
+  const div=document.createElement('div');
+  div.className='bank-entry';div.id='bentry-'+bankIdx;
+  div.innerHTML=`<div class="bank-entry-head"><span class="bank-entry-num">Rekening #${bankIdx}</span><button class="btn-del-bank" onclick="removeBankEntry('bentry-${bankIdx}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button></div>
+  <div class="ap-grid ap-2"><div class="ap-field"><label>Nama Bank <span class="req">*</span></label><select><option>BCA</option><option>Mandiri</option><option>BNI</option><option>BRI</option><option>CIMB Niaga</option><option>Danamon</option><option>Lainnya</option></select></div><div class="ap-field"><label>Cabang</label><input type="text" placeholder="KCU Sudirman" value="${prefill?.branch||''}"></div></div>
+  <div class="ap-grid ap-2"><div class="ap-field"><label>No. Rekening <span class="req">*</span></label><input type="text" placeholder="123-456-7890" style="font-family:var(--font-mono)" value="${prefill?.acc||''}"></div><div class="ap-field"><label>Atas Nama <span class="req">*</span></label><input type="text" placeholder="PT Nama Vendor" value="${prefill?.holder||''}"></div></div>
+  <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;color:var(--color-text-secondary);margin-top:6px"><input type="checkbox" ${(prefill?.isDefault||bankIdx===1)?'checked':''} style="width:14px;height:14px;accent-color:var(--color-action)">Rekening utama (default untuk pembayaran)</label>`;
+  wrap.appendChild(div);
+  if(prefill?.name){const sel=div.querySelector('select');[...sel.options].forEach(o=>{if(o.value===prefill.name)o.selected=true;});}
+}
+function removeBankEntry(id){const el=document.getElementById(id);if(el)el.remove();}
+function triggerPhotoUpload(){document.getElementById('photoInput').click();}
+function handlePhotoUpload(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{document.getElementById('photoPreviewImg').src=ev.target.result;document.getElementById('photoPreviewImg').style.display='block';document.getElementById('photoPlaceholderIcon').style.display='none';};
+  reader.readAsDataURL(file);
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+
+// -- EXPORT
+function toggleExpMenu(){
+  var m=document.getElementById('expMenu');
+  m.classList.toggle('open');
+  if(m.classList.contains('open')){
+    setTimeout(function(){document.addEventListener('click',function h(e){
+      if(!e.target.closest('.exp-wrap'))m.classList.remove('open');
+      document.removeEventListener('click',h);
+    });},10);
+  }
+}
+function doExport(scope,fmt){
+  document.getElementById('expMenu').classList.remove('open');
+  var rows=scope==='all'?VENDORS:getFilteredSorted().slice((currentPage-1)*pageSize,(currentPage-1)*pageSize+pageSize);
+  var headers=['Kode','Nama Vendor','Kategori','Status','Payment Term','PKP','NPWP','Telepon','Email','Alamat','Transaksi Terakhir','AP Balance'];
+  var data=rows.map(function(v){return[
+    v.code,v.name,CAT_LABELS[v.category]||v.category,
+    v.status==='active'?'Aktif':'Non-aktif',
+    v.payment_terms,v.pkp,v.tax_id||'',v.phone||'',v.email||'',v.address||'',
+    v.lastTx||'',AP_BALANCE[v.id]||0
+  ];});
+  var esc=function(v){
+    v=String(v);
+    return (v.indexOf(',')>=0||v.indexOf('"')>=0||v.indexOf('\n')>=0)?'"'+v.replace(/"/g,'""')+'"':v;
+  };
+  var csv=[headers.map(esc).join(',')].concat(data.map(function(r){return r.map(esc).join(',');})).join('\n');
+  if(fmt==='xlsx'){csv=String.fromCharCode(0xFEFF)+csv;}
+  var blob=new Blob([csv],{type:'text/csv'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='vendors_'+scope+'_'+new Date().toISOString().slice(0,10)+(fmt==='xlsx'?'.xlsx':'.csv');
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},200);
+  showToast('Export berhasil ('+rows.length+' vendor)');
+}
+
+// -- INIT ──────────────────────────────────────────────────────────────────────
+renderTable();
+document.getElementById('th-name').classList.add('sort-asc');
+</script>
+</body>
+</html>
