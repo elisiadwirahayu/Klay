@@ -93,14 +93,88 @@ body{font-family:var(--font-sans);background:var(--color-surface-base);color:var
 .btn-ghost svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
 .btn-ghost:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
 
-/* ── CLOSING PROGRESS ── */
-.closing-progress{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);padding:10px var(--space-5);margin-bottom:var(--space-3);display:flex;align-items:center;gap:12px}
-.cp-icon{width:26px;height:26px;background:var(--color-action);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.cp-icon svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:1.5}
-.cp-label{font-size:12px;font-weight:600;color:var(--color-text-secondary);white-space:nowrap}
-.cp-pct{font-size:12px;font-weight:800;color:var(--color-action);white-space:nowrap}
-.cp-bar-track{flex:1;height:5px;background:var(--color-surface-sunken);border-radius:var(--radius-full);overflow:hidden}
-.cp-bar-fill{height:100%;background:linear-gradient(90deg,var(--color-action),#4D72E0);border-radius:var(--radius-full);transition:width 0.6s ease}
+/* ── CLOSING ASSISTANT ── */
+.ca-section{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);margin-bottom:var(--space-3);overflow:hidden}
+.ca-head{display:flex;align-items:center;justify-content:space-between;padding:10px var(--space-5);cursor:pointer;transition:background var(--transition-fast)}
+.ca-head:hover{background:var(--color-surface-sunken)}
+.ca-head-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.ca-prog-icon{width:24px;height:24px;background:var(--color-action);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ca-prog-icon svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:1.5}
+.ca-prog-label{font-size:12px;font-weight:600;color:var(--color-text-secondary);white-space:nowrap}
+.ca-prog-track{flex:1;height:4px;background:var(--color-surface-sunken);border-radius:var(--radius-full);overflow:hidden;max-width:180px}
+.ca-prog-fill{height:100%;background:var(--color-action);border-radius:var(--radius-full);transition:width .6s ease}
+.ca-prog-pct{font-size:12px;font-weight:700;color:var(--color-action);white-space:nowrap}
+.ca-prog-period{font-size:11px;color:var(--color-text-tertiary);white-space:nowrap}
+.ca-chevron{width:15px;height:15px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;transition:transform var(--transition-base);flex-shrink:0}
+.ca-chevron.open{transform:rotate(180deg)}
+.ca-body{border-top:1px solid var(--color-border-default)}
+.ca-body.collapsed{display:none}
+.ca-ai-row{display:flex;align-items:flex-start;gap:10px;padding:11px var(--space-5);background:var(--color-surface-sunken);border-bottom:1px solid var(--color-border-default)}
+.ca-ai-badge{display:flex;align-items:center;gap:4px;flex-shrink:0;padding-top:2px;white-space:nowrap}
+.ca-ai-icon{width:18px;height:18px;border-radius:var(--radius-sm);background:#EBF0FD;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ca-ai-icon svg{width:10px;height:10px;color:var(--color-action)}
+.ca-ai-label{font-size:10px;font-weight:700;color:var(--color-action)}
+.ca-ai-content{flex:1;min-width:0}
+.ca-ai-text{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.ca-ai-text strong{font-weight:600;color:var(--color-text-primary)}
+.ca-ai-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.ca-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:2px 8px;border-radius:var(--radius-full);white-space:nowrap}
+.ca-chip svg{width:9px;height:9px;flex-shrink:0}
+.ca-chip-ok{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.ca-chip-ok svg{stroke:var(--success-text);fill:none}
+.ca-chip-down{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.ca-chip-down svg{stroke:var(--danger-text);fill:none}
+.ca-chip-warn{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.ca-chip-warn svg{fill:var(--warning-text)}
+.ca-chip-info{background:#EBF0FD;color:var(--color-action);border:1px solid #C8D8FA}
+.ca-chip-info svg{stroke:var(--color-action);fill:none}
+.ca-cards{padding:var(--space-3) var(--space-5);display:flex;flex-direction:column;gap:var(--space-2)}
+.ca-card{border:1px solid var(--color-border-default);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:10px 12px;display:flex;gap:12px;align-items:flex-start}
+.ca-card-body{flex:1;min-width:0}
+.ca-tag{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--radius-full);margin-bottom:4px;letter-spacing:.03em}
+.ca-tag-neu{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+.ca-tag-warn{background:var(--warning-surface);color:var(--warning-text)}
+.ca-tag-err{background:var(--danger-surface);color:var(--danger-text)}
+.ca-tag-info{background:#EBF0FD;color:var(--color-action)}
+.ca-card-title{font-size:12px;font-weight:600;color:var(--color-text-primary);margin-bottom:2px}
+.ca-card-desc{font-size:11px;color:var(--color-text-secondary);line-height:1.4}
+.ca-je-pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.ca-je-pill{font-family:var(--font-mono);font-size:10px;padding:1px 7px;border-radius:var(--radius-full);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);color:var(--color-text-tertiary)}
+.ca-card-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;padding-top:2px}
+.ca-count{font-size:20px;font-weight:700;line-height:1;color:var(--color-text-primary);font-family:var(--font-mono)}
+.ca-count-label{font-size:10px;color:var(--color-text-tertiary);text-align:right}
+.ca-btns{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.ca-btn{font-family:var(--font-sans);font-size:11px;font-weight:500;padding:4px 10px;border-radius:var(--radius-sm);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-secondary);cursor:pointer;transition:all var(--transition-fast)}
+.ca-btn:hover{border-color:#c8c2ba;background:var(--color-surface-sunken)}
+.ca-btn.ca-btn-blue{border:none;background:var(--color-action);color:#fff}
+.ca-btn.ca-btn-blue:hover{background:var(--color-action-hover)}
+.ca-log-head{display:flex;align-items:center;justify-content:space-between;padding:9px var(--space-5);cursor:pointer;border-top:1px solid var(--color-border-default);user-select:none;background:var(--color-surface-sunken)}
+.ca-log-label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--color-text-secondary)}
+.ca-log-label svg{width:13px;height:13px;stroke:var(--color-text-secondary);fill:none;flex-shrink:0}
+.ca-log-toggle{font-size:11px;color:var(--color-text-tertiary)}
+.ca-log-body{padding:0 var(--space-5) var(--space-3);display:flex;flex-direction:column;gap:5px}
+.ca-log-item{display:flex;align-items:flex-start;gap:9px;padding:7px 10px;background:var(--color-surface-sunken);border-radius:var(--radius-sm)}
+.ca-log-dot{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ca-dot-ok{background:var(--success-surface);border:1px solid var(--success-border)}
+.ca-dot-ok svg{stroke:var(--success-text);fill:none;width:9px;height:9px;stroke-width:2.5}
+.ca-dot-info{background:#EBF0FD;border:1px solid #C8D8FA}
+.ca-dot-info svg{stroke:var(--color-action);fill:none;width:9px;height:9px;stroke-width:2}
+.ca-log-text{flex:1;min-width:0}
+.ca-log-action{font-size:11px;font-weight:600;color:var(--color-text-primary)}
+.ca-log-meta{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.ca-log-count{font-size:11px;font-weight:600;color:var(--color-text-tertiary);white-space:nowrap;flex-shrink:0;align-self:center;font-family:var(--font-mono)}
+
+/* ── KURS TOGGLE ── */
+.kurs-toggle-wrap{display:inline-flex;align-items:center;gap:6px}
+.kurs-toggle-label{font-size:11px;color:var(--color-text-tertiary)}
+.kurs-switch{position:relative;width:28px;height:16px;flex-shrink:0;cursor:pointer;display:inline-block}
+.kurs-switch input{opacity:0;width:0;height:0;position:absolute}
+.kurs-track{position:absolute;inset:0;background:var(--color-border-default);border-radius:var(--radius-full);transition:background var(--transition-base)}
+.kurs-switch input:checked+.kurs-track{background:var(--color-action)}
+.kurs-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;background:#fff;border-radius:50%;transition:left var(--transition-base);pointer-events:none}
+.kurs-switch input:checked~.kurs-thumb{left:14px}
+.kurs-detail{display:none;font-size:10px;color:var(--color-text-tertiary);font-family:var(--font-sans);font-weight:400;margin-top:1px}
+.kurs-visible .kurs-detail{display:block}
 
 /* ── ANOMALI SECTION (new grouped accordion) ── */
 .anom-section{background:#FFFEF0;border:1px solid #E8C870;border-radius:var(--radius-lg);margin-bottom:var(--space-3);overflow:hidden}
@@ -507,7 +581,7 @@ td{padding:10px 14px;vertical-align:middle}
         <div class="page-head">
           <div>
             <div class="page-title">General Ledger</div>
-            <div style="font-size:12px;color:var(--color-text-tertiary);margin-top:2px">PT Sejahtera Makmur · Jan–Apr 2025</div>
+            <div style="font-size:12px;color:var(--color-text-tertiary);margin-top:2px">PT Sejahtera Makmur · Periode saat ini: Januari 2025</div>
           </div>
           <div class="head-right">
             <div class="export-wrap">
@@ -530,29 +604,156 @@ td{padding:10px 14px;vertical-align:middle}
           </div>
         </div>
 
-        <!-- CLOSING PROGRESS -->
-        <div class="closing-progress">
-          <div class="cp-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
-          <span class="cp-label">Closing Progress</span>
-          <span class="cp-pct">80%</span>
-          <div class="cp-bar-track"><div class="cp-bar-fill" style="width:80%"></div></div>
-        </div>
+        <!-- CLOSING ASSISTANT -->
+        <div class="ca-section" id="caSection">
 
-        <!-- ANOMALI SECTION -->
-        <div class="anom-section" id="anomSection">
-          <div class="anom-head" onclick="toggleAnomsection()">
-            <div class="anom-head-icon" id="anomHeadIcon">
-              <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <!-- HEADER (always visible, clickable) -->
+          <div class="ca-head" onclick="toggleCA()">
+            <div class="ca-head-left">
+              <div class="ca-prog-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+              <span class="ca-prog-label">Closing Progress</span>
+              <div class="ca-prog-track"><div class="ca-prog-fill" style="width:60%"></div></div>
+              <span class="ca-prog-pct">60%</span>
+              <span class="ca-prog-period">Jan 2025</span>
             </div>
-            <div class="anom-head-text">
-              <div class="anom-head-title" id="anomHeadTitle">Anomali Transaksi Terdeteksi</div>
-              <div class="anom-head-sub" id="anomHeadSub">AI mendeteksi pola transaksi menyimpang. Peninjauan diperlukan untuk memastikan integritas data sebelum proses penutupan periode dilakukan.</div>
+            <svg class="ca-chevron open" id="caChevron" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+          </div>
+
+          <!-- BODY (accordion content) -->
+          <div class="ca-body" id="caBody">
+
+            <!-- AI SUMMARY ROW -->
+            <div class="ca-ai-row">
+              <div class="ca-ai-badge">
+                <div class="ca-ai-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor"/></svg></div>
+                <span class="ca-ai-label">Klay AI</span>
+              </div>
+              <div class="ca-ai-content">
+                <div class="ca-ai-text">Saldo berjalan per hari ini <strong>Rp 616.625.000</strong>, turun <strong>Rp 33jt</strong> dari kemarin akibat pelunasan piutang INV-C001. GL periode Jan 2025 <strong>seimbang</strong> — total debit = kredit. Ada 5 entri baru masuk sejak pagi. Masih ada 1 anomali dan 12 transaksi belum direkon sebelum closing bisa diselesaikan.</div>
+                <div class="ca-ai-chips">
+                  <span class="ca-chip ca-chip-ok"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>GL seimbang</span>
+                  <span class="ca-chip ca-chip-down"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>Saldo −Rp 33jt hari ini</span>
+                  <span class="ca-chip ca-chip-warn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>1 anomali pending</span>
+                  <span class="ca-chip ca-chip-info"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>12 unmatched</span>
+                </div>
+              </div>
             </div>
-            <svg class="anom-chevron open" id="anomChevron" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
-          </div>
-          <div class="anom-body" id="anomBody">
-            <div id="anomGroupList"></div>
-          </div>
+
+            <!-- ACTION CARDS -->
+            <div class="ca-cards">
+
+              <!-- JE hari ini -->
+              <div class="ca-card" style="border-left:2px solid var(--color-border-default)">
+                <div class="ca-card-body">
+                  <div class="ca-tag ca-tag-neu">Hari ini</div>
+                  <div class="ca-card-title">5 journal entry masuk hari ini</div>
+                  <div class="ca-card-desc">3 sudah di-post ke GL · 2 masih pending review</div>
+                  <div class="ca-je-pills">
+                    <span class="ca-je-pill">INV-C001-20250118</span>
+                    <span class="ca-je-pill">BILL-2025-0003</span>
+                    <span class="ca-je-pill">JE-2025-0019</span>
+                    <span class="ca-je-pill">+2 lainnya</span>
+                  </div>
+                </div>
+                <div class="ca-card-right">
+                  <div class="ca-count">5</div><div class="ca-count-label">JE hari ini</div>
+                  <div class="ca-btns">
+                    <button class="ca-btn" onclick="filterTodayPosted()">Lihat yang posted</button>
+                    <button class="ca-btn ca-btn-blue" onclick="alert('Buka halaman Journal Entry')">Lihat pending di JE</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Anomali -->
+              <div class="ca-card" id="caCardAnom" style="border-left:2px solid #EF9F27">
+                <div class="ca-card-body">
+                  <div class="ca-tag ca-tag-warn">Anomali</div>
+                  <div class="ca-card-title">Fluktuasi nominal tidak wajar</div>
+                  <div class="ca-card-desc">Beban Gaji JE-2025-0001 melebihi rata-rata historis 16.9%</div>
+                </div>
+                <div class="ca-card-right">
+                  <div class="ca-count" id="caAnomCount">1</div><div class="ca-count-label">entri</div>
+                  <div class="ca-btns">
+                    <button class="ca-btn" onclick="scrollToRow('JE-2025-0001')">Lihat di tabel</button>
+                    <button class="ca-btn" onclick="markValid('JE-2025-0001');updateCACards()">Tandai valid</button>
+                    <button class="ca-btn ca-btn-blue" onclick="alert('Membuka JE-2025-0001 di halaman Journal Entry')">Lihat di Jurnal Entry</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- JE pending -->
+              <div class="ca-card" style="border-left:2px solid #E24B4A">
+                <div class="ca-card-body">
+                  <div class="ca-tag ca-tag-err">Perlu aksi</div>
+                  <div class="ca-card-title">3 journal entry belum di-post</div>
+                  <div class="ca-card-desc">Belum tercermin di GL dan saldo periode ini</div>
+                </div>
+                <div class="ca-card-right">
+                  <div class="ca-count">3</div><div class="ca-count-label">pending</div>
+                  <div class="ca-btns"><button class="ca-btn ca-btn-blue">Buka Journal Entry</button></div>
+                </div>
+              </div>
+
+              <!-- Rekonsiliasi -->
+              <div class="ca-card" style="border-left:2px solid #85B7EB">
+                <div class="ca-card-body">
+                  <div class="ca-tag ca-tag-info">Rekonsiliasi</div>
+                  <div class="ca-card-title">12 transaksi belum dicocokkan</div>
+                  <div class="ca-card-desc">Belum ada padanan di mutasi bank periode ini</div>
+                </div>
+                <div class="ca-card-right">
+                  <div class="ca-count">12</div><div class="ca-count-label">unmatched</div>
+                  <div class="ca-btns">
+                    <button class="ca-btn">Filter unmatched</button>
+                    <button class="ca-btn">Halaman rekonsiliasi</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- SYSTEM LOG -->
+            <div class="ca-log-head" onclick="toggleSyslog()">
+              <div class="ca-log-label" style="color:var(--color-text-secondary);font-weight:600;font-size:12px">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" style="stroke:var(--color-text-secondary)"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                Yang sudah dilakukan sistem hari ini
+              </div>
+              <span class="ca-log-toggle" id="syslogToggle" style="color:var(--color-text-tertiary)">Tampilkan ↓</span>
+            </div>
+            <div class="ca-log-body" id="syslogBody" style="display:none">
+              <div class="ca-log-item">
+                <div class="ca-log-dot ca-dot-ok"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div class="ca-log-text"><div class="ca-log-action">Auto-rekonsiliasi bank</div><div class="ca-log-meta">08.02 — cocokkan berdasarkan nominal + tanggal ±1 hari</div></div>
+                <span class="ca-log-count">38 matched</span>
+              </div>
+              <div class="ca-log-item">
+                <div class="ca-log-dot ca-dot-ok"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div class="ca-log-text"><div class="ca-log-action">Klasifikasi akun otomatis</div><div class="ca-log-meta">10.14 — model klasifikasi v2.1, akurasi rata-rata 96%</div></div>
+                <span class="ca-log-count">21 entri</span>
+              </div>
+              <div class="ca-log-item">
+                <div class="ca-log-dot ca-dot-info"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                <div class="ca-log-text"><div class="ca-log-action">Deteksi anomali dijalankan</div><div class="ca-log-meta">11.30 — scan 57 entri, 1 anomali ditemukan, 2 duplikat dikirim ke JE</div></div>
+                <span class="ca-log-count">57 diperiksa</span>
+              </div>
+              <div class="ca-log-item">
+                <div class="ca-log-dot ca-dot-ok"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div class="ca-log-text"><div class="ca-log-action">Running balance diperbarui</div><div class="ca-log-meta">14.07 — dihitung ulang setelah 5 entri baru di-post</div></div>
+                <span class="ca-log-count">5 entri</span>
+              </div>
+            </div>
+
+          </div><!-- /ca-body -->
+        </div><!-- /ca-section -->
+
+        <!-- ANOMALI SECTION (kept for table anomaly logic, hidden visually) -->
+        <div id="anomSection" style="display:none">
+          <div id="anomHeadIcon"></div>
+          <div id="anomHeadTitle"></div>
+          <div id="anomHeadSub"></div>
+          <div id="anomGroupList"></div>
+          <div id="anomBody"></div>
+          <div id="anomChevron"></div>
         </div>
 
         <!-- FILTER BAR -->
@@ -581,6 +782,15 @@ td{padding:10px 14px;vertical-align:middle}
               Filter Lainnya
               <span class="badge" id="filterBadge" style="display:none">0</span>
             </button>
+            <div class="fsep"></div>
+            <div class="kurs-toggle-wrap">
+              <label class="kurs-switch">
+                <input type="checkbox" id="kursToggle" onchange="toggleKurs()">
+                <div class="kurs-track"></div>
+                <div class="kurs-thumb"></div>
+              </label>
+              <span class="kurs-toggle-label">Tampilkan kurs</span>
+            </div>
           </div>
         </div>
 
@@ -597,6 +807,7 @@ td{padding:10px 14px;vertical-align:middle}
                   <th class="sortable r" data-col="debit">Debit (Rp)<span class="sort-arrow"></span></th>
                   <th class="sortable r" data-col="credit">Kredit (Rp)<span class="sort-arrow"></span></th>
                   <th class="sortable r" data-col="balance">Saldo (Rp)<span class="sort-arrow"></span></th>
+                  <th style="text-align:center">Rekon</th>
                 </tr>
               </thead>
               <tbody id="glBody"></tbody>
@@ -791,7 +1002,7 @@ const BILL_REFS = {
 };
 const INV_REFS = {
   'INV001': 'INV-C001-20250118',
-  'INV002': 'JE-2025-0005',
+  'INV002': 'INV-C002-20250125',
   'INV003': 'INV-C001-20250210',
   'INV004': 'INV-C003-20250220',
   'INV005': 'INV-C004-20250315',
@@ -855,11 +1066,6 @@ const JE_DATA = [
     {acct:'1-1100',acctName:'Kas & Bank',debit:0,credit:27500000,desc:'Pengeluaran kas'}
   ]},
   // ── INVOICES ──
-  {id:'JE-2025-0005',date:'2025-01-25',refType:'invoice',refId:'INV002',memo:'Pencatatan penjualan produk divisi B kepada distributor',postedBy:'Sarah Wijaya',postedDate:'2025-03-09',createdBy:'Rina Kusuma',createdDate:'2025-01-25',lines:[
-    {acct:'1-1200',acctName:'Piutang Usaha',debit:9625000,credit:0,desc:'Piutang penjualan produk divisi B'},
-    {acct:'4-1020',acctName:'Penjualan Produk - Divisi B',debit:0,credit:8750000,desc:'Pendapatan penjualan produk divisi B'},
-    {acct:'2-1200',acctName:'Utang Pajak',debit:0,credit:875000,desc:'PPN keluaran atas penjualan'}
-  ]},
   {id:'JE-2025-0006',date:'2025-02-10',refType:'invoice',refId:'INV003',memo:'Pencatatan penjualan produk divisi A + jasa setup & training',postedBy:'Andi Prasetyo',postedDate:'2025-03-10',createdBy:'Sarah Wijaya',createdDate:'2025-02-10',lines:[
     {acct:'1-1200',acctName:'Piutang Usaha',debit:24200000,credit:0,desc:'Piutang penjualan produk + jasa'},
     {acct:'4-1010',acctName:'Penjualan Produk - Divisi A',debit:0,credit:20000000,desc:'Pendapatan penjualan divisi A'},
@@ -907,7 +1113,70 @@ function getDisplayRef(je){
 }
 
 // Keys that are anomalies — must be defined before buildGLRows is called
-const ANOMALIES_KEYS = {'JE-2025-0001':1,'JE-2025-0005':1,'INV-C002-20250125':1};
+/* ── REKONSILIASI DATA ── */
+const REKON_DATA = {
+  'JE-2025-0002': 'matched',
+  'JE-2025-0003': 'matched',
+  'JE-2025-0011': 'matched',
+  'JE-2025-0012': 'matched',
+  'JE-2025-0013': 'matched',
+  'JE-2025-0015': 'matched',
+  'JE-2025-0016': 'matched',
+  'JE-2025-0017': 'matched',
+  'JE-2025-0018': 'matched',
+};
+
+const TODAY_POSTED_JE = ['JE-2025-0015','JE-2025-0016','JE-2025-0017'];
+
+function filterTodayPosted(){
+  filteredRows = ALL_ROWS.filter(r=>TODAY_POSTED_JE.includes(r.jeId));
+  currentPage=1;
+  document.querySelectorAll('#typeChips .chip').forEach(c=>{
+    c.classList.remove('on');
+    c.style.borderStyle='';
+    c.textContent=({'all':'Semua','je':'Jurnal Entry','inv':'Invoice','bill':'Bill'})[c.dataset.v]||c.dataset.v;
+  });
+  document.querySelectorAll('#timeChips .chip').forEach(c=>c.classList.remove('on'));
+  const allChip=document.querySelector('#typeChips .chip[data-v="all"]');
+  if(allChip){allChip.style.borderStyle='dashed';allChip.textContent='Semua ↩';}
+  renderTable();
+  document.querySelector('.table-wrap')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ── KURS DATA ── */
+const KURS_DATA = {
+  'JE-2025-0002': {orig:'USD 5.222', rate:'15.800'},
+  'JE-2025-0004': {orig:'USD 791', rate:'15.800'},
+  'JE-2025-0008': {orig:'USD 1.582', rate:'15.800'},
+};
+let kursVisible = false;
+function toggleKurs(){
+  kursVisible = document.getElementById('kursToggle').checked;
+  renderTable();
+}
+
+/* ── CLOSING ASSISTANT JS ── */
+function toggleCA(){
+  const body=document.getElementById('caBody');
+  const chev=document.getElementById('caChevron');
+  body.classList.toggle('collapsed');
+  chev.classList.toggle('open');
+}
+function toggleSyslog(){
+  const b=document.getElementById('syslogBody');
+  const t=document.getElementById('syslogToggle');
+  const open=b.style.display==='none';
+  b.style.display=open?'block':'none';
+  t.textContent=open?'Sembunyikan ↑':'Tampilkan ↓';
+}
+function updateCACards(){
+  const card=document.getElementById('caCardAnom');
+  if(!card) return;
+  const anomStillActive = ANOM_GROUPS[0].items.some(i=>!dismissedAnomalies.has(i.id));
+  card.style.display=anomStillActive?'':'none';
+}
+
+const ANOMALIES_KEYS = {'JE-2025-0001':1};
 
 // Build GL rows — proper GL per line item
 // Anomaly rows: show only 1 representative row (the primary debit line)
@@ -919,9 +1188,7 @@ function buildGLRows(){
 
   sorted.forEach(je=>{
     const displayRef=getDisplayRef(je);
-    // JE-2025-0005 is flagged as anomaly — force refType to 'je' regardless of source
-    const forceJE = (je.id==='JE-2025-0005');
-    const refType = forceJE ? 'je' : mapRefType(je.refType);
+    const refType = mapRefType(je.refType);
     const isAnomaly = !!ANOMALIES_KEYS[je.id];
 
     if(isAnomaly){
@@ -950,29 +1217,8 @@ function buildGLRows(){
         jeData: je
       });
 
-      // Inject duplicate row for JE-2025-0005
-      if(je.id==='JE-2025-0005'){
-        const dupNet = je.lines.reduce((s,l)=>(s+(l.debit||0)-(l.credit||0)),0);
-        runBal += dupNet;
-        rows.push({
-          id: 'INV-C002-20250125-L0',
-          jeId: 'INV-C002-20250125',
-          date: je.date,
-          dateLabel: fmtDate(je.date),
-          ref: 'INV-C002-20250125',
-          refRaw: 'INV-C002-20250125',
-          refType: 'inv',
-          refId: 'INV002',
-          acct: primaryLine.acct,
-          acctName: primaryLine.acctName,
-          desc: je.memo,
-          debit,
-          credit,
-          balance: runBal,
-          jeData: je,
-          isDuplicate: true
-        });
-      }
+      // (duplicate injection removed — INV-C002-20250125 no longer shown in GL)
+
     } else {
       // Normal JE: all lines, exclusive debit/credit
       je.lines.forEach((l,idx)=>{
@@ -1121,8 +1367,6 @@ function resetFilters(){
 /* ── ANOMALY DATA ── */
 const ANOMALIES = {
   'JE-2025-0001': {type:'warn', flag:'Nilai tidak wajar', detail:'Nilai beban gaji melebihi rata-rata 3 bulan sebelumnya.', grid:[{label:'Rata-rata Historis',val:'Rp 38.500.000'},{label:'Nilai Saat Ini',val:'Rp 45.000.000'},{label:'Selisih',val:'+16.9%'}]},
-  'JE-2025-0005': {type:'danger', flag:'Kemungkinan duplikasi', detail:'Transaksi ini memiliki karakteristik yang sangat mirip dengan INV-C002-20250125 yang diinput 4 menit setelahnya.', grid:[{label:'Pelanggan Sama',val:'CV Distributor'},{label:'Nilai Identik',val:'Rp 9.625.000'},{label:'Selisih Waktu',val:'4 menit'}]},
-  'INV-C002-20250125': {type:'danger', flag:'Kemungkinan duplikasi', detail:'Transaksi ini memiliki karakteristik yang sangat mirip dengan JE-2025-0005 yang diinput 4 menit sebelumnya.', grid:[{label:'Pelanggan Sama',val:'CV Distributor'},{label:'Nilai Identik',val:'Rp 9.625.000'},{label:'Selisih Waktu',val:'4 menit'}]},
 };
 let dismissedAnomalies = new Set();
 let expandedRows = new Set();
@@ -1135,16 +1379,6 @@ const ANOM_GROUPS = [
     sub: '1 transaksi tidak wajar dibanding dengan history serupa',
     items: [
       {id:'JE-2025-0001', ref:'JE-2025-0001', desc:'Beban Gaji & Tunjangan', amount:'45.000.000', note:'Nilai beban gaji melebihi rata-rata 3 bulan sebelumnya'}
-    ]
-  },
-  {
-    id: 'grp-duplikat',
-    title: 'Indikasi Transaksi Duplikat',
-    sub: '2 transaksi memiliki detail yang sangat mirip',
-    showAll: true,
-    items: [
-      {id:'JE-2025-0005', ref:'JE-2025-0005', desc:'Piutang Usaha', amount:'9.625.000', note:'Karakteristik sangat mirip dengan INV-C002-20250125 (Input selisih 4 menit)'},
-      {id:'INV-C002-20250125', ref:'INV-C002-20250125', desc:'Piutang Usaha', amount:'9.625.000', note:'Karakteristik sangat mirip dengan JE-2025-0005 (Input selisih 4 menit)'}
     ]
   }
 ];
@@ -1244,7 +1478,7 @@ function renderAlertSection(){
           <div class="anom-item-actions">
             <button class="ai-btn-lihat" onclick="scrollToRow('${item.id}')">Lihat item</button>
             <button class="ai-btn-valid" onclick="markValid('${item.id}')">Tandai sebagai valid</button>
-            <button class="ai-btn-reklasifikasi" onclick="doReklasifikasi('${item.id}')">Reklasifikasi</button>
+            <button class="ai-btn-reklasifikasi" onclick="alert('Membuka ${item.id} di halaman Journal Entry')">Lihat di Jurnal Entry</button>
           </div>
         </div>`).join('')}
       </div>
@@ -1335,20 +1569,29 @@ function renderTable(){
       const flagHtml = (anom && isFirstLine) ? `<span class="anomaly-flag ${anom.type}">✨ ${anom.flag}</span>` : '';
       const expandBtn = (anom && isFirstLine) ? `<span onclick="event.stopPropagation();toggleRow('${r.id}')" style="cursor:pointer;margin-left:6px;font-size:10px;color:var(--color-text-tertiary)">${isExpanded?'▲':'▼'}</span>` : '';
 
+      const kursInfo = kursVisible ? (KURS_DATA[r.jeId] || null) : null;
+      const kursHtml = kursInfo ? `<div class="kurs-detail" style="display:block;font-size:10px;color:var(--color-text-tertiary);margin-top:1px">${kursInfo.orig} @ ${kursInfo.rate}</div>` : '';
+
+      const rekonStatus = REKON_DATA[r.jeId] || 'unmatched';
+      const rekonCell = rekonStatus === 'matched'
+        ? `<td style="text-align:center"><span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--success-text);background:var(--success-surface);border:1px solid var(--success-border);padding:2px 7px;border-radius:9999px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Matched</span></td>`
+        : `<td style="text-align:center"><span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--color-text-tertiary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);padding:2px 7px;border-radius:9999px"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>Unmatched</span></td>`;
+
       rows.push(`<tr class="${anomClass}" onclick="openDrawer('${r.jeId}')">
         <td class="td-date">${r.dateLabel}</td>
         <td><span class="td-ref">${r.ref}</span>${flagHtml}${expandBtn}</td>
         <td><span class="type-badge ${r.refType}">${typeLbl(r.refType)}</span></td>
         <td><div class="td-acct-name">${r.acctName}</div><div class="td-acct">${r.acct}</div></td>
-        <td class="r">${r.debit?`<span class="td-amount debit" style="font-weight:800">${fmtNum(r.debit)}</span>`:'<span style="color:var(--color-border-default)">–</span>'}</td>
-        <td class="r">${r.credit?`<span class="td-amount credit" style="font-weight:800">${fmtNum(r.credit)}</span>`:'<span style="color:var(--color-border-default)">–</span>'}</td>
+        <td class="r">${r.debit?`<div><span class="td-amount debit" style="font-weight:800">${fmtNum(r.debit)}</span>${kursInfo&&r.debit?kursHtml:''}</div>`:'<span style="color:var(--color-border-default)">–</span>'}</td>
+        <td class="r">${r.credit?`<div><span class="td-amount credit" style="font-weight:800">${fmtNum(r.credit)}</span>${kursInfo&&r.credit?kursHtml:''}</div>`:'<span style="color:var(--color-border-default)">–</span>'}</td>
         <td class="r"><span class="td-balance" style="font-weight:800">${fmtNum(r.balance)}</span></td>
+        ${rekonCell}
       </tr>`);
 
       // Show expand detail after last line of each JE group
       if(anom && isExpanded && isLastLine){
         rows.push(`<tr class="anomaly-expand-row ${anomClass}">
-          <td colspan="7">
+          <td colspan="8">
             <div class="anomaly-expand-inner">
               <div class="anomaly-expand-title">${anom.detail}</div>
               <div class="anomaly-expand-grid">
@@ -1356,7 +1599,7 @@ function renderTable(){
               </div>
               <div class="anomaly-expand-actions">
                 <button class="ai-btn-valid" onclick="event.stopPropagation();markValid('${anomKey}')">Tandai sebagai valid</button>
-                <button class="ai-btn-reklasifikasi" onclick="event.stopPropagation();doReklasifikasi('${anomKey}')">Reklasifikasi</button>
+                <button class="ai-btn-reklasifikasi" onclick="event.stopPropagation();alert('Membuka ${anomKey} di halaman Journal Entry')">Lihat di Jurnal Entry</button>
               </div>
             </div>
           </td>
@@ -1499,7 +1742,6 @@ const JE_DIM = {
   'JE-2025-0002': {dept:'Operations',proj:'Produk Divisi A',branch:'HQ Jakarta'},
   'JE-2025-0003': {dept:'General Affairs',proj:null,branch:'HQ Jakarta'},
   'JE-2025-0004': {dept:'Operations',proj:'Distribusi Feb',branch:'Surabaya'},
-  'JE-2025-0005': {dept:'Sales',proj:'Produk Divisi B',branch:'HQ Jakarta'},
   'JE-2025-0006': {dept:'Sales',proj:'Produk Divisi A',branch:'HQ Jakarta'},
   'JE-2025-0007': {dept:'Sales',proj:'Produk Divisi B',branch:'Bandung'},
   'JE-2025-0008': {dept:'Finance',proj:'Audit Internal Q1',branch:'HQ Jakarta'},
