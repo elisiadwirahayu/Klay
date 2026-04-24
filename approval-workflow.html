@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Approval Workflow — Klay</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Manrope:wght@300;400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-brand:#B83D08;--color-brand-hover:#A03206;
+  --color-action:#1A46C8;--color-action-hover:#1338A8;
+  --color-text-primary:#080706;--color-text-secondary:#2E2B27;--color-text-tertiary:#8C857C;
+  --color-surface-base:#FBF8F5;--color-surface-raised:#FFFFFF;--color-surface-sunken:#F4F0EB;--color-surface-deep:#080706;
+  --color-border-default:#E2DDD7;
+  --success-text:#166638;--success-border:#A8D9BC;--success-surface:#E8F5EE;
+  --warning-text:#7A4D00;--warning-border:#E8C870;--warning-surface:#FDF3E0;
+  --danger-text:#A02020;--danger-border:#EAB8B8;--danger-surface:#FBF0F0;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;--radius-full:9999px;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;
+  --transition-fast:0.1s ease;--transition-base:0.15s ease;--transition-slow:0.2s ease;
+  --font-display:'Playfair Display',serif;--font-sans:'Manrope',sans-serif;--font-mono:'Inconsolata',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-surface-base);color:var(--color-text-primary);-webkit-font-smoothing:antialiased;font-size:13px;height:100vh;overflow:hidden}
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sb{width:196px;flex-shrink:0;background:var(--color-surface-raised);border-right:1px solid var(--color-border-default);display:flex;flex-direction:column;overflow-y:auto}
+.sb-top{padding:0 16px;height:52px;display:flex;align-items:center;border-bottom:1px solid var(--color-border-default);gap:8px;flex-shrink:0}
+.sb-logo{width:26px;height:26px;background:var(--color-brand);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logo svg{width:12px;height:12px;fill:#fff}
+.sb-brand{font-size:14px;font-weight:700;letter-spacing:-.02em}
+.sb-sec{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-border-default);padding:16px 16px 6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 12px;margin:1px 6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:400;color:var(--color-text-tertiary);text-decoration:none;transition:background var(--transition-fast),color var(--transition-fast)}
+.sb-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.sb-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+.sb-item.active{background:var(--color-surface-sunken);color:var(--color-text-primary);font-weight:600;border-left:2px solid var(--color-brand);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-left:0;padding-left:14px}
+.sb-foot{margin-top:auto;padding:12px 16px;border-top:1px solid var(--color-surface-sunken)}
+.sb-foot-item{display:flex;align-items:center;gap:8px;padding:6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--color-text-tertiary)}
+.sb-foot-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+
+/* MAIN */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* TOPBAR */
+.topbar{height:52px;flex-shrink:0;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 20px;gap:12px}
+.tb-bc{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-text-tertiary)}
+.tb-bc a{color:var(--color-text-tertiary);text-decoration:none;cursor:pointer}
+.tb-bc a:hover{color:var(--color-text-secondary)}
+.tb-bc svg{width:12px;height:12px;stroke:var(--color-border-default);fill:none;stroke-width:2}
+.tb-bc span{font-weight:600;color:var(--color-text-primary)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-notif{width:30px;height:30px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.tb-notif svg{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--color-brand);border-radius:50%;border:1.5px solid var(--color-surface-raised)}
+.tb-av{width:28px;height:28px;border-radius:var(--radius-sm);background:var(--color-action);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* VIEWS */
+.view{flex:1;overflow:hidden;display:none;flex-direction:column}
+.view.on{display:flex}
+
+/* ─ LANDING ─ */
+.land-scroll{flex:1;overflow-y:auto;padding:var(--space-6)}
+.land-head{margin-bottom:var(--space-6)}
+.land-title{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.land-sub{font-size:13px;color:var(--color-text-tertiary);margin-top:4px}
+.mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:12px}
+
+.mod-card{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);padding:var(--space-5);cursor:pointer;transition:all var(--transition-base);position:relative}
+.mod-card:hover{border-color:#c8c2ba;box-shadow:0 4px 20px rgba(8,7,6,.07);transform:translateY(-1px)}
+.mod-card.empty{background:transparent;border-style:dashed}
+.mod-card.empty:hover{background:var(--color-surface-raised);border-style:solid}
+.mc-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:var(--space-3)}
+.mc-icon{width:36px;height:36px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mc-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5}
+.mc-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:var(--radius-full)}
+.b-on{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.b-empty{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.mc-name{font-size:14px;font-weight:700;margin-bottom:4px}
+.mc-desc{font-size:11px;color:var(--color-text-tertiary);margin-bottom:var(--space-4);line-height:1.5}
+.mc-summary{background:var(--color-surface-sunken);border-radius:var(--radius-md);padding:10px 12px}
+.mc-summary.mc-empty-s{background:transparent;border:1.5px dashed var(--color-border-default);display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;color:var(--color-text-tertiary)}
+.mc-empty-s svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.mc-steps{display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.step-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:var(--radius-full);background:var(--color-surface-raised);border:1px solid var(--color-border-default);color:var(--color-text-secondary);white-space:nowrap}
+.step-pill svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.arr-icon{width:14px;height:14px;stroke:var(--color-border-default);fill:none;stroke-width:2;flex-shrink:0}
+.mc-meta{font-size:11px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:4px;margin-top:4px}
+.mc-meta svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.mc-cta{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--color-action);margin-top:var(--space-3)}
+.mc-cta svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5}
+
+/* ─ BUILDER ─ */
+.builder-shell{flex:1;display:flex;overflow:hidden;min-height:0}
+.builder-area{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+.builder-bar{height:48px;flex-shrink:0;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 var(--space-5);gap:var(--space-3)}
+.btn-back{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--color-text-tertiary);background:transparent;border:none;cursor:pointer;padding:5px 8px;border-radius:var(--radius-sm);transition:all var(--transition-fast)}
+.btn-back:hover{background:var(--color-surface-sunken);color:var(--color-text-secondary)}
+.btn-back svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
+.vdiv{width:1px;height:20px;background:var(--color-border-default)}
+.bld-modname{font-size:13px;font-weight:700}
+.bld-modmeta{font-size:11px;color:var(--color-text-tertiary)}
+.bld-actions{margin-left:auto;display:flex;gap:8px}
+.btn-primary{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:600;padding:7px 14px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base);white-space:nowrap}
+.btn-primary:hover{background:var(--color-action-hover)}
+.btn-primary svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.5}
+.btn-ghost{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:6px 13px;cursor:pointer;transition:all var(--transition-fast);white-space:nowrap}
+.btn-ghost:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+
+/* Canvas */
+.canvas-scroll{flex:1;overflow-y:auto;padding:var(--space-6) var(--space-5) var(--space-8)}
+.wf-col{width:100%;max-width:560px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
+
+/* Summary card */
+.sum-card{width:100%;background:#F8F9FF;border:1px solid #DDE4FA;border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);margin-bottom:var(--space-5)}
+.sum-head{display:flex;align-items:center;gap:8px;margin-bottom:var(--space-2)}
+.sum-ico{width:22px;height:22px;border-radius:var(--radius-sm);background:#EBF0FD;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sum-ico svg{width:11px;height:11px;stroke:var(--color-action);fill:none;stroke-width:1.5}
+.sum-lbl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-action)}
+.sum-text{font-size:13px;color:var(--color-text-secondary);line-height:1.65}
+.sum-text strong{font-weight:700;color:var(--color-text-primary)}
+.sum-text em{font-style:normal;color:var(--color-brand);font-weight:600}
+
+/* Status bar */
+.ws-bar{display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--color-surface-raised);border-radius:var(--radius-md);margin-bottom:var(--space-5);border:1px solid var(--color-border-default);width:100%}
+.ws-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.ws-dot.on{background:var(--success-text)}
+.ws-dot.off{background:var(--color-border-default)}
+.ws-txt{font-size:12px;font-weight:600;color:var(--color-text-secondary)}
+.ws-meta{font-size:11px;color:var(--color-text-tertiary);margin-left:auto;white-space:nowrap}
+.toggle{position:relative;width:32px;height:18px;cursor:pointer;display:inline-block;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:var(--color-border-default);border-radius:var(--radius-full);transition:background var(--transition-base)}
+.toggle input:checked+.toggle-track{background:var(--color-action)}
+.toggle-thumb{position:absolute;top:2px;left:2px;width:14px;height:14px;background:#fff;border-radius:50%;transition:left var(--transition-base);pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.toggle input:checked~.toggle-thumb{left:16px}
+
+/* Connector */
+.conn{width:2px;height:24px;background:var(--color-border-default);position:relative;flex-shrink:0}
+.conn::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--color-border-default)}
+
+/* Nodes */
+.node{width:100%;border-radius:var(--radius-lg);border:1px solid var(--color-border-default);background:var(--color-surface-raised);overflow:visible;transition:box-shadow var(--transition-base),border-color var(--transition-base)}
+.node:hover{box-shadow:0 2px 12px rgba(8,7,6,.05)}
+.node.exp{border-color:#C8D8FA}
+
+/* Trigger node */
+.node-trg .node-hd{background:var(--color-surface-deep);padding:13px 16px;display:flex;align-items:center;gap:10px}
+.trg-icon{width:30px;height:30px;border-radius:var(--radius-sm);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.trg-icon svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:1.5}
+.trg-lbl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.trg-ttl{font-size:14px;font-weight:700;color:#fff;margin-top:1px}
+.node-lock{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:rgba(255,255,255,.3);margin-left:auto;white-space:nowrap;flex-shrink:0}
+.node-lock svg{width:11px;height:11px;stroke:rgba(255,255,255,.3);fill:none;stroke-width:1.5}
+
+/* Generic node head */
+.node-hd-row{padding:13px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background var(--transition-fast)}
+.node-hd-row:hover{background:var(--color-surface-sunken)}
+.ni{width:30px;height:30px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ni svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+.ni-c{background:#EBF0FD;color:var(--color-action)}
+.ni-s{background:var(--color-surface-sunken);border:1px solid var(--color-border-default);color:var(--color-text-secondary)}
+.ni-sa{background:var(--color-action);border-color:var(--color-action);color:#fff}
+.ni-e{background:var(--warning-surface);border:1px solid var(--warning-border);color:var(--warning-text)}
+.ni-o{background:var(--success-text);border-radius:50%;color:#fff}
+.n-lbl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary)}
+.n-ttl{font-size:13px;font-weight:700;color:var(--color-text-primary);margin-top:1px}
+.n-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.n-chev{width:16px;height:16px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;transition:transform var(--transition-base);flex-shrink:0}
+.n-chev.op{transform:rotate(180deg)}
+.node-bd{border-top:1px solid var(--color-border-default);padding:var(--space-4);overflow:visible}
+.node-bd.hid{display:none}
+
+/* Condition builder */
+.cond-rows{display:flex;flex-direction:column}
+.cond-row{display:flex;align-items:center;gap:var(--space-2);background:var(--color-surface-sunken);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);margin-bottom:0}
+.cs{height:30px;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:0 8px;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);cursor:pointer;outline:none;flex:1;min-width:0;transition:border-color var(--transition-fast)}
+.cs:focus{border-color:var(--color-action)}
+.cs.op{max-width:108px;flex:none}
+.ci{height:30px;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:0 8px;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);outline:none;flex:1;min-width:0;transition:border-color var(--transition-fast)}
+.ci:focus{border-color:var(--color-action)}
+.c-del{width:24px;height:24px;border-radius:var(--radius-sm);background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--color-text-tertiary);transition:all var(--transition-fast);flex-shrink:0}
+.c-del:hover{background:var(--danger-surface);color:var(--danger-text)}
+.c-del svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* AND/OR connector between rows */
+.logic-row{display:flex;align-items:center;gap:8px;padding:4px 0;margin:0}
+.logic-line{flex:1;height:1px;background:var(--color-border-default)}
+.logic-pill{display:inline-flex;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-sunken);overflow:hidden;cursor:pointer;user-select:none;flex-shrink:0}
+.logic-opt{font-size:10px;font-weight:700;padding:3px 10px;color:var(--color-text-tertiary);transition:all var(--transition-fast)}
+.logic-opt.on{background:var(--color-surface-deep);color:#fff}
+
+.cond-foot{display:flex;align-items:center;justify-content:space-between;margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-border-default)}
+.btn-add-cond{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--color-action);background:transparent;border:1.5px dashed #C8D8FA;border-radius:var(--radius-sm);padding:5px 10px;cursor:pointer;transition:all var(--transition-fast)}
+.btn-add-cond:hover{background:#EBF0FD;border-style:solid}
+.btn-add-cond svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5}
+.btn-sv{font-family:var(--font-sans);font-size:11px;font-weight:600;padding:6px 14px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;transition:background var(--transition-fast)}
+.btn-sv:hover{background:var(--color-action-hover)}
+.btn-cn{font-family:var(--font-sans);font-size:11px;font-weight:500;padding:6px 12px;background:transparent;color:var(--color-text-tertiary);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);cursor:pointer;transition:all var(--transition-fast);margin-right:6px}
+.btn-cn:hover{color:var(--color-text-secondary);border-color:#c8c2ba}
+
+/* Approver chips */
+.chips{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:var(--space-3) var(--space-4) var(--space-4)}
+.req-btn{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:var(--radius-sm);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);color:var(--color-text-secondary);cursor:pointer;user-select:none;transition:all var(--transition-fast);white-space:nowrap}
+.req-btn:hover{border-color:#c8c2ba}
+.req-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2}
+.a-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:var(--radius-full);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);cursor:pointer;transition:all var(--transition-fast)}
+.a-chip:hover{border-color:#c8c2ba;background:#ede8e2}
+.a-chip:hover .chip-x{opacity:1}
+.a-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.a-name{font-size:11px;font-weight:600;color:var(--color-text-secondary)}
+.chip-x{width:14px;height:14px;border-radius:50%;background:var(--color-border-default);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity var(--transition-fast)}
+.chip-x svg{width:8px;height:8px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2}
+
+/* Picker dropdown */
+.a-drop{position:relative;display:inline-block}
+.btn-add-av{width:26px;height:26px;border-radius:50%;background:var(--color-surface-raised);border:1.5px dashed var(--color-border-default);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--transition-fast)}
+.btn-add-av:hover{border-color:var(--color-action);background:#EBF0FD}
+.btn-add-av svg{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2.5;transition:stroke var(--transition-fast)}
+.btn-add-av:hover svg{stroke:var(--color-action)}
+.a-picker{position:absolute;top:calc(100% + 6px);left:0;z-index:200;width:240px;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);box-shadow:0 8px 32px rgba(8,7,6,.12);display:none;overflow:hidden}
+.a-picker.open{display:block}
+.pk-search{padding:8px 10px;border-bottom:1px solid var(--color-border-default)}
+.pk-search input{width:100%;height:28px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:0 10px;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);outline:none}
+.pk-search input:focus{border-color:var(--color-action)}
+.pk-list{max-height:200px;overflow-y:auto;padding:4px}
+.pk-it{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);cursor:pointer;transition:background var(--transition-fast)}
+.pk-it:hover,.pk-it.sel{background:var(--color-surface-sunken)}
+.pk-it.sel .pk-chk{opacity:1}
+.pk-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.pk-name{flex:1;font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.pk-role{font-size:10px;color:var(--color-text-tertiary)}
+.pk-chk{width:15px;height:15px;border-radius:var(--radius-sm);background:var(--color-action);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity var(--transition-fast);flex-shrink:0}
+.pk-chk svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:2.5}
+.pk-sec{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary);padding:8px 10px 4px}
+
+/* SLA row */
+.sla-row{padding:0 var(--space-4) var(--space-4);display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);flex-wrap:wrap}
+.sla-l{display:flex;align-items:center;gap:8px}
+.sla-lbl{font-size:11px;color:var(--color-text-tertiary);font-weight:600}
+.sla-in{width:52px;height:28px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);text-align:center;font-family:var(--font-mono);font-size:12px;font-weight:600;outline:none;color:var(--color-text-primary)}
+.sla-sel{height:28px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:0 8px;font-family:var(--font-sans);font-size:11px;color:var(--color-text-secondary);outline:none}
+.btn-del-step{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-sans);font-size:11px;font-weight:500;color:var(--danger-text);background:transparent;border:1px solid var(--danger-border);border-radius:var(--radius-sm);padding:5px 10px;cursor:pointer;transition:all var(--transition-fast)}
+.btn-del-step:hover{background:var(--danger-surface)}
+.btn-del-step svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5}
+
+.add-step-btn{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--color-text-tertiary);padding:6px 14px;border-radius:var(--radius-full);border:1.5px dashed var(--color-border-default);background:transparent;cursor:pointer;transition:all var(--transition-fast);margin:2px 0;white-space:nowrap}
+.add-step-btn:hover{color:var(--color-action);border-color:var(--color-action);background:#EBF0FD}
+.add-step-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5}
+
+/* Outcome */
+.node-out{border-color:var(--success-border)}
+.node-out .node-hd-row{background:var(--success-surface);cursor:default}
+.node-out .node-hd-row:hover{background:var(--success-surface)}
+.out-ttl{font-size:14px;font-weight:700;color:var(--success-text)}
+.out-sub{font-size:11px;color:var(--success-text);opacity:.7;margin-top:1px}
+
+/* Escalation */
+.node-esc{border-color:var(--warning-border)}
+.node-esc .node-hd-row{background:#FFFEF5}
+.node-esc .node-hd-row:hover{background:var(--warning-surface)}
+
+/* Empty state in builder */
+.empty-bld{width:100%;background:var(--color-surface-raised);border:1.5px dashed var(--color-border-default);border-radius:var(--radius-lg);padding:var(--space-8) var(--space-6);display:flex;flex-direction:column;align-items:center;gap:var(--space-3);text-align:center;margin:var(--space-6) 0}
+.eb-icon{width:40px;height:40px;border-radius:var(--radius-md);background:var(--color-surface-sunken);display:flex;align-items:center;justify-content:center}
+.eb-icon svg{width:18px;height:18px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.eb-title{font-size:14px;font-weight:700;color:var(--color-text-secondary)}
+.eb-sub{font-size:12px;color:var(--color-text-tertiary);max-width:320px;line-height:1.5}
+
+/* Right panel */
+.rp{width:272px;flex-shrink:0;border-left:1px solid var(--color-border-default);display:flex;flex-direction:column;overflow:hidden;background:var(--color-surface-raised)}
+.rp-hd{padding:var(--space-5);border-bottom:1px solid var(--color-border-default);flex-shrink:0}
+.rp-ttl{font-size:13px;font-weight:700;color:var(--color-text-primary)}
+.rp-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.rp-scroll{flex:1;overflow-y:auto;padding:var(--space-4) var(--space-5)}
+.rp-lbl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:var(--space-2)}
+.rp-sel{width:100%;height:34px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:0 12px;font-family:var(--font-sans);font-size:12px;color:var(--color-text-secondary);cursor:pointer;outline:none;margin-bottom:8px}
+.rp-sel:focus{border-color:var(--color-action)}
+.btn-test{width:100%;display:flex;align-items:center;justify-content:center;gap:6px;height:34px;font-family:var(--font-sans);font-size:12px;font-weight:600;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-fast)}
+.btn-test:hover{background:var(--color-action-hover)}
+.test-res{background:var(--color-surface-sunken);border-radius:var(--radius-md);padding:var(--space-4);margin-top:var(--space-3)}
+.tr-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}
+.tr-row:last-child{margin-bottom:0}
+.tr-lbl{font-size:11px;color:var(--color-text-tertiary)}
+.tr-val{font-size:12px;font-weight:600;font-family:var(--font-mono);text-align:right}
+.tr-b{font-size:11px;font-weight:600;padding:2px 8px;border-radius:var(--radius-full)}
+.b-ok{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.b-no{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.step-chain{margin-top:10px;padding-top:10px;border-top:1px solid var(--color-border-default);display:flex;flex-direction:column;gap:6px}
+.sc-lbl{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:2px}
+.sc-row{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:500;color:var(--color-text-secondary)}
+.sc-num{width:18px;height:18px;border-radius:50%;background:var(--color-action);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-mono)}
+
+/* Picker overlay */
+.pk-overlay{position:fixed;inset:0;z-index:190}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--color-border-default);border-radius:var(--radius-full)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sb">
+  <div class="sb-top">
+    <div class="sb-logo"><svg viewBox="0 0 12 12"><path d="M2 10L6 2 10 10M3.5 7h5"/></svg></div>
+    <span class="sb-brand">Klay</span>
+  </div>
+  <div class="sb-sec">Workspace</div>
+  <a class="sb-item"><svg viewBox="0 0 14 14"><rect x="1" y="1" width="5" height="5" rx="1"/><rect x="8" y="1" width="5" height="5" rx="1"/><rect x="1" y="8" width="5" height="5" rx="1"/><rect x="8" y="8" width="5" height="5" rx="1"/></svg>Dashboard</a>
+  <div class="sb-sec">Finance</div>
+  <a class="sb-item"><svg viewBox="0 0 14 14"><path d="M1 3h12M1 7h12M1 11h7"/></svg>General Ledger</a>
+  <a class="sb-item"><svg viewBox="0 0 14 14"><path d="M9 1H3a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V5L9 1z"/><path d="M9 1v4h4"/></svg>Journal Entry</a>
+  <a class="sb-item"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="6"/><path d="M7 4v3l2 2"/></svg>Invoice</a>
+  <a class="sb-item"><svg viewBox="0 0 14 14"><path d="M2 2h10v10H2zM5 2v10M2 5h3"/></svg>Bills</a>
+  <div class="sb-sec">Settings</div>
+  <a class="sb-item active"><svg viewBox="0 0 14 14"><path d="M7 1l1.5 2.5L11 4l-2 2 .5 3L7 8l-2.5 1L5 6 3 4l2.5-.5z"/></svg>Approval Workflow</a>
+  <a class="sb-item"><svg viewBox="0 0 14 14"><circle cx="7" cy="4" r="2.5"/><path d="M2 12c0-2.8 2.2-5 5-5s5 2.2 5 5"/></svg>Users & Roles</a>
+  <a class="sb-item"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3M7 9.5v.5"/></svg>General Settings</a>
+  <div class="sb-foot">
+    <div class="sb-foot-item"><svg viewBox="0 0 14 14"><circle cx="7" cy="4" r="2.5"/><path d="M2 12c0-2.8 2.2-5 5-5s5 2.2 5 5"/></svg>Budi Santoso</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-bc" id="tbBc"><span>Approval Workflow</span></div>
+    <div class="tb-right">
+      <div class="tb-notif"><svg viewBox="0 0 14 14"><path d="M7 1a4 4 0 014 4c0 3 1 4 1 4H2s1-1 1-4a4 4 0 014-4zM5.5 12a1.5 1.5 0 003 0"/></svg><div class="notif-dot"></div></div>
+      <div class="tb-av">BS</div>
+    </div>
+  </div>
+
+  <!-- ══ LANDING ══ -->
+  <div class="view on" id="vLand">
+    <div class="land-scroll">
+      <div class="land-head">
+        <div class="land-title">Approval Workflow</div>
+        <div class="land-sub">Pilih modul untuk mengatur siapa yang perlu menyetujui dan dalam kondisi apa</div>
+      </div>
+      <div class="mod-grid">
+
+        <!-- PO -->
+        <div class="mod-card" onclick="openWf('po')">
+          <div class="mc-head">
+            <div class="mc-icon" style="background:#EBF0FD;color:var(--color-action)"><svg viewBox="0 0 16 16"><path d="M3 2h10v12H3zM3 6h10M6 2V1M10 2V1"/></svg></div>
+            <span class="mc-badge b-on">● Aktif</span>
+          </div>
+          <div class="mc-name">Purchase Order</div>
+          <div class="mc-desc">Setiap PO yang dibuat masuk ke alur persetujuan sebelum dikirim ke vendor</div>
+          <div class="mc-summary">
+            <div class="mc-steps">
+              <div class="step-pill"><svg viewBox="0 0 12 12"><path d="M2 3h8M4 7h4"/></svg>Jika nilai &gt; Rp 10 jt atau vendor baru</div>
+              <svg class="arr-icon" viewBox="0 0 14 14"><path d="M3 7h8M8 4l3 3-3 3"/></svg>
+              <div class="step-pill"><svg viewBox="0 0 12 12"><circle cx="6" cy="4" r="2"/><path d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>Finance Mgr</div>
+              <svg class="arr-icon" viewBox="0 0 14 14"><path d="M3 7h8M8 4l3 3-3 3"/></svg>
+              <div class="step-pill"><svg viewBox="0 0 12 12"><circle cx="6" cy="4" r="2"/><path d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>CFO</div>
+            </div>
+            <div class="mc-meta"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5"/><path d="M6 3v3l1.5 1.5"/></svg>2 kondisi · 2 step · SLA 2+3 hari kerja</div>
+          </div>
+          <div class="mc-cta">Ubah pengaturan <svg viewBox="0 0 12 12"><path d="M2 6h8M7 3l3 3-3 3"/></svg></div>
+        </div>
+
+        <!-- Invoice -->
+        <div class="mod-card" onclick="openWf('invoice')">
+          <div class="mc-head">
+            <div class="mc-icon" style="background:#E8F5EE;color:var(--success-text)"><svg viewBox="0 0 16 16"><path d="M4 2h8v12H4zM4 6h8M6 9h4M6 12h2"/></svg></div>
+            <span class="mc-badge b-on">● Aktif</span>
+          </div>
+          <div class="mc-name">Invoice</div>
+          <div class="mc-desc">Invoice ke pelanggan perlu divalidasi sebelum dikirim</div>
+          <div class="mc-summary">
+            <div class="mc-steps">
+              <div class="step-pill"><svg viewBox="0 0 12 12"><path d="M2 3h8M4 7h4"/></svg>Semua invoice</div>
+              <svg class="arr-icon" viewBox="0 0 14 14"><path d="M3 7h8M8 4l3 3-3 3"/></svg>
+              <div class="step-pill"><svg viewBox="0 0 12 12"><circle cx="6" cy="4" r="2"/><path d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>Finance Mgr</div>
+            </div>
+            <div class="mc-meta"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5"/><path d="M6 3v3l1.5 1.5"/></svg>Tanpa kondisi · 1 step · SLA 1 hari kerja</div>
+          </div>
+          <div class="mc-cta">Ubah pengaturan <svg viewBox="0 0 12 12"><path d="M2 6h8M7 3l3 3-3 3"/></svg></div>
+        </div>
+
+        <!-- Bill -->
+        <div class="mod-card" onclick="openWf('bill')">
+          <div class="mc-head">
+            <div class="mc-icon" style="background:#FDF3E0;color:var(--warning-text)"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="1"/><path d="M5 6h6M5 9h4"/></svg></div>
+            <span class="mc-badge b-on">● Aktif</span>
+          </div>
+          <div class="mc-name">Bill (Tagihan Masuk)</div>
+          <div class="mc-desc">Tagihan dari vendor diverifikasi sebelum dijadwalkan pembayarannya</div>
+          <div class="mc-summary">
+            <div class="mc-steps">
+              <div class="step-pill"><svg viewBox="0 0 12 12"><path d="M2 3h8M4 7h4"/></svg>Jika nilai &gt; Rp 5 jt</div>
+              <svg class="arr-icon" viewBox="0 0 14 14"><path d="M3 7h8M8 4l3 3-3 3"/></svg>
+              <div class="step-pill"><svg viewBox="0 0 12 12"><circle cx="6" cy="4" r="2"/><path d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>Akuntansi</div>
+              <svg class="arr-icon" viewBox="0 0 14 14"><path d="M3 7h8M8 4l3 3-3 3"/></svg>
+              <div class="step-pill"><svg viewBox="0 0 12 12"><circle cx="6" cy="4" r="2"/><path d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>Finance Mgr</div>
+            </div>
+            <div class="mc-meta"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5"/><path d="M6 3v3l1.5 1.5"/></svg>1 kondisi · 2 step · SLA 2+2 hari kerja</div>
+          </div>
+          <div class="mc-cta">Ubah pengaturan <svg viewBox="0 0 12 12"><path d="M2 6h8M7 3l3 3-3 3"/></svg></div>
+        </div>
+
+        <!-- Journal Entry -->
+        <div class="mod-card" onclick="openWf('je')">
+          <div class="mc-head">
+            <div class="mc-icon" style="background:#F4F0EB;color:var(--color-text-secondary)"><svg viewBox="0 0 16 16"><path d="M3 3h10M3 7h7M3 11h5"/></svg></div>
+            <span class="mc-badge b-on">● Aktif</span>
+          </div>
+          <div class="mc-name">Journal Entry</div>
+          <div class="mc-desc">Jurnal manual memerlukan review untuk menjaga integritas laporan keuangan</div>
+          <div class="mc-summary">
+            <div class="mc-steps">
+              <div class="step-pill"><svg viewBox="0 0 12 12"><path d="M2 3h8M4 7h4"/></svg>Semua jurnal manual</div>
+              <svg class="arr-icon" viewBox="0 0 14 14"><path d="M3 7h8M8 4l3 3-3 3"/></svg>
+              <div class="step-pill"><svg viewBox="0 0 12 12"><circle cx="6" cy="4" r="2"/><path d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>Finance Mgr</div>
+            </div>
+            <div class="mc-meta"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5"/><path d="M6 3v3l1.5 1.5"/></svg>Tanpa kondisi · 1 step · SLA 1 hari kerja</div>
+          </div>
+          <div class="mc-cta">Ubah pengaturan <svg viewBox="0 0 12 12"><path d="M2 6h8M7 3l3 3-3 3"/></svg></div>
+        </div>
+
+        <!-- Petty Cash — EMPTY -->
+        <div class="mod-card empty" onclick="openWf('petty')">
+          <div class="mc-head">
+            <div class="mc-icon" style="background:var(--color-surface-sunken);color:var(--color-text-tertiary)"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5.5v1.5l1 1M6 5a2 2 0 112 1.7"/></svg></div>
+            <span class="mc-badge b-empty">Belum diatur</span>
+          </div>
+          <div class="mc-name" style="color:var(--color-text-tertiary)">Petty Cash</div>
+          <div class="mc-desc">Pengeluaran kas kecil. Workflow approval belum dikonfigurasi.</div>
+          <div class="mc-summary mc-empty-s">
+            <svg viewBox="0 0 14 14"><path d="M7 1v6M4 4l3-3 3 3M2 13h10"/></svg>
+            Klik untuk mulai mengatur workflow
+          </div>
+          <div class="mc-cta" style="color:var(--color-text-tertiary)">Mulai konfigurasi <svg viewBox="0 0 12 12"><path d="M2 6h8M7 3l3 3-3 3"/></svg></div>
+        </div>
+
+        <!-- Expense Report — EMPTY -->
+        <div class="mod-card empty" onclick="openWf('expense')">
+          <div class="mc-head">
+            <div class="mc-icon" style="background:var(--color-surface-sunken);color:var(--color-text-tertiary)"><svg viewBox="0 0 16 16"><path d="M2 4h12v9H2zM2 7h12M5 4V2M11 4V2"/></svg></div>
+            <span class="mc-badge b-empty">Belum diatur</span>
+          </div>
+          <div class="mc-name" style="color:var(--color-text-tertiary)">Expense Report</div>
+          <div class="mc-desc">Klaim pengeluaran karyawan. Workflow approval belum dikonfigurasi.</div>
+          <div class="mc-summary mc-empty-s">
+            <svg viewBox="0 0 14 14"><path d="M7 1v6M4 4l3-3 3 3M2 13h10"/></svg>
+            Klik untuk mulai mengatur workflow
+          </div>
+          <div class="mc-cta" style="color:var(--color-text-tertiary)">Mulai konfigurasi <svg viewBox="0 0 12 12"><path d="M2 6h8M7 3l3 3-3 3"/></svg></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ BUILDER ══ -->
+  <div class="view" id="vBuild">
+    <div class="builder-shell">
+      <div class="builder-area">
+        <!-- Builder bar -->
+        <div class="builder-bar">
+          <button class="btn-back" onclick="goBack()"><svg viewBox="0 0 13 13"><path d="M8 2L4 6.5 8 11"/></svg>Kembali</button>
+          <div class="vdiv"></div>
+          <span class="bld-modname" id="bldName">Purchase Order</span>
+          <span class="bld-modmeta" id="bldMeta">· 2 step · Aktif</span>
+          <div class="bld-actions">
+            <button class="btn-ghost" onclick="goBack()">Batalkan</button>
+            <button class="btn-primary" id="bldSave" onclick="doSave()">
+              <svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5"/></svg>Simpan
+            </button>
+          </div>
+        </div>
+        <!-- Canvas -->
+        <div class="canvas-scroll">
+          <div class="wf-col" id="wfCol">
+
+            <!-- Summary card -->
+            <div class="sum-card" id="sumCard">
+              <div class="sum-head">
+                <div class="sum-ico"><svg viewBox="0 0 11 11"><circle cx="5.5" cy="5.5" r="4.5"/><path d="M5.5 3v2.5M5.5 7.5v.5"/></svg></div>
+                <span class="sum-lbl">Ringkasan Workflow</span>
+              </div>
+              <div class="sum-text" id="sumTxt">–</div>
+            </div>
+
+            <!-- Status bar -->
+            <div class="ws-bar">
+              <div class="ws-dot on" id="wsDot"></div>
+              <div class="ws-txt" id="wsTxt">Workflow Aktif</div>
+              <div class="ws-meta" id="wsMeta">Terakhir diubah: 18 Apr 2025 · Budi S.</div>
+              <label class="toggle" style="margin-left:8px">
+                <input type="checkbox" checked id="actToggle" onchange="onToggleActive(this)">
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+              </label>
+            </div>
+
+            <!-- Trigger node -->
+            <div class="node node-trg" style="width:100%">
+              <div class="node-hd">
+                <div style="display:flex;align-items:center;gap:10px;width:100%;padding:13px 16px;background:var(--color-surface-deep)">
+                  <div class="trg-icon"><svg viewBox="0 0 14 14"><path d="M7 1l1.5 2.5L11 4l-2 2 .5 3L7 8l-2.5 1L5 6 3 4l2.5-.5z"/></svg></div>
+                  <div><div class="trg-lbl">Trigger</div><div class="trg-ttl" id="trgTtl">Ketika Purchase Order dibuat</div></div>
+                  <div class="node-lock" style="margin-left:auto"><svg viewBox="0 0 11 11"><rect x="2" y="5" width="7" height="5" rx="1"/><path d="M3.5 5V3.5a2 2 0 014 0V5"/></svg>Terkunci</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty state -->
+            <div class="empty-bld" id="emptyBld" style="display:none">
+              <div class="eb-icon"><svg viewBox="0 0 18 18"><path d="M9 2v6M6 5l3-3 3 3M2 16h14"/></svg></div>
+              <div class="eb-title">Workflow belum dikonfigurasi</div>
+              <div class="eb-sub">Tambahkan kondisi dan approver untuk menentukan alur persetujuan modul ini.</div>
+              <button class="btn-primary" onclick="startEmpty()" style="margin-top:4px">
+                <svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg>Mulai dari kondisi
+              </button>
+            </div>
+
+            <!-- Configured flow -->
+            <div id="cfgNodes" style="width:100%;display:flex;flex-direction:column;align-items:center">
+
+              <div class="conn"></div>
+
+              <!-- Condition node -->
+              <div class="node" id="condNode" style="width:100%">
+                <div class="node-hd-row" onclick="tog('condNode','condBd','condChv')">
+                  <div class="ni ni-c"><svg viewBox="0 0 14 14"><path d="M2 3h10M4 7h6M6 11h2"/></svg></div>
+                  <div style="flex:1;min-width:0">
+                    <div class="n-lbl">Kondisi</div>
+                    <div class="n-ttl">Jika memenuhi syarat berikut</div>
+                    <div class="n-sub" id="condSub">Total PO > Rp 10.000.000 ATAU Vendor belum terverifikasi</div>
+                  </div>
+                  <svg class="n-chev op" id="condChv" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg>
+                </div>
+                <div class="node-bd" id="condBd">
+                  <div class="cond-rows" id="condRows">
+                    <!-- Row 1 -->
+                    <div id="cwr0">
+                      <div class="cond-row">
+                        <select class="cs"><option>Total Amount</option><option>Vendor Category</option><option>Department</option><option>GL Account</option><option>Currency</option></select>
+                        <select class="cs op"><option selected>lebih dari</option><option>kurang dari</option><option>sama dengan</option><option>bukan</option><option>adalah</option></select>
+                        <input class="ci" type="text" value="10.000.000">
+                        <button class="c-del" onclick="delRow('cwr0','lc0')"><svg viewBox="0 0 12 12"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
+                      </div>
+                    </div>
+                    <!-- AND/OR connector -->
+                    <div class="logic-row" id="lc0">
+                      <div class="logic-line"></div>
+                      <div class="logic-pill" onclick="flipLogic(this)"><span class="logic-opt">DAN</span><span class="logic-opt on">ATAU</span></div>
+                      <div class="logic-line"></div>
+                    </div>
+                    <!-- Row 2 -->
+                    <div id="cwr1">
+                      <div class="cond-row">
+                        <select class="cs"><option>Total Amount</option><option selected>Vendor Category</option><option>Department</option><option>GL Account</option><option>Currency</option></select>
+                        <select class="cs op"><option>lebih dari</option><option>kurang dari</option><option>sama dengan</option><option selected>bukan</option><option>adalah</option></select>
+                        <input class="ci" type="text" value="Terverifikasi">
+                        <button class="c-del" onclick="delRow('cwr1','lc-1')"><svg viewBox="0 0 12 12"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cond-foot">
+                    <button class="btn-add-cond" onclick="addRow()"><svg viewBox="0 0 11 11"><path d="M5.5 1v9M1 5.5h9"/></svg>Tambah kondisi</button>
+                    <div style="display:flex;gap:6px">
+                      <button class="btn-cn" onclick="tog('condNode','condBd','condChv')">Tutup</button>
+                      <button class="btn-sv" onclick="saveCond()">Simpan</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="conn"></div>
+
+              <!-- Step 1 -->
+              <div class="node" id="sn1" style="width:100%">
+                <div class="node-hd-row" onclick="tog('sn1','sb1','sc1')">
+                  <div class="ni ni-sa" style="font-family:var(--font-mono);font-size:12px;font-weight:700">01</div>
+                  <div style="flex:1;min-width:0">
+                    <div class="n-lbl">Approval Step 1</div>
+                    <div class="n-ttl">Finance Manager</div>
+                    <div class="n-sub">Require all · Budi Santoso, Rina Wijaya · SLA 2 hari kerja</div>
+                  </div>
+                  <svg class="n-chev" id="sc1" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg>
+                </div>
+                <div class="node-bd hid" id="sb1">
+                  <div class="chips">
+                    <button class="req-btn" onclick="flipReq(this)">Require all <svg viewBox="0 0 11 11"><path d="M2 4l3 3 4-4"/></svg></button>
+                    <div class="a-chip" onclick="rmChip(this)"><div class="a-av" style="background:#1A46C8">BS</div><span class="a-name">Budi Santoso</span><div class="chip-x"><svg viewBox="0 0 8 8"><path d="M1 1l6 6M7 1L1 7"/></svg></div></div>
+                    <div class="a-chip" onclick="rmChip(this)"><div class="a-av" style="background:#166638">RW</div><span class="a-name">Rina Wijaya</span><div class="chip-x"><svg viewBox="0 0 8 8"><path d="M1 1l6 6M7 1L1 7"/></svg></div></div>
+                    <div class="a-drop">
+                      <button class="btn-add-av" onclick="openPk('pk1')"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></button>
+                      <div class="a-picker" id="pk1">
+                        <div class="pk-search"><input type="text" placeholder="Cari user..."></div>
+                        <div class="pk-list">
+                          <div class="pk-sec">Users</div>
+                          <div class="pk-it sel" onclick="pickU(this,'pk1','Budi Santoso','#1A46C8','BS')"><div class="pk-av" style="background:#1A46C8">BS</div><div><div class="pk-name">Budi Santoso</div><div class="pk-role">Finance Manager</div></div><div class="pk-chk"><svg viewBox="0 0 9 9"><path d="M1.5 4.5l2.5 2.5 4-4"/></svg></div></div>
+                          <div class="pk-it sel" onclick="pickU(this,'pk1','Rina Wijaya','#166638','RW')"><div class="pk-av" style="background:#166638">RW</div><div><div class="pk-name">Rina Wijaya</div><div class="pk-role">Finance Manager</div></div><div class="pk-chk"><svg viewBox="0 0 9 9"><path d="M1.5 4.5l2.5 2.5 4-4"/></svg></div></div>
+                          <div class="pk-it" onclick="pickU(this,'pk1','Ahmad Fauzi','#B83D08','AF')"><div class="pk-av" style="background:#B83D08">AF</div><div><div class="pk-name">Ahmad Fauzi</div><div class="pk-role">CFO</div></div><div class="pk-chk"><svg viewBox="0 0 9 9"><path d="M1.5 4.5l2.5 2.5 4-4"/></svg></div></div>
+                          <div class="pk-it" onclick="pickU(this,'pk1','Dewi Kartika','#7C3AED','DK')"><div class="pk-av" style="background:#7C3AED">DK</div><div><div class="pk-name">Dewi Kartika</div><div class="pk-role">Senior Accountant</div></div><div class="pk-chk"><svg viewBox="0 0 9 9"><path d="M1.5 4.5l2.5 2.5 4-4"/></svg></div></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="sla-row">
+                    <div class="sla-l"><span class="sla-lbl">SLA:</span><input type="number" value="2" class="sla-in"><select class="sla-sel"><option>Hari kerja</option><option>Jam kerja</option></select></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="conn"></div>
+
+              <!-- Step 2 -->
+              <div class="node" id="sn2" style="width:100%">
+                <div class="node-hd-row" onclick="tog('sn2','sb2','sc2')">
+                  <div class="ni ni-s" style="font-family:var(--font-mono);font-size:12px;font-weight:700">02</div>
+                  <div style="flex:1;min-width:0">
+                    <div class="n-lbl">Approval Step 2</div>
+                    <div class="n-ttl">CFO / Direktur</div>
+                    <div class="n-sub">Require any · Ahmad Fauzi · SLA 3 hari kerja</div>
+                  </div>
+                  <svg class="n-chev" id="sc2" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg>
+                </div>
+                <div class="node-bd hid" id="sb2">
+                  <div class="chips">
+                    <button class="req-btn" onclick="flipReq(this)">Require any <svg viewBox="0 0 11 11"><path d="M2 4l3 3 4-4"/></svg></button>
+                    <div class="a-chip" onclick="rmChip(this)"><div class="a-av" style="background:#B83D08">AF</div><span class="a-name">Ahmad Fauzi</span><div class="chip-x"><svg viewBox="0 0 8 8"><path d="M1 1l6 6M7 1L1 7"/></svg></div></div>
+                    <div class="a-drop">
+                      <button class="btn-add-av" onclick="openPk('pk2')"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></button>
+                      <div class="a-picker" id="pk2">
+                        <div class="pk-search"><input type="text" placeholder="Cari user..."></div>
+                        <div class="pk-list">
+                          <div class="pk-sec">Users</div>
+                          <div class="pk-it" onclick="pickU(this,'pk2','Ahmad Fauzi','#B83D08','AF')"><div class="pk-av" style="background:#B83D08">AF</div><div><div class="pk-name">Ahmad Fauzi</div><div class="pk-role">CFO</div></div><div class="pk-chk"><svg viewBox="0 0 9 9"><path d="M1.5 4.5l2.5 2.5 4-4"/></svg></div></div>
+                          <div class="pk-it" onclick="pickU(this,'pk2','Sari Dewi','#7C3AED','SD')"><div class="pk-av" style="background:#7C3AED">SD</div><div><div class="pk-name">Sari Dewi</div><div class="pk-role">Direktur</div></div><div class="pk-chk"><svg viewBox="0 0 9 9"><path d="M1.5 4.5l2.5 2.5 4-4"/></svg></div></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="sla-row">
+                    <div class="sla-l"><span class="sla-lbl">SLA:</span><input type="number" value="3" class="sla-in"><select class="sla-sel"><option>Hari kerja</option><option>Jam kerja</option></select></div>
+                    <button class="btn-del-step" onclick="delStep('sn2')"><svg viewBox="0 0 12 12"><path d="M2 3h8M5 3V2h2v1M10 3l-.5 7a1 1 0 01-1 .8H3.5A1 1 0 012.5 10L2 3"/></svg>Hapus step</button>
+                  </div>
+                </div>
+              </div>
+
+              <div style="height:6px"></div>
+              <button class="add-step-btn" id="addStepBtn" onclick="addStep()"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg>Tambah Approval Step</button>
+              <div style="height:6px"></div>
+
+              <!-- Escalation -->
+              <div class="conn" style="height:20px"></div>
+              <div class="node node-esc" id="escNode" style="width:100%">
+                <div class="node-hd-row" onclick="tog('escNode','escBd','escChv')">
+                  <div class="ni ni-e"><svg viewBox="0 0 14 14"><path d="M7 2v5M7 10v.5" stroke-linecap="round"/></svg></div>
+                  <div style="flex:1;min-width:0">
+                    <div class="n-lbl" style="color:var(--warning-text)">Eskalasi Otomatis</div>
+                    <div class="n-ttl">Jika tidak ada respons setelah SLA habis</div>
+                    <div class="n-sub">Eskalasi ke CFO · 3 hari tanpa aksi</div>
+                  </div>
+                  <svg class="n-chev" id="escChv" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg>
+                </div>
+                <div class="node-bd hid" id="escBd">
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <span style="font-size:11px;font-weight:600;color:var(--color-text-tertiary);white-space:nowrap">Eskalasi ke</span>
+                    <div class="a-chip"><div class="a-av" style="background:#B83D08">AF</div><span class="a-name">Ahmad Fauzi (CFO)</span></div>
+                    <span style="font-size:11px;color:var(--color-text-tertiary);white-space:nowrap">setelah</span>
+                    <input type="number" value="3" style="width:52px;height:28px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);text-align:center;font-family:var(--font-mono);font-size:12px;font-weight:600;outline:none;color:var(--color-text-primary)">
+                    <select style="height:28px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:0 8px;font-family:var(--font-sans);font-size:11px;color:var(--color-text-secondary);outline:none"><option>hari kerja</option><option>jam kerja</option></select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="conn"></div>
+
+              <!-- Outcome -->
+              <div class="node node-out" style="width:100%">
+                <div class="node-hd-row">
+                  <div class="ni ni-o"><svg viewBox="0 0 14 14"><path d="M2.5 7l3.5 3.5 5.5-5.5"/></svg></div>
+                  <div style="flex:1">
+                    <div class="out-ttl" id="outTtl">Purchase Order disetujui</div>
+                    <div class="out-sub">Status diubah ke "Approved" · Notifikasi dikirim ke pembuat</div>
+                  </div>
+                  <div class="node-lock" style="color:var(--success-text);opacity:.6"><svg viewBox="0 0 11 11" style="stroke:var(--success-text);opacity:.5"><rect x="2" y="5" width="7" height="5" rx="1"/><path d="M3.5 5V3.5a2 2 0 014 0V5"/></svg>Outcome</div>
+                </div>
+              </div>
+              <div style="height:40px"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="rp">
+        <div class="rp-hd">
+          <div class="rp-ttl">Simulasi Workflow</div>
+          <div class="rp-sub">Tes dengan transaksi nyata sebelum menyimpan</div>
+        </div>
+        <div class="rp-scroll">
+          <div class="rp-lbl">Pilih transaksi untuk simulasi</div>
+          <select class="rp-sel" id="testSel">
+            <option value="">— Pilih dokumen —</option>
+            <option value="a">PO-2025-0041 · Vendor Baru · Rp 15.500.000</option>
+            <option value="b">PO-2025-0038 · PT Maju Jaya · Rp 3.200.000</option>
+            <option value="c">PO-2025-0035 · Vendor Baru · Rp 87.000.000</option>
+            <option value="d">PO-2025-0031 · PT Rekanan Lama · Rp 900.000</option>
+          </select>
+          <button class="btn-test" onclick="runTest()">
+            <svg viewBox="0 0 13 13" style="width:11px;height:11px"><polygon points="3,1 12,6.5 3,12" fill="#fff"/></svg>
+            Jalankan Simulasi
+          </button>
+          <div class="test-res" id="testRes" style="display:none">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:12px">
+              <div id="trIco" style="width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"></div>
+              <span style="font-size:12px;font-weight:700" id="trTtl"></span>
+            </div>
+            <div class="tr-row"><span class="tr-lbl">Kondisi terpenuhi</span><span class="tr-b" id="trCond"></span></div>
+            <div class="tr-row"><span class="tr-lbl">Hasil</span><span class="tr-val" id="trRte"></span></div>
+            <div class="step-chain" id="trChain"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="pk-overlay" id="pkOv" style="display:none" onclick="closePk()"></div>
+
+<script>
+const MODS = {
+  po:      {name:'Purchase Order',       meta:'· 2 step · Aktif',  trg:'Ketika Purchase Order dibuat',      out:'Purchase Order disetujui',      cfg:true},
+  invoice: {name:'Invoice',              meta:'· 1 step · Aktif',  trg:'Ketika Invoice dibuat',             out:'Invoice disetujui',              cfg:true},
+  bill:    {name:'Bill (Tagihan Masuk)', meta:'· 2 step · Aktif',  trg:'Ketika Bill dibuat',                out:'Bill disetujui',                 cfg:true},
+  je:      {name:'Journal Entry',        meta:'· 1 step · Aktif',  trg:'Ketika Journal Entry dibuat',       out:'Journal Entry disetujui',        cfg:true},
+  petty:   {name:'Petty Cash',           meta:'· Belum diatur',     trg:'Ketika Petty Cash request dibuat', out:'Petty Cash request disetujui',   cfg:false},
+  expense: {name:'Expense Report',       meta:'· Belum diatur',     trg:'Ketika Expense Report dibuat',     out:'Expense Report disetujui',       cfg:false},
+};
+const SUMS = {
+  po:      'Setiap <strong>Purchase Order</strong> yang dibuat akan diperiksa kondisinya. Jika <em>total nilainya di atas Rp 10.000.000</em> atau <em>vendor belum terverifikasi</em>, maka harus disetujui oleh <strong>Finance Manager</strong>, kemudian <strong>CFO</strong>. Jika tidak ada respons dalam batas waktu, dieskalasi otomatis ke CFO.',
+  invoice: 'Semua <strong>Invoice</strong> yang dibuat wajib melalui persetujuan <strong>Finance Manager</strong> sebelum dikirim ke pelanggan. Tidak ada kondisi khusus — semua invoice masuk ke alur ini.',
+  bill:    'Setiap <strong>Bill</strong> dengan nilai di atas <em>Rp 5.000.000</em> harus disetujui oleh <strong>Tim Akuntansi</strong>, dilanjutkan ke <strong>Finance Manager</strong>. Bill di bawah Rp 5 juta langsung diproses tanpa approval.',
+  je:      'Semua <strong>Journal Entry manual</strong> harus disetujui oleh <strong>Finance Manager</strong> untuk memastikan integritas laporan keuangan sebelum diposting.',
+  petty:   'Workflow untuk <strong>Petty Cash</strong> belum dikonfigurasi. Semua request saat ini tidak memerlukan approval. Mulailah dengan menambahkan kondisi dan approver.',
+  expense: 'Workflow untuk <strong>Expense Report</strong> belum dikonfigurasi. Semua klaim saat ini tidak memerlukan approval. Mulailah dengan menambahkan kondisi dan approver.',
+};
+
+let curMod = 'po';
+
+function openWf(mod) {
+  curMod = mod;
+  const m = MODS[mod];
+  document.getElementById('bldName').textContent = m.name;
+  document.getElementById('bldMeta').textContent = m.meta;
+  document.getElementById('trgTtl').textContent = m.trg;
+  document.getElementById('outTtl').textContent = m.out;
+  document.getElementById('sumTxt').innerHTML = SUMS[mod];
+  document.getElementById('tbBc').innerHTML = `<a onclick="goBack()">Approval Workflow</a><svg viewBox="0 0 12 12"><path d="M4 2l4 4-4 4"/></svg><span>${m.name}</span>`;
+  const empty = !m.cfg;
+  document.getElementById('emptyBld').style.display = empty ? 'flex' : 'none';
+  document.getElementById('cfgNodes').style.display = empty ? 'none' : 'flex';
+  document.getElementById('sumCard').style.display = empty ? 'none' : 'block';
+  document.getElementById('actToggle').checked = m.cfg;
+  document.getElementById('wsDot').className = 'ws-dot ' + (m.cfg ? 'on' : 'off');
+  document.getElementById('wsTxt').textContent = m.cfg ? 'Workflow Aktif' : 'Workflow Nonaktif';
+  document.getElementById('wsMeta').textContent = m.cfg ? 'Terakhir diubah: 18 Apr 2025 · Budi S.' : 'Belum pernah disimpan';
+  document.getElementById('vLand').classList.remove('on');
+  document.getElementById('vBuild').classList.add('on');
+}
+
+function goBack() {
+  document.getElementById('vBuild').classList.remove('on');
+  document.getElementById('vLand').classList.add('on');
+  document.getElementById('tbBc').innerHTML = '<span>Approval Workflow</span>';
+}
+
+function startEmpty() {
+  MODS[curMod].cfg = true;
+  document.getElementById('emptyBld').style.display = 'none';
+  document.getElementById('cfgNodes').style.display = 'flex';
+  document.getElementById('sumCard').style.display = 'block';
+  document.getElementById('condRows').innerHTML = '';
+  document.getElementById('condSub').textContent = 'Belum ada kondisi — tambahkan di bawah';
+  document.getElementById('sumTxt').innerHTML = 'Workflow baru untuk <strong>' + MODS[curMod].name + '</strong>. Tambahkan kondisi dan approver untuk menyelesaikan pengaturan.';
+  // Auto-open condition body
+  const bd = document.getElementById('condBd');
+  bd.classList.remove('hid');
+  document.getElementById('condChv').classList.add('op');
+  document.getElementById('condNode').classList.add('exp');
+  toast('Tambahkan kondisi untuk melanjutkan');
+}
+
+function tog(nodeId, bdId, chvId) {
+  const bd = document.getElementById(bdId);
+  const chv = document.getElementById(chvId);
+  const node = document.getElementById(nodeId);
+  const wasHid = bd.classList.contains('hid');
+  bd.classList.toggle('hid', !wasHid);
+  chv.classList.toggle('op', wasHid);
+  if(node) node.classList.toggle('exp', wasHid);
+}
+
+function flipLogic(el) {
+  el.querySelectorAll('.logic-opt').forEach(o => o.classList.toggle('on'));
+  updateCondSub();
+}
+
+let condCnt = 2;
+function addRow() {
+  const rid = 'cwr'+condCnt;
+  const lid = 'lc'+condCnt;
+  const rows = document.getElementById('condRows');
+  const hasRows = rows.querySelectorAll('.cond-row').length > 0;
+  // Connector hanya muncul jika sudah ada row sebelumnya
+  const conn = hasRows ? `
+    <div class="logic-row" id="${lid}">
+      <div class="logic-line"></div>
+      <div class="logic-pill" onclick="flipLogic(this)"><span class="logic-opt on">DAN</span><span class="logic-opt">ATAU</span></div>
+      <div class="logic-line"></div>
+    </div>` : '';
+  const html = conn + `
+    <div id="${rid}">
+      <div class="cond-row">
+        <select class="cs"><option>Total Amount</option><option>Vendor Category</option><option>Department</option><option>GL Account</option><option>Currency</option></select>
+        <select class="cs op"><option>lebih dari</option><option>kurang dari</option><option>sama dengan</option><option>bukan</option><option>adalah</option></select>
+        <input class="ci" type="text" placeholder="Nilai...">
+        <button class="c-del" onclick="delRow('${rid}','${hasRows ? lid : ''}')"><svg viewBox="0 0 12 12"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
+      </div>
+    </div>`;
+  rows.insertAdjacentHTML('beforeend', html);
+  condCnt++;
+}
+
+function delRow(rid, lid) {
+  [rid, lid].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) { el.style.opacity='0'; el.style.transition='opacity .15s'; setTimeout(()=>el.remove(),150); }
+  });
+  setTimeout(updateCondSub, 200);
+}
+
+function updateCondSub() {
+  const rows = document.querySelectorAll('#condRows .cond-row');
+  if(!rows.length) { document.getElementById('condSub').textContent='Belum ada kondisi'; return; }
+  const parts = [];
+  rows.forEach(r => {
+    const f = r.querySelector('.cs')?.value;
+    const o = r.querySelectorAll('.cs')[1]?.value;
+    const v = r.querySelector('.ci')?.value;
+    if(v) parts.push(`${f} ${o} ${v}`);
+  });
+  const pills = document.querySelectorAll('#condRows .logic-pill');
+  let s = parts[0]||'';
+  pills.forEach((p,i) => {
+    const active = p.querySelector('.logic-opt.on')?.textContent?.trim()||'DAN';
+    if(parts[i+1]) s += ` ${active} `+parts[i+1];
+  });
+  document.getElementById('condSub').textContent = s;
+}
+
+function saveCond() {
+  updateCondSub();
+  tog('condNode','condBd','condChv');
+  toast('Kondisi disimpan');
+}
+
+function flipReq(btn) {
+  const t = btn.childNodes[0].textContent.trim();
+  btn.childNodes[0].textContent = (t==='Require all'?'Require any':'Require all') + ' ';
+}
+
+function openPk(id) {
+  const pk = document.getElementById(id);
+  closePk();
+  pk.classList.add('open');
+  document.getElementById('pkOv').style.display='block';
+}
+function closePk() {
+  document.querySelectorAll('.a-picker').forEach(p=>p.classList.remove('open'));
+  document.getElementById('pkOv').style.display='none';
+}
+
+function pickU(el, pkId, name, color, init) {
+  const isSel = el.classList.toggle('sel');
+  const chips = el.closest('.node-bd').querySelector('.chips');
+  const cid = 'chip_'+pkId+'_'+name.replace(/\s/g,'_');
+  if(isSel) {
+    if(!document.getElementById(cid)) {
+      const drop = chips.querySelector('.a-drop');
+      const chip = document.createElement('div');
+      chip.className='a-chip'; chip.id=cid;
+      chip.innerHTML=`<div class="a-av" style="background:${color}">${init}</div><span class="a-name">${name}</span><div class="chip-x"><svg viewBox="0 0 8 8"><path d="M1 1l6 6M7 1L1 7"/></svg></div>`;
+      chip.onclick=()=>{chip.remove();el.classList.remove('sel');};
+      drop.insertAdjacentElement('beforebegin',chip);
+    }
+  } else {
+    const c=document.getElementById(cid);
+    if(c){c.style.opacity='0';c.style.transition='opacity .15s';setTimeout(()=>c.remove(),150);}
+  }
+}
+
+function rmChip(chip) {
+  chip.style.opacity='0';chip.style.transform='scale(.9)';chip.style.transition='all .15s';
+  setTimeout(()=>chip.remove(),150);
+}
+
+let stepCnt=2;
+function addStep() {
+  stepCnt++;
+  const sn='sn'+stepCnt, sb='sb'+stepCnt, sc='sc'+stepCnt, pk='pk'+stepCnt;
+  const html=`
+    <div class="conn"></div>
+    <div class="node" id="${sn}" style="width:100%">
+      <div class="node-hd-row" onclick="tog('${sn}','${sb}','${sc}')">
+        <div class="ni ni-s" style="font-family:var(--font-mono);font-size:12px;font-weight:700">0${stepCnt}</div>
+        <div style="flex:1;min-width:0">
+          <div class="n-lbl">Approval Step ${stepCnt}</div>
+          <div class="n-ttl" style="color:var(--color-text-tertiary)">Tambahkan approver</div>
+          <div class="n-sub">Belum ada approver</div>
+        </div>
+        <svg class="n-chev op" id="${sc}" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg>
+      </div>
+      <div class="node-bd" id="${sb}">
+        <div class="chips">
+          <button class="req-btn" onclick="flipReq(this)">Require all <svg viewBox="0 0 11 11"><path d="M2 4l3 3 4-4"/></svg></button>
+          <div class="a-drop">
+            <button class="btn-add-av" onclick="openPk('${pk}')"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></button>
+            <div class="a-picker" id="${pk}">
+              <div class="pk-search"><input type="text" placeholder="Cari user..."></div>
+              <div class="pk-list">
+                <div class="pk-sec">Users</div>
+                <div class="pk-it" onclick="pickU(this,'${pk}','Budi Santoso','#1A46C8','BS')"><div class="pk-av" style="background:#1A46C8">BS</div><div><div class="pk-name">Budi Santoso</div><div class="pk-role">Finance Manager</div></div><div class="pk-chk"><svg viewBox="0 0 9 9"><path d="M1.5 4.5l2.5 2.5 4-4"/></svg></div></div>
+                <div class="pk-it" onclick="pickU(this,'${pk}','Ahmad Fauzi','#B83D08','AF')"><div class="pk-av" style="background:#B83D08">AF</div><div><div class="pk-name">Ahmad Fauzi</div><div class="pk-role">CFO</div></div><div class="pk-chk"><svg viewBox="0 0 9 9"><path d="M1.5 4.5l2.5 2.5 4-4"/></svg></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sla-row">
+          <div class="sla-l"><span class="sla-lbl">SLA:</span><input type="number" value="2" class="sla-in"><select class="sla-sel"><option>Hari kerja</option><option>Jam kerja</option></select></div>
+          <button class="btn-del-step" onclick="delStep('${sn}')"><svg viewBox="0 0 12 12"><path d="M2 3h8M5 3V2h2v1M10 3l-.5 7a1 1 0 01-1 .8H3.5A1 1 0 012.5 10L2 3"/></svg>Hapus step</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('addStepBtn').insertAdjacentHTML('beforebegin',html);
+  toast('Step '+stepCnt+' ditambahkan');
+}
+
+function delStep(id) {
+  const el=document.getElementById(id);
+  if(!el) return;
+  const prev=el.previousElementSibling;
+  el.style.opacity='0';el.style.transition='opacity .2s';
+  setTimeout(()=>{if(prev&&prev.classList.contains('conn'))prev.remove();el.remove();},200);
+  toast('Step dihapus');
+}
+
+function onToggleActive(cb) {
+  document.getElementById('wsDot').className='ws-dot '+(cb.checked?'on':'off');
+  document.getElementById('wsTxt').textContent=cb.checked?'Workflow Aktif':'Workflow Nonaktif';
+}
+
+function doSave() {
+  const btn=document.getElementById('bldSave');
+  btn.innerHTML=`<svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5"/></svg>Menyimpan...`;
+  btn.style.opacity='.7';
+  setTimeout(()=>{
+    btn.innerHTML=`<svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5"/></svg>Tersimpan ✓`;
+    btn.style.background='var(--success-text)';btn.style.opacity='1';
+    setTimeout(()=>{btn.innerHTML=`<svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5"/></svg>Simpan`;btn.style.background='';},2000);
+  },700);
+}
+
+const TD = {
+  a:{title:'Butuh 2 langkah approval', ok:false, cond:'Ya — kondisi terpenuhi', route:'Step 1 → Step 2', steps:['Budi Santoso / Rina Wijaya','Ahmad Fauzi (CFO)']},
+  b:{title:'Langsung diproses', ok:true, cond:'Tidak — di bawah threshold', route:'Bypass workflow', steps:['Tidak perlu approval']},
+  c:{title:'Butuh 2 langkah approval', ok:false, cond:'Ya — nilai sangat besar', route:'Step 1 → Step 2 (Urgent)', steps:['Budi Santoso / Rina Wijaya','Ahmad Fauzi (CFO) — Prioritas']},
+  d:{title:'Langsung diproses', ok:true, cond:'Tidak — vendor rekanan & nilai kecil', route:'Bypass workflow', steps:['Tidak perlu approval']},
+};
+
+function runTest() {
+  const v=document.getElementById('testSel').value;
+  if(!v){toast('Pilih transaksi terlebih dahulu');return;}
+  const d=TD[v];
+  const res=document.getElementById('testRes');
+  res.style.display='block';
+  const ico=document.getElementById('trIco');
+  ico.style.background=d.ok?'var(--success-text)':'var(--danger-text)';
+  ico.innerHTML=d.ok
+    ?'<svg viewBox="0 0 14 14" style="width:10px;height:10px"><path d="M2 7l3.5 3.5L12 4" stroke="#fff" fill="none" stroke-width="2"/></svg>'
+    :'<svg viewBox="0 0 14 14" style="width:10px;height:10px"><path d="M7 4v4M7 10v.5" stroke="#fff" fill="none" stroke-width="2" stroke-linecap="round"/></svg>';
+  document.getElementById('trTtl').textContent=d.title;
+  const ce=document.getElementById('trCond');
+  ce.textContent=d.cond; ce.className='tr-b '+(d.ok?'b-ok':'b-no');
+  document.getElementById('trRte').textContent=d.route;
+  const ch=document.getElementById('trChain');
+  ch.innerHTML='<div class="sc-lbl">Urutan Approval</div>';
+  d.steps.forEach((s,i)=>{ ch.innerHTML+=`<div class="sc-row"><div class="sc-num">${i+1}</div>${s}</div>`; });
+}
+
+function toast(msg) {
+  const old=document.getElementById('k-toast'); if(old) old.remove();
+  const t=document.createElement('div'); t.id='k-toast';
+  t.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--color-surface-deep);color:#fff;font-size:12px;font-weight:600;padding:8px 16px;border-radius:var(--radius-full);z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.2);transition:opacity .2s;font-family:var(--font-sans);white-space:nowrap';
+  t.textContent=msg; document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),200);},2000);
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePk();});
+</script>
+</body>
+</html>

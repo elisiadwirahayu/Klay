@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard — TradeOS</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Manrope:wght@300;400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-brand:#B83D08;--color-brand-hover:#A03206;
+  --color-action:#1A46C8;--color-action-hover:#1338A8;
+  --color-text-primary:#080706;--color-text-secondary:#2E2B27;--color-text-tertiary:#8C857C;
+  --color-surface-base:#FBF8F5;--color-surface-raised:#FFFFFF;--color-surface-sunken:#F4F0EB;--color-surface-deep:#080706;
+  --color-border-default:#E2DDD7;
+  --success-text:#166638;--success-border:#A8D9BC;--success-surface:#E8F5EE;
+  --warning-text:#7A4D00;--warning-border:#E8C870;--warning-surface:#FDF3E0;
+  --danger-text:#A02020;--danger-border:#EAB8B8;--danger-surface:#FBF0F0;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;--radius-full:9999px;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;
+  --transition-fast:0.1s ease;--transition-base:0.15s ease;--transition-slow:0.2s ease;
+  --font-display:'Playfair Display',serif;--font-sans:'Manrope',sans-serif;--font-mono:'Inconsolata',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-surface-base);color:var(--color-text-primary);-webkit-font-smoothing:antialiased;font-size:13px;height:100vh;overflow:hidden}
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sb{width:196px;flex-shrink:0;background:var(--color-surface-raised);border-right:1px solid var(--color-border-default);display:flex;flex-direction:column;overflow-y:auto}
+.sb-top{padding:0 16px;height:52px;display:flex;align-items:center;border-bottom:1px solid var(--color-border-default);gap:8px;flex-shrink:0}
+.sb-logomark{width:26px;height:26px;background:var(--color-brand);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logomark svg{width:12px;height:12px;fill:#fff}
+.sb-brand{font-size:14px;font-weight:700;letter-spacing:-.02em}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-border-default);padding:16px 16px 6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 12px;margin:1px 6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:400;color:var(--color-text-tertiary);text-decoration:none;transition:background var(--transition-fast),color var(--transition-fast)}
+.sb-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.sb-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+.sb-item.active{background:var(--color-surface-sunken);color:var(--color-text-primary);font-weight:600;border-left:2px solid var(--color-brand);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-left:0;padding-left:14px}
+.sb-badge{margin-left:auto;font-size:10px;font-weight:700;background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border);border-radius:var(--radius-full);padding:1px 6px;line-height:1.4}
+.sb-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--color-surface-sunken)}
+.sb-footer-item{display:flex;align-items:center;gap:8px;padding:6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--color-text-tertiary)}
+.sb-footer-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+.sb-footer-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* ── TOPBAR ── */
+.topbar{height:52px;flex-shrink:0;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 20px;gap:12px;z-index:10}
+.tb-search-wrap{position:relative;flex:1;max-width:400px}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 12px;cursor:text;transition:border-color var(--transition-fast)}
+.tb-search svg{width:13px;height:13px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.tb-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.tb-search input::placeholder{color:var(--color-text-tertiary)}
+.tb-kbd{font-size:10px;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:4px;padding:1px 5px;font-family:var(--font-mono);flex-shrink:0}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-notif{width:30px;height:30px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.tb-notif svg{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--color-brand);border-radius:50%;border:1.5px solid var(--color-surface-raised)}
+.tb-org{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);cursor:pointer}
+.tb-org-name{font-size:12px;font-weight:500;color:var(--color-text-secondary)}
+.tb-av{width:24px;height:24px;border-radius:var(--radius-sm);background:var(--color-action);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── SCROLL AREA ── */
+.scroll-area{flex:1;overflow-y:auto;padding:var(--space-6);min-height:0}
+
+/* ── AI BRIEF ── */
+.ai-brief{background:linear-gradient(135deg,rgba(26,70,200,.06) 0%,rgba(124,58,237,.04) 100%);border:1px solid rgba(26,70,200,.15);border-radius:var(--radius-lg);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:var(--space-5)}
+.ai-brief-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.ai-brief-icon{width:32px;height:32px;border-radius:var(--radius-md);background:linear-gradient(135deg,#1A46C8,#7C3AED);display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:aiPulse 3s ease-in-out infinite}
+@keyframes aiPulse{0%,100%{box-shadow:0 0 0 0 rgba(26,70,200,.3)}50%{box-shadow:0 0 0 5px rgba(26,70,200,0)}}
+.ai-brief-icon svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ai-brief-text{flex:1;min-width:0}
+.ai-brief-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#1A46C8;margin-bottom:3px}
+.ai-brief-msg{font-size:13px;color:var(--color-text-secondary);line-height:1.5}
+.ai-brief-msg strong{color:var(--color-text-primary);font-weight:600}
+.ai-brief-actions{display:flex;gap:8px;flex-shrink:0}
+.ai-brief-date{font-size:11px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:5px}
+.ai-brief-date svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5}
+
+/* ── SECTION HEADING ── */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-3)}
+.section-title{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--color-text-tertiary)}
+.section-dot{width:7px;height:7px;border-radius:50%}
+.section-dot.danger{background:var(--danger-text)}
+.section-dot.warning{background:#D97706}
+.section-dot.info{background:var(--color-action)}
+.section-count{font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--radius-full);background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+.section-link{font-size:11px;color:var(--color-action);font-weight:500;cursor:pointer;text-decoration:none}
+.section-link:hover{text-decoration:underline}
+
+/* ── ACTION CARDS ── */
+.action-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-6)}
+
+.action-card{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-3);transition:box-shadow var(--transition-base),border-color var(--transition-base);cursor:default;position:relative;overflow:hidden}
+.action-card:hover{box-shadow:0 4px 16px rgba(8,7,6,.07);border-color:#ccc8c2}
+.action-card.danger{border-color:var(--danger-border);background:linear-gradient(180deg,var(--danger-surface) 0%,var(--color-surface-raised) 60%)}
+.action-card.warning{border-color:var(--warning-border);background:linear-gradient(180deg,var(--warning-surface) 0%,var(--color-surface-raised) 60%)}
+
+/* accent line */
+.action-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+.action-card.danger::before{background:var(--danger-text)}
+.action-card.warning::before{background:#D97706}
+.action-card.neutral::before{background:var(--color-action)}
+
+.ac-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.ac-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:var(--radius-full)}
+.ac-badge.danger{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.ac-badge.warning{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.ac-badge.neutral{background:#EBF0FD;color:var(--color-action);border:1px solid #C5D0F5}
+.ac-badge svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:2.5}
+
+.ac-icon{width:34px;height:34px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ac-icon.danger{background:var(--danger-surface);border:1px solid var(--danger-border)}
+.ac-icon.warning{background:var(--warning-surface);border:1px solid var(--warning-border)}
+.ac-icon.neutral{background:#EBF0FD;border:1px solid #C5D0F5}
+.ac-icon svg{width:16px;height:16px;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.ac-icon.danger svg{stroke:var(--danger-text)}
+.ac-icon.warning svg{stroke:var(--warning-text)}
+.ac-icon.neutral svg{stroke:var(--color-action)}
+
+.ac-body{flex:1}
+.ac-title{font-size:13px;font-weight:600;color:var(--color-text-primary);margin-bottom:4px;line-height:1.35}
+.ac-sub{font-size:11px;color:var(--color-text-tertiary);line-height:1.4}
+.ac-ref{font-size:11px;font-family:var(--font-mono);color:var(--color-text-tertiary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:1px 6px;display:inline-block;margin-top:4px}
+.ac-amount{font-family:var(--font-mono);font-size:18px;font-weight:600;color:var(--color-text-primary);letter-spacing:-.01em;margin-top:4px}
+.ac-amount-label{font-size:10px;color:var(--color-text-tertiary);font-family:var(--font-sans);font-weight:500;margin-bottom:2px}
+
+.ac-footer{display:flex;gap:6px;align-items:center;margin-top:auto}
+.btn-ac-primary{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-sans);font-size:12px;font-weight:600;padding:7px 14px;border:none;border-radius:var(--radius-md);cursor:pointer;transition:all var(--transition-base);white-space:nowrap}
+.btn-ac-primary.danger{background:var(--danger-text);color:#fff}
+.btn-ac-primary.danger:hover{background:#8B1A1A}
+.btn-ac-primary.warning{background:#D97706;color:#fff}
+.btn-ac-primary.warning:hover{background:#B45309}
+.btn-ac-primary.neutral{background:var(--color-action);color:#fff}
+.btn-ac-primary.neutral:hover{background:var(--color-action-hover)}
+.btn-ac-primary svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
+.btn-ac-ghost{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-sans);font-size:12px;font-weight:500;padding:6px 12px;background:transparent;border:1px solid var(--color-border-default);color:var(--color-text-tertiary);border-radius:var(--radius-md);cursor:pointer;transition:all var(--transition-base)}
+.btn-ac-ghost:hover{border-color:#b8b2aa;color:var(--color-text-secondary)}
+
+/* ── CONTEXT STRIP ── */
+.context-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);margin-bottom:var(--space-6)}
+.ctx-card{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);display:flex;flex-direction:column;gap:var(--space-1);transition:box-shadow var(--transition-base)}
+.ctx-card:hover{box-shadow:0 2px 10px rgba(8,7,6,.05)}
+.ctx-label{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--color-text-tertiary);display:flex;align-items:center;gap:5px}
+.ctx-label svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.5}
+.ctx-value{font-family:var(--font-mono);font-size:19px;font-weight:600;color:var(--color-text-primary);letter-spacing:-.01em;line-height:1.2}
+.ctx-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px;display:flex;align-items:center;gap:4px}
+.ctx-delta{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 6px;border-radius:var(--radius-full)}
+.ctx-delta.up{background:var(--success-surface);color:var(--success-text)}
+.ctx-delta.down{background:var(--danger-surface);color:var(--danger-text)}
+.ctx-delta svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:2.5}
+
+/* ── QUICK ACTIONS ── */
+.quick-row{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);margin-bottom:var(--space-6)}
+.quick-card{background:var(--color-surface-raised);border:1px dashed var(--color-border-default);border-radius:var(--radius-lg);padding:var(--space-4);display:flex;align-items:center;gap:12px;cursor:pointer;transition:all var(--transition-base);text-decoration:none}
+.quick-card:hover{background:var(--color-surface-sunken);border-color:#b8b2aa;border-style:solid}
+.quick-card:hover .qc-arrow{transform:translateX(2px)}
+.qc-icon{width:36px;height:36px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all var(--transition-base)}
+.qc-icon svg{width:16px;height:16px;stroke:var(--color-text-secondary);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.quick-card:hover .qc-icon{background:#EBF0FD;border-color:#C5D0F5}
+.quick-card:hover .qc-icon svg{stroke:var(--color-action)}
+.qc-text{flex:1;min-width:0}
+.qc-label{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.qc-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.qc-arrow{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0;transition:transform var(--transition-base)}
+
+/* ── PERIOD BANNER ── */
+.period-banner{background:var(--warning-surface);border:1px solid var(--warning-border);border-radius:var(--radius-md);padding:10px 16px;display:flex;align-items:center;gap:10px;margin-bottom:var(--space-5)}
+.period-banner svg{width:14px;height:14px;stroke:var(--warning-text);fill:none;stroke-width:1.5;flex-shrink:0}
+.period-banner-text{font-size:12px;color:var(--warning-text);flex:1}
+.period-banner-text strong{font-weight:700}
+.btn-period-close{font-size:12px;font-weight:600;color:var(--warning-text);background:transparent;border:1px solid var(--warning-border);border-radius:var(--radius-sm);padding:5px 12px;cursor:pointer;transition:all var(--transition-fast);flex-shrink:0}
+.btn-period-close:hover{background:var(--warning-border)}
+
+/* ── DIVIDER ROW ── */
+.section-divider{display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-4);margin-top:var(--space-2)}
+.divider-line{flex:1;height:1px;background:var(--color-border-default)}
+
+/* ── BUTTONS ── */
+.btn-primary{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:8px 16px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base)}
+.btn-primary:hover{background:var(--color-action-hover)}
+.btn-ghost{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 13px;cursor:pointer;transition:all var(--transition-fast)}
+.btn-ghost:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+
+/* ── GREETING ── */
+.page-greeting{margin-bottom:var(--space-5)}
+.greeting-line{display:flex;align-items:baseline;gap:10px;justify-content:space-between}
+.greeting-name{font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--color-text-primary)}
+.greeting-date{font-size:12px;color:var(--color-text-tertiary);font-weight:400}
+
+/* ── SCROLLBAR ── */
+.scroll-area::-webkit-scrollbar{width:4px}
+.scroll-area::-webkit-scrollbar-track{background:transparent}
+.scroll-area::-webkit-scrollbar-thumb{background:var(--color-border-default);border-radius:4px}
+
+/* ── FADE IN ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ai-brief{animation:fadeUp .3s ease both}
+.period-banner{animation:fadeUp .35s ease .05s both}
+.context-strip{animation:fadeUp .35s ease .1s both}
+.action-grid{animation:fadeUp .4s ease .15s both}
+.quick-row{animation:fadeUp .4s ease .2s both}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ─────────────── SIDEBAR ─────────────── -->
+<nav class="sb">
+  <div class="sb-top">
+    <div class="sb-logomark">
+      <svg viewBox="0 0 12 12"><path d="M2 10 L6 2 L10 10 M3.5 7h5" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+    <span class="sb-brand">TradeOS</span>
+  </div>
+
+  <div class="sb-section">Menu</div>
+  <a class="sb-item active" href="#">
+    <svg viewBox="0 0 14 14"><rect x="1" y="1" width="5" height="5" rx="1"/><rect x="8" y="1" width="5" height="5" rx="1"/><rect x="1" y="8" width="5" height="5" rx="1"/><rect x="8" y="8" width="5" height="5" rx="1"/></svg>
+    Dashboard
+  </a>
+
+  <div class="sb-section">Penjualan</div>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 14 14"><path d="M2 3h10M2 7h7M2 11h5"/></svg>
+    Invoices
+    <span class="sb-badge">1</span>
+  </a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 14 14"><circle cx="7" cy="5" r="3"/><path d="M2 12c0-2.76 2.24-5 5-5s5 2.24 5 5"/></svg>
+    Customers
+  </a>
+
+  <div class="sb-section">Pembelian</div>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 14 14"><path d="M1 1h2l1.5 7h7l1-5H4"/><circle cx="6" cy="12" r="1"/><circle cx="11" cy="12" r="1"/></svg>
+    Bills
+    <span class="sb-badge">1</span>
+  </a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 14 14"><path d="M2 2h10v10H2z"/><path d="M2 5h10M5 5v7"/></svg>
+    Vendors
+  </a>
+
+  <div class="sb-section">Akuntansi</div>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 14 14"><path d="M2 2h10v10H2zM2 5h10M5 2v10"/></svg>
+    General Ledger
+  </a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 14 14"><path d="M3 11V3M7 11V6M11 11V9"/></svg>
+    Journal Entry
+  </a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5"/><path d="M7 4v3l2 2"/></svg>
+    Rekonsiliasi
+  </a>
+
+  <div class="sb-footer">
+    <div class="sb-footer-item">
+      <svg viewBox="0 0 14 14"><circle cx="7" cy="5" r="2.5"/><path d="M2 12c0-2.5 2.2-4.5 5-4.5s5 2 5 4.5"/></svg>
+      Sarah Wijaya
+    </div>
+    <div class="sb-footer-item">
+      <svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5"/><path d="M7 4v3l2 2"/></svg>
+      Pengaturan
+    </div>
+  </div>
+</nav>
+
+<!-- ─────────────── MAIN ─────────────── -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-search-wrap">
+      <div class="tb-search">
+        <svg viewBox="0 0 14 14"><circle cx="6" cy="6" r="4"/><path d="M9.5 9.5L13 13"/></svg>
+        <input type="text" placeholder="Cari transaksi, pelanggan, akun…">
+        <span class="tb-kbd">⌘K</span>
+      </div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-notif">
+        <svg viewBox="0 0 14 14"><path d="M7 1a3 3 0 013 3v2.5l1 1.5H3l1-1.5V4a3 3 0 013-3zM5.5 11a1.5 1.5 0 003 0"/></svg>
+        <span class="notif-dot"></span>
+      </div>
+      <div class="tb-org">
+        <span class="tb-org-name">PT Sejahtera Makmur</span>
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2.5 3.75L5 6.25L7.5 3.75" stroke="#8C857C" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="tb-av">SW</div>
+    </div>
+  </div>
+
+  <!-- SCROLL AREA -->
+  <div class="scroll-area">
+
+    <!-- Greeting -->
+    <div class="page-greeting">
+      <div class="greeting-line">
+        <span class="greeting-name">Selamat pagi, Sarah 👋</span>
+        <span class="greeting-date">Rabu, 30 April 2025 · Akhir periode April</span>
+      </div>
+    </div>
+
+    <!-- AI Brief -->
+    <div class="ai-brief">
+      <div class="ai-brief-left">
+        <div class="ai-brief-icon">
+          <svg viewBox="0 0 15 15"><path d="M7.5 1L9.5 5.5H14L10.5 8.5L12 13L7.5 10L3 13L4.5 8.5L1 5.5H5.5L7.5 1Z"/></svg>
+        </div>
+        <div class="ai-brief-text">
+          <div class="ai-brief-label">AI Brief · Ringkasan Hari Ini</div>
+          <div class="ai-brief-msg">
+            Keuangan April terlihat sehat — pendapatan bulan ini <strong>Rp 48,4 juta</strong>. Ada <strong>6 hal yang perlu tindakan</strong>: 2 transaksi open, 2 jurnal menunggu approval, rekonsiliasi bank belum selesai, dan period close hari ini. Selesaikan sebelum EOD.
+          </div>
+        </div>
+      </div>
+      <div class="ai-brief-date">
+        <svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.5"/><path d="M6 3.5v2.5L8 8"/></svg>
+        Diperbarui 08:42
+      </div>
+    </div>
+
+    <!-- Period Close Banner -->
+    <div class="period-banner">
+      <svg viewBox="0 0 14 14"><path d="M7 2L7 8M7 10.5v.5"/><circle cx="7" cy="7" r="6"/></svg>
+      <span class="period-banner-text"><strong>Period Close — April 2025 berakhir hari ini.</strong> Selesaikan semua approval dan rekonsiliasi sebelum periode dikunci pukul 23:59.</span>
+      <button class="btn-period-close" onclick="this.parentElement.style.display='none'">Lihat Checklist</button>
+    </div>
+
+    <!-- Context Strip -->
+    <div class="context-strip">
+      <div class="ctx-card">
+        <div class="ctx-label">
+          <svg viewBox="0 0 11 11"><path d="M1 6.5L4 3.5L7 5.5L10 1.5"/></svg>
+          Revenue Apr
+        </div>
+        <div class="ctx-value">48,4 jt</div>
+        <div class="ctx-sub">
+          <span class="ctx-delta up">
+            <svg viewBox="0 0 9 9"><path d="M1.5 7L4.5 3L7.5 7"/></svg>
+            +12%
+          </span>
+          vs Maret
+        </div>
+      </div>
+      <div class="ctx-card">
+        <div class="ctx-label">
+          <svg viewBox="0 0 11 11"><circle cx="5.5" cy="5.5" r="4"/></svg>
+          Kas & Bank
+        </div>
+        <div class="ctx-value">440,5 jt</div>
+        <div class="ctx-sub" style="color:var(--color-text-tertiary)">Saldo per hari ini</div>
+      </div>
+      <div class="ctx-card">
+        <div class="ctx-label" style="color:#A02020">
+          <svg viewBox="0 0 11 11"><path d="M1 9L5.5 2L10 9"/></svg>
+          AR Outstanding
+        </div>
+        <div class="ctx-value" style="color:var(--danger-text)">48,4 jt</div>
+        <div class="ctx-sub">1 invoice · jatuh tempo 14 hari</div>
+      </div>
+      <div class="ctx-card">
+        <div class="ctx-label" style="color:#7A4D00">
+          <svg viewBox="0 0 11 11"><path d="M1 2h9v7H1zM4 2V1M7 2V1"/></svg>
+          AP Upcoming
+        </div>
+        <div class="ctx-value" style="color:var(--warning-text)">13,75 jt</div>
+        <div class="ctx-sub">1 bill · jatuh tempo 14 hari</div>
+      </div>
+    </div>
+
+    <!-- ─── ACTION QUEUE SECTION ─── -->
+
+    <!-- URGENT: Hari Ini -->
+    <div class="section-head">
+      <div class="section-title">
+        <span class="section-dot danger"></span>
+        Harus Diselesaikan Hari Ini
+        <span class="section-count">2</span>
+      </div>
+      <a class="section-link" href="#">Lihat semua →</a>
+    </div>
+    <div class="action-grid" style="grid-template-columns:1fr 1fr;margin-bottom:var(--space-5)">
+
+      <!-- Card: Journal Approval -->
+      <div class="action-card danger">
+        <div class="ac-top">
+          <span class="ac-badge danger">
+            <svg viewBox="0 0 9 9"><path d="M4.5 1.5v3M4.5 6.5v.5"/><circle cx="4.5" cy="4.5" r="3.5"/></svg>
+            Butuh Approval
+          </span>
+          <div class="ac-icon danger">
+            <svg viewBox="0 0 16 16"><path d="M3 8h10M3 5h7M3 11h5"/></svg>
+          </div>
+        </div>
+        <div class="ac-body">
+          <div class="ac-title">2 Journal Entry menunggu approval</div>
+          <div class="ac-sub">JE-2025-0009 dan JE-2025-0010 sudah dibuat tapi belum di-approve. Period close hari ini — tidak bisa dikunci kalau ada entry draft.</div>
+          <span class="ac-ref">JE-2025-0009 · JE-2025-0010</span>
+        </div>
+        <div class="ac-amount-label">Total nilai entri</div>
+        <div class="ac-amount">Rp 62.150.000</div>
+        <div class="ac-footer">
+          <button class="btn-ac-primary danger">
+            <svg viewBox="0 0 11 11"><path d="M2 5.5l3 3L9 2"/></svg>
+            Review & Approve
+          </button>
+          <button class="btn-ac-ghost">Lihat Detail</button>
+        </div>
+      </div>
+
+      <!-- Card: Bank Rekon -->
+      <div class="action-card danger">
+        <div class="ac-top">
+          <span class="ac-badge danger">
+            <svg viewBox="0 0 9 9"><path d="M4.5 1.5v3M4.5 6.5v.5"/><circle cx="4.5" cy="4.5" r="3.5"/></svg>
+            Belum Selesai
+          </span>
+          <div class="ac-icon danger">
+            <svg viewBox="0 0 16 16"><path d="M2 8h5l2-5 2 10 2-5h1"/></svg>
+          </div>
+        </div>
+        <div class="ac-body">
+          <div class="ac-title">Rekonsiliasi bank April belum selesai</div>
+          <div class="ac-sub">2 transaksi masuk di mutasi bank belum ter-match ke General Ledger. Tidak bisa close period sebelum rekonsiliasi bersih.</div>
+          <span class="ac-ref">BCA · April 2025</span>
+        </div>
+        <div class="ac-amount-label">Unmatched items</div>
+        <div class="ac-amount" style="font-size:22px;color:var(--danger-text)">2 transaksi</div>
+        <div class="ac-footer">
+          <button class="btn-ac-primary danger">
+            <svg viewBox="0 0 11 11"><path d="M1 5.5 C1 3 3 1 5.5 1 s4.5 2 4.5 4.5"/><path d="M10 5.5 C10 8 8 10 5.5 10 S1 8 1 5.5"/><path d="M8.5 3.5L10 5.5L8.5 7.5"/></svg>
+            Selesaikan Rekon
+          </button>
+          <button class="btn-ac-ghost">Lihat Mutasi</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- THIS WEEK: Jatuh Tempo -->
+    <div class="section-head">
+      <div class="section-title">
+        <span class="section-dot warning"></span>
+        Jatuh Tempo Minggu Ini
+        <span class="section-count">2</span>
+      </div>
+      <a class="section-link" href="#">Lihat semua →</a>
+    </div>
+    <div class="action-grid" style="grid-template-columns:1fr 1fr;margin-bottom:var(--space-5)">
+
+      <!-- Card: Invoice AR -->
+      <div class="action-card warning">
+        <div class="ac-top">
+          <span class="ac-badge warning">
+            <svg viewBox="0 0 9 9"><path d="M4.5 1v3.5L6.5 6.5"/><circle cx="4.5" cy="4.5" r="3.5"/></svg>
+            14 Hari Lagi
+          </span>
+          <div class="ac-icon warning">
+            <svg viewBox="0 0 16 16"><path d="M3 4h10v9H3zM7 8h4M7 11h2"/><path d="M6 2v3M10 2v3"/></svg>
+          </div>
+        </div>
+        <div class="ac-body">
+          <div class="ac-title">Invoice belum dibayar — Hypermarket Medan Sentosa</div>
+          <div class="ac-sub">Jatuh tempo <strong>14 Mei 2025</strong>. Belum ada konfirmasi pembayaran dari pelanggan.</div>
+          <span class="ac-ref">INV-C004-20250315</span>
+        </div>
+        <div class="ac-amount-label">Outstanding</div>
+        <div class="ac-amount">Rp 48.400.000</div>
+        <div class="ac-footer">
+          <button class="btn-ac-primary warning">
+            <svg viewBox="0 0 11 11"><path d="M1 2.5h7M1 5h9M1 7.5h7M9 9.5l2-2-2-2"/></svg>
+            Kirim Reminder
+          </button>
+          <button class="btn-ac-ghost">Lihat Invoice</button>
+        </div>
+      </div>
+
+      <!-- Card: Bill AP -->
+      <div class="action-card warning">
+        <div class="ac-top">
+          <span class="ac-badge warning">
+            <svg viewBox="0 0 9 9"><path d="M4.5 1v3.5L6.5 6.5"/><circle cx="4.5" cy="4.5" r="3.5"/></svg>
+            14 Hari Lagi
+          </span>
+          <div class="ac-icon warning">
+            <svg viewBox="0 0 16 16"><path d="M2 3h12v10H2z"/><path d="M5 6h6M5 9h4"/></svg>
+          </div>
+        </div>
+        <div class="ac-body">
+          <div class="ac-title">Bill belum dibayar — Koperasi Tani Sejahtera</div>
+          <div class="ac-sub">Jatuh tempo <strong>14 Mei 2025</strong>. NET 60, bahan baku jagung pipil premium 5.000 kg.</div>
+          <span class="ac-ref">INV-V005-20250315</span>
+        </div>
+        <div class="ac-amount-label">Total tagihan</div>
+        <div class="ac-amount">Rp 13.750.000</div>
+        <div class="ac-footer">
+          <button class="btn-ac-primary warning">
+            <svg viewBox="0 0 11 11"><path d="M1 6L4 9L10 2"/></svg>
+            Bayar Sekarang
+          </button>
+          <button class="btn-ac-ghost">Jadwalkan</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- NEEDS REVIEW -->
+    <div class="section-head">
+      <div class="section-title">
+        <span class="section-dot info"></span>
+        Perlu Ditinjau
+        <span class="section-count">2</span>
+      </div>
+    </div>
+    <div class="action-grid" style="grid-template-columns:1fr 1fr;margin-bottom:var(--space-6)">
+
+      <!-- Card: Unmatched transactions -->
+      <div class="action-card neutral">
+        <div class="ac-top">
+          <span class="ac-badge neutral">AI Detected</span>
+          <div class="ac-icon neutral">
+            <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6 8l2 2 3-3"/></svg>
+          </div>
+        </div>
+        <div class="ac-body">
+          <div class="ac-title">Transaksi bank perlu di-match ke GL</div>
+          <div class="ac-sub">AI menemukan 2 transaksi masuk yang kemungkinan besar cocok dengan invoice yang ada. Konfirmasi untuk auto-post ke jurnal.</div>
+          <span class="ac-ref">BCA · Mutasi masuk</span>
+        </div>
+        <div class="ac-amount-label">Nilai yang perlu dikonfirmasi</div>
+        <div class="ac-amount">Rp 9.625.000</div>
+        <div class="ac-footer">
+          <button class="btn-ac-primary neutral">
+            <svg viewBox="0 0 11 11"><path d="M1 5.5 C1 3 3 1 5.5 1 s4.5 2 4.5 4.5M10 5.5 C10 8 8 10 5.5 10 S1 8 1 5.5"/></svg>
+            Match Sekarang
+          </button>
+          <button class="btn-ac-ghost">Lihat Detail</button>
+        </div>
+      </div>
+
+      <!-- Card: PPN Report -->
+      <div class="action-card neutral">
+        <div class="ac-top">
+          <span class="ac-badge neutral">Batas 31 Mei</span>
+          <div class="ac-icon neutral">
+            <svg viewBox="0 0 16 16"><path d="M3 2h10v12H3z"/><path d="M6 6h4M6 9h4M6 12h2"/></svg>
+          </div>
+        </div>
+        <div class="ac-body">
+          <div class="ac-title">Laporan PPN Masa April siap dibuat</div>
+          <div class="ac-sub">Semua data PPN Masukan dan Keluaran April sudah lengkap. Batas pelaporan ke DJP <strong>31 Mei 2025</strong> — mulai dari sekarang sebelum data terkunci.</div>
+          <span class="ac-ref">SPT Masa PPN · April 2025</span>
+        </div>
+        <div class="ac-amount-label">PPN Keluaran vs Masukan</div>
+        <div class="ac-amount" style="font-size:14px;font-weight:600;margin-top:6px;font-family:var(--font-mono)">8,4 jt <span style="color:var(--color-text-tertiary);font-size:11px">keluaran</span> · 16,67 jt <span style="color:var(--color-text-tertiary);font-size:11px">masukan</span></div>
+        <div class="ac-footer">
+          <button class="btn-ac-primary neutral">
+            <svg viewBox="0 0 11 11"><path d="M2 9.5V5.5l3.5-4h4l-2 3h2l-4 5v-4H2z"/></svg>
+            Buat Laporan PPN
+          </button>
+          <button class="btn-ac-ghost">Lihat Data</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Quick Create -->
+    <div class="section-head">
+      <div class="section-title" style="font-size:10px">
+        Buat Baru
+      </div>
+    </div>
+    <div class="quick-row">
+      <a class="quick-card" href="#">
+        <div class="qc-icon">
+          <svg viewBox="0 0 16 16"><path d="M3 4h10v9H3zM7 8h4M7 11h2"/><path d="M6 2v3M10 2v3"/></svg>
+        </div>
+        <div class="qc-text">
+          <div class="qc-label">Invoice Baru</div>
+          <div class="qc-sub">Tagih pelanggan</div>
+        </div>
+        <svg class="qc-arrow" viewBox="0 0 14 14"><path d="M3 7h8M8 4l3 3-3 3"/></svg>
+      </a>
+      <a class="quick-card" href="#">
+        <div class="qc-icon">
+          <svg viewBox="0 0 16 16"><path d="M2 3h12v10H2z"/><path d="M5 6h6M5 9h4"/></svg>
+        </div>
+        <div class="qc-text">
+          <div class="qc-label">Catat Bill</div>
+          <div class="qc-sub">Tagihan dari vendor</div>
+        </div>
+        <svg class="qc-arrow" viewBox="0 0 14 14"><path d="M3 7h8M8 4l3 3-3 3"/></svg>
+      </a>
+      <a class="quick-card" href="#">
+        <div class="qc-icon">
+          <svg viewBox="0 0 16 16"><path d="M2 8h5l2-5 2 10 2-5h1"/></svg>
+        </div>
+        <div class="qc-text">
+          <div class="qc-label">Rekam Pembayaran</div>
+          <div class="qc-sub">Masuk atau keluar</div>
+        </div>
+        <svg class="qc-arrow" viewBox="0 0 14 14"><path d="M3 7h8M8 4l3 3-3 3"/></svg>
+      </a>
+      <a class="quick-card" href="#">
+        <div class="qc-icon">
+          <svg viewBox="0 0 16 16"><path d="M3 8h10M3 5h7M3 11h5"/></svg>
+        </div>
+        <div class="qc-text">
+          <div class="qc-label">Journal Entry</div>
+          <div class="qc-sub">Entri manual</div>
+        </div>
+        <svg class="qc-arrow" viewBox="0 0 14 14"><path d="M3 7h8M8 4l3 3-3 3"/></svg>
+      </a>
+    </div>
+
+    <div style="height:32px"></div>
+
+  </div><!-- /scroll-area -->
+</div><!-- /main -->
+</div><!-- /shell -->
+</body>
+</html>

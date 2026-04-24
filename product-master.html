@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Product Master — Klay</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Manrope:wght@300;400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-brand:#B83D08;--color-brand-hover:#A03206;
+  --color-action:#1A46C8;--color-action-hover:#1338A8;
+  --color-text-primary:#080706;--color-text-secondary:#2E2B27;--color-text-tertiary:#8C857C;
+  --color-surface-base:#FBF8F5;--color-surface-raised:#FFFFFF;--color-surface-sunken:#F4F0EB;--color-surface-deep:#080706;
+  --color-border-default:#E2DDD7;
+  --success-text:#166638;--success-border:#A8D9BC;--success-surface:#E8F5EE;
+  --warning-text:#7A4D00;--warning-border:#E8C870;--warning-surface:#FDF3E0;
+  --danger-text:#A02020;--danger-border:#EAB8B8;--danger-surface:#FBF0F0;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;--radius-full:9999px;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;
+  --transition-fast:0.1s ease;--transition-base:0.15s ease;--transition-slow:0.2s ease;
+  --font-display:'Playfair Display',serif;--font-sans:'Manrope',sans-serif;--font-mono:'Inconsolata',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-surface-base);color:var(--color-text-primary);-webkit-font-smoothing:antialiased;font-size:13px;height:100vh;overflow:hidden}
+
+/* ══════════════════════
+   LAYOUT: LIST VIEW
+══════════════════════ */
+.app-shell{display:flex;height:100vh;overflow:hidden}
+
+.sb{width:196px;flex-shrink:0;background:var(--color-surface-raised);border-right:1px solid var(--color-border-default);display:flex;flex-direction:column;overflow-y:auto}
+.sb-top{padding:0 16px;height:52px;display:flex;align-items:center;border-bottom:1px solid var(--color-border-default);gap:8px;flex-shrink:0}
+.sb-logomark{width:26px;height:26px;background:var(--color-brand);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center}
+.sb-logomark svg{width:12px;height:12px;fill:#fff}
+.sb-brand{font-size:14px;font-weight:700;letter-spacing:-.02em}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-border-default);padding:16px 16px 6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 12px;margin:1px 6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--color-text-tertiary);text-decoration:none;transition:background var(--transition-fast),color var(--transition-fast)}
+.sb-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.sb-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+.sb-item.active{background:var(--color-surface-sunken);color:var(--color-text-primary);font-weight:600;border-left:2px solid var(--color-brand);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-left:0;padding-left:14px}
+.sb-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--color-surface-sunken)}
+.sb-footer-item{display:flex;align-items:center;gap:8px;padding:6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--color-text-tertiary)}
+.sb-footer-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+
+.main-col{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+.topbar{height:52px;flex-shrink:0;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 20px;gap:12px}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 12px;flex:1;max-width:400px}
+.tb-search svg{width:13px;height:13px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.tb-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;background:transparent;width:100%}
+.tb-search input::placeholder{color:var(--color-text-tertiary)}
+.tb-kbd{font-size:10px;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:4px;padding:1px 5px;font-family:var(--font-mono)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-notif{width:30px;height:30px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.tb-notif svg{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--color-brand);border-radius:50%;border:1.5px solid #fff}
+.tb-org{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);cursor:pointer}
+.tb-org-name{font-size:12px;font-weight:500;color:var(--color-text-secondary)}
+.tb-av{width:24px;height:24px;border-radius:var(--radius-sm);background:var(--color-action);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+/* BUTTONS */
+.btn-primary{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:8px 16px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base);white-space:nowrap}
+.btn-primary:hover{background:var(--color-action-hover)}
+.btn-primary svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5}
+.btn-ghost{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 13px;cursor:pointer;transition:border-color var(--transition-fast),color var(--transition-fast);white-space:nowrap}
+.btn-ghost svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+.btn-ghost:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+
+/* LIST BODY */
+.list-body{display:flex;flex-direction:column;flex:1;overflow:hidden}
+.scroll-area{flex:1;overflow-y:auto;padding:var(--space-6) var(--space-6) 0}
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:var(--space-5)}
+.page-title{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.page-sub{font-size:12px;color:var(--color-text-tertiary);margin-top:2px}
+.head-right{display:flex;gap:8px;align-items:center}
+
+/* HEALTH CARDS */
+.health-row{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);margin-bottom:var(--space-5)}
+.hcard{background:var(--color-surface-raised);border:1.5px solid var(--color-border-default);border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);position:relative;overflow:hidden;cursor:pointer;transition:border-color var(--transition-base),box-shadow var(--transition-base),transform var(--transition-fast)}
+.hcard:hover{box-shadow:0 4px 16px rgba(8,7,6,.07);transform:translateY(-1px)}
+.hcard-label{font-size:11px;font-weight:600;color:var(--color-text-tertiary);margin-bottom:var(--space-2)}
+.hcard-val{font-family:var(--font-mono);font-size:28px;font-weight:600;color:var(--color-text-primary);line-height:1;margin-bottom:var(--space-1)}
+.hcard-sub{font-size:11px;color:var(--color-text-tertiary)}
+.hcard-icon{position:absolute;top:var(--space-4);right:var(--space-4);width:32px;height:32px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;background:var(--color-surface-sunken)}
+.hcard-icon svg{width:15px;height:15px;fill:none;stroke-width:1.5;stroke:var(--color-text-tertiary)}
+.hcard-hint{display:none;font-size:10px;font-weight:700;margin-top:var(--space-2)}
+.hcard.active-filter .hcard-hint{display:block}
+.hcard.active-filter{box-shadow:0 0 0 3px rgba(26,70,200,.12)!important;border-color:var(--color-action)!important}
+.hcard:not(.warn):not(.danger):not(.ok) .hcard-hint{color:var(--color-action)}
+.hcard.warn{border-color:var(--warning-border);background:var(--warning-surface)}
+.hcard.warn .hcard-val{color:var(--warning-text)}
+.hcard.warn .hcard-label{color:#A06D00}
+.hcard.warn .hcard-icon{background:rgba(232,200,112,.3)}
+.hcard.warn .hcard-icon svg{stroke:var(--warning-text)}
+.hcard.warn.active-filter{box-shadow:0 0 0 3px rgba(122,77,0,.1)!important;border-color:#C49830!important}
+.hcard.warn .hcard-hint{color:var(--warning-text)}
+.hcard.danger{border-color:var(--danger-border);background:var(--danger-surface)}
+.hcard.danger .hcard-val{color:var(--danger-text)}
+.hcard.danger .hcard-label{color:#802020}
+.hcard.danger .hcard-icon{background:rgba(234,184,184,.3)}
+.hcard.danger .hcard-icon svg{stroke:var(--danger-text)}
+.hcard.danger.active-filter{box-shadow:0 0 0 3px rgba(160,32,32,.08)!important;border-color:#C44444!important}
+.hcard.danger .hcard-hint{color:var(--danger-text)}
+.hcard.ok .hcard-icon{background:var(--success-surface)}
+.hcard.ok .hcard-icon svg{stroke:var(--success-text)}
+.hcard.ok.active-filter{box-shadow:0 0 0 3px rgba(22,102,56,.1)!important;border-color:var(--success-border)!important}
+.hcard.ok .hcard-hint{color:var(--success-text)}
+
+/* FILTER BAR */
+.filter-bar{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);margin-bottom:var(--space-3);display:flex;align-items:center;gap:var(--space-2)}
+.f-search{display:flex;align-items:center;gap:7px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:6px 10px;width:220px;flex-shrink:0;transition:border-color var(--transition-fast),box-shadow var(--transition-fast)}
+.f-search:focus-within{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.f-search svg{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.f-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;background:transparent;width:100%}
+.f-search input::placeholder{color:var(--color-text-tertiary)}
+.fsep{width:1px;height:18px;background:var(--color-border-default);margin:0 2px}
+.chip-grp{display:flex;gap:3px}
+.chip{font-family:var(--font-sans);font-size:11px;font-weight:500;padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-tertiary);cursor:pointer;transition:all var(--transition-fast);white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.chip:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.chip.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.chip-count{min-width:15px;height:15px;padding:0 3px;border-radius:var(--radius-full);font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.chip:not(.on) .chip-count{background:var(--danger-surface);color:var(--danger-text)}
+.chip.on .chip-count{background:rgba(255,255,255,.25);color:#fff}
+.f-right{margin-left:auto;display:flex;gap:8px}
+
+/* TABLE */
+.table-wrap{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:0}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--color-surface-sunken);border-bottom:1px solid var(--color-border-default)}
+thead th{font-size:11px;font-weight:700;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;text-align:left;white-space:nowrap;user-select:none}
+thead th.r{text-align:right}
+tbody tr{border-bottom:1px solid var(--color-surface-sunken);transition:background var(--transition-fast);cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#FAFAF9}
+tbody tr.active-row{background:#EBF0FD}
+td{padding:9px 14px;vertical-align:middle}
+.td-sku{font-family:var(--font-mono);font-size:12px;color:var(--color-text-tertiary)}
+.td-name{font-size:13px;font-weight:600;color:var(--color-text-primary)}
+.td-name-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.td-cat{font-size:11px;color:var(--color-text-secondary)}
+.td-uom{font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary)}
+.td-price{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--color-text-primary);text-align:right}
+.td-acct{font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary)}
+.td-acct.missing{color:var(--danger-text);font-style:italic;font-family:var(--font-sans);font-size:11px}
+.type-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-full);font-size:10px;font-weight:700;white-space:nowrap}
+.type-badge.barang{background:#EBF0FD;color:var(--color-action)}
+.type-badge.jasa{background:var(--success-surface);color:var(--success-text)}
+.comp-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:var(--radius-full);font-size:10px;font-weight:600;white-space:nowrap}
+.comp-pill svg{width:9px;height:9px;flex-shrink:0}
+.comp-ok{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.comp-ok svg{stroke:var(--success-text);fill:none;stroke-width:2.5}
+.comp-warn{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.comp-warn svg{fill:var(--warning-text);stroke:none}
+.comp-bad{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.comp-bad svg{stroke:var(--danger-text);fill:none;stroke-width:2}
+.comp-inactive{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+
+/* PAGINATION */
+.pagination-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid var(--color-border-default);background:var(--color-surface-raised)}
+.pg-info{font-size:12px;color:var(--color-text-tertiary)}
+.pg-info strong{color:var(--color-text-primary);font-weight:600}
+.pg-center{display:flex;align-items:center;gap:4px}
+.pg-btn{width:28px;height:28px;border-radius:var(--radius-sm);border:1px solid var(--color-border-default);background:var(--color-surface-raised);display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--color-text-secondary);transition:all var(--transition-fast);flex-shrink:0}
+.pg-btn:hover:not([disabled]):not(.on){background:var(--color-surface-sunken);border-color:#c8c2ba}
+.pg-btn.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.pg-btn[disabled]{opacity:.35;cursor:not-allowed}
+.pg-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pg-right{display:flex;align-items:center;gap:8px}
+.pg-per-page-label{font-size:11px;color:var(--color-text-tertiary)}
+.pg-per-page{font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:4px 26px 4px 8px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238C857C' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center}
+.pg-per-page:focus{border-color:var(--color-action)}
+.pg-ellipsis{padding:0 4px;font-size:12px;color:var(--color-text-tertiary);display:flex;align-items:center}
+
+/* STATUS BAR */
+.status-bar{background:var(--color-surface-deep);border-top:1px solid rgba(255,255,255,.08);padding:9px 14px;display:flex;align-items:center;gap:var(--space-5);flex-shrink:0}
+.sb-stat{display:flex;align-items:center;gap:6px}
+.sb-stat-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.sb-stat-val{font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(255,255,255,.85)}
+.sb-stat-val.ok{color:#86D4A4}
+.sb-stat-val.warn{color:#F5D67A}
+.sb-stat-val.bad{color:#F59A9A}
+.sb-sep{width:1px;height:14px;background:rgba(255,255,255,.12)}
+.sb-right{margin-left:auto}
+
+/* IMPORT DROPDOWN */
+.import-wrap{position:relative}
+.import-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);box-shadow:0 4px 20px rgba(8,7,6,.1);padding:var(--space-2);min-width:210px;display:none;z-index:50}
+.import-menu.open{display:block}
+.import-item{display:flex;align-items:flex-start;gap:9px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;transition:background var(--transition-fast)}
+.import-item:hover{background:var(--color-surface-sunken)}
+.import-item svg{width:13px;height:13px;stroke:var(--color-text-secondary);fill:none;stroke-width:1.5;flex-shrink:0;margin-top:1px}
+.import-item-name{font-size:12px;font-weight:500;color:var(--color-text-secondary)}
+.import-item-sub{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.import-div{height:1px;background:var(--color-border-default);margin:4px 0}
+
+/* ══════════════════════
+   DETAIL DRAWER
+══════════════════════ */
+.drawer-overlay{position:fixed;inset:0;background:rgba(8,7,6,.3);z-index:40;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:420px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow);box-shadow:-4px 0 24px rgba(8,7,6,.1)}
+.drawer.open{transform:translateX(0)}
+.d-head{padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--color-border-default);display:flex;align-items:flex-start;gap:var(--space-3);flex-shrink:0}
+.d-head-left{flex:1;min-width:0}
+.d-head-eyebrow{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:3px}
+.d-head-title{font-size:15px;font-weight:700;letter-spacing:-.01em;margin-bottom:5px}
+.d-head-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.d-head-sku{font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary)}
+.d-head-actions{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
+.d-close{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-tertiary);transition:background var(--transition-fast)}
+.d-close:hover{background:var(--color-surface-sunken);color:var(--color-text-primary)}
+.d-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.d-edit-btn{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-sans);font-size:11px;font-weight:600;padding:5px 11px;border-radius:var(--radius-sm);background:var(--color-action);color:#fff;border:none;cursor:pointer;transition:background var(--transition-fast)}
+.d-edit-btn:hover{background:var(--color-action-hover)}
+.d-edit-btn svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2}
+.d-tabs{display:flex;padding:0 var(--space-5);border-bottom:1px solid var(--color-border-default);flex-shrink:0;overflow-x:auto}
+.d-tab{padding:10px 0;margin-right:var(--space-5);font-size:12px;font-weight:500;color:var(--color-text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--transition-fast);white-space:nowrap;flex-shrink:0}
+.d-tab:hover{color:var(--color-text-secondary)}
+.d-tab.on{color:var(--color-action);border-bottom-color:var(--color-action);font-weight:600}
+.d-body{flex:1;overflow-y:auto;padding:var(--space-4) var(--space-5)}
+.d-pane{display:none}
+.d-pane.on{display:block}
+.d-section{margin-bottom:var(--space-5)}
+.d-sec-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:var(--space-3);padding-bottom:var(--space-2);border-bottom:1px solid var(--color-border-default)}
+.info-row{display:flex;align-items:flex-start;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--color-surface-sunken);gap:var(--space-3)}
+.info-row:last-child{border-bottom:none}
+.info-row label{font-size:11px;color:var(--color-text-tertiary);flex-shrink:0;padding-top:1px;width:130px}
+.info-row span{font-size:12px;font-weight:500;text-align:right}
+.info-row span.mono{font-family:var(--font-mono)}
+.info-row span.missing{color:var(--danger-text);font-style:italic;font-weight:400}
+.info-row span.muted{color:var(--color-text-tertiary);font-weight:400}
+.audit-list{display:flex;flex-direction:column}
+.audit-item{display:flex;gap:10px;padding:8px 0;position:relative}
+.audit-item:not(:last-child)::after{content:'';position:absolute;left:11px;top:28px;bottom:-8px;width:1px;background:var(--color-border-default)}
+.audit-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.audit-dot.ok{background:var(--success-surface);border:1.5px solid var(--success-border)}
+.audit-dot.ok svg{width:10px;height:10px;stroke:var(--success-text);fill:none;stroke-width:2.5}
+.audit-dot.edit{background:#EBF0FD;border:1.5px solid #C8D8FA}
+.audit-dot.edit svg{width:10px;height:10px;stroke:var(--color-action);fill:none;stroke-width:2}
+.audit-dot.neutral{background:var(--color-surface-sunken);border:1.5px solid var(--color-border-default)}
+.audit-dot.neutral svg{width:8px;height:8px;fill:var(--color-text-tertiary)}
+.audit-action{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.audit-meta{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+
+/* ══════════════════════
+   FORM: FULL SCREEN
+   No sidebar, no topbar
+══════════════════════ */
+#viewForm{
+  position:fixed;inset:0;
+  background:var(--color-surface-base);
+  z-index:100;
+  display:none;
+  flex-direction:column;
+  overflow:hidden;
+}
+#viewForm.open{display:flex}
+
+/* X button — top right */
+.form-close-x{
+  position:fixed;top:20px;right:24px;z-index:115;
+  width:36px;height:36px;border-radius:var(--radius-md);
+  background:var(--color-surface-raised);border:1px solid var(--color-border-default);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  color:var(--color-text-tertiary);
+  transition:background var(--transition-fast),border-color var(--transition-fast),color var(--transition-fast);
+  box-shadow:0 2px 8px rgba(8,7,6,.08);
+}
+.form-close-x:hover{background:var(--danger-surface);border-color:var(--danger-border);color:var(--danger-text)}
+.form-close-x svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* scrollable form content */
+.form-scroll{flex:1;overflow-y:auto;padding:56px 0 180px}
+.form-inner{max-width:680px;margin:0 auto;padding:0 var(--space-6)}
+
+.form-page-head{margin-bottom:var(--space-8);padding-right:60px}
+.form-page-title{font-size:24px;font-weight:700;letter-spacing:-.02em;margin-bottom:4px}
+.form-page-sub{font-size:13px;color:var(--color-text-tertiary);line-height:1.6}
+
+.form-section{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);margin-bottom:var(--space-5);overflow:hidden}
+.form-section-head{padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;gap:10px}
+.form-section-icon{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.form-section-icon svg{width:14px;height:14px;fill:none;stroke-width:1.5;stroke:currentColor}
+.form-section-icon.blue{background:#EBF0FD;color:var(--color-action)}
+.form-section-icon.orange{background:#FEF0E8;color:var(--color-brand)}
+.form-section-icon.green{background:var(--success-surface);color:var(--success-text)}
+.form-section-icon.yellow{background:var(--warning-surface);color:var(--warning-text)}
+.form-section-title{font-size:13px;font-weight:700}
+.form-section-sub{font-size:11px;color:var(--color-text-tertiary);margin-left:auto}
+.form-section-body{padding:var(--space-5)}
+
+/* fields */
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-4)}
+.f-row.col3{grid-template-columns:1fr 1fr 1fr}
+.f-row.col1{grid-template-columns:1fr}
+.f-row:last-child{margin-bottom:0}
+.f-field{display:flex;flex-direction:column}
+.f-label{font-size:11px;font-weight:600;color:var(--color-text-secondary);margin-bottom:var(--space-1);display:flex;align-items:center;gap:3px}
+.f-label .req{color:var(--danger-text)}
+.f-input{font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:8px 11px;width:100%;outline:none;transition:border-color var(--transition-fast),box-shadow var(--transition-fast)}
+.f-input:focus{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08);background:#fff}
+.f-input.mono{font-family:var(--font-mono)}
+.f-input[readonly]{background:var(--color-surface-base);color:var(--color-text-tertiary);cursor:default}
+.f-select{font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:8px 32px 8px 11px;width:100%;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238C857C' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.f-select:focus{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.f-textarea{font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:8px 11px;width:100%;outline:none;resize:vertical;min-height:80px;line-height:1.6;transition:border-color var(--transition-fast)}
+.f-textarea:focus{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08);background:#fff}
+.f-hint{font-size:10px;color:var(--color-text-tertiary);margin-top:4px}
+.f-prefix-wrap{display:flex;align-items:stretch}
+.f-prefix{background:var(--color-surface-base);border:1px solid var(--color-border-default);border-right:none;border-radius:var(--radius-sm) 0 0 var(--radius-sm);padding:0 11px;font-size:12px;color:var(--color-text-tertiary);display:flex;align-items:center;font-family:var(--font-mono)}
+.f-prefix-wrap .f-input{border-radius:0 var(--radius-sm) var(--radius-sm) 0}
+.form-note{font-size:11px;color:var(--color-text-tertiary);padding:10px 12px;background:var(--color-surface-sunken);border-radius:var(--radius-sm);margin-bottom:var(--space-4);line-height:1.5}
+
+/* acct mapping */
+.acct-row{display:grid;grid-template-columns:180px 1fr auto;align-items:center;gap:var(--space-3);padding:10px 0;border-bottom:1px solid var(--color-surface-sunken)}
+.acct-row:last-child{border-bottom:none}
+.acct-row-label{font-size:12px;color:var(--color-text-secondary)}
+.acct-row-label small{display:block;font-size:10px;color:var(--color-text-tertiary);margin-top:2px}
+.acct-side-pill{font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--radius-full);white-space:nowrap}
+.tag-ar{background:#EBF0FD;color:var(--color-action)}
+.tag-ap{background:var(--warning-surface);color:var(--warning-text)}
+.tag-both{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+
+/* ── BOTTOM CENTER CTA ── */
+.form-cta-wrap{
+  position:fixed;bottom:0;left:0;right:0;z-index:110;
+  display:flex;justify-content:center;align-items:flex-end;
+  padding-bottom:var(--space-8);
+  pointer-events:none;
+  background:linear-gradient(to top, var(--color-surface-base) 55%, transparent);
+}
+.form-cta-card{
+  pointer-events:all;
+  background:var(--color-surface-raised);
+  border:1px solid var(--color-border-default);
+  border-radius:var(--radius-xl);
+  padding:10px 12px 10px 20px;
+  display:flex;align-items:center;gap:var(--space-3);
+  box-shadow:0 8px 32px rgba(8,7,6,.12),0 2px 8px rgba(8,7,6,.06);
+}
+.cta-meta{font-size:12px;color:var(--color-text-tertiary)}
+.cta-meta strong{color:var(--color-text-primary);font-weight:600}
+.cta-divider{width:1px;height:20px;background:var(--color-border-default);margin:0 2px}
+.btn-cta-cancel{display:inline-flex;align-items:center;font-family:var(--font-sans);font-size:12px;font-weight:500;padding:9px 18px;border-radius:var(--radius-lg);background:transparent;border:1px solid var(--color-border-default);color:var(--color-text-secondary);cursor:pointer;transition:all var(--transition-fast)}
+.btn-cta-cancel:hover{background:var(--color-surface-sunken);border-color:#c8c2ba}
+.btn-cta-save{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-sans);font-size:13px;font-weight:700;padding:10px 24px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-lg);cursor:pointer;transition:background var(--transition-base),box-shadow var(--transition-base)}
+.btn-cta-save:hover{background:var(--color-action-hover);box-shadow:0 4px 14px rgba(26,70,200,.3)}
+.btn-cta-save svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.5}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════
+     LIST VIEW
+════════════════════════ -->
+<div class="app-shell" id="appShell">
+
+  <nav class="sb">
+    <div class="sb-top">
+      <div class="sb-logomark"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <span class="sb-brand">Klay</span>
+    </div>
+    <div class="sb-section">Overview</div>
+    <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <div class="sb-section">Keuangan</div>
+    <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>General Ledger</a>
+    <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Journal Entry</a>
+    <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Bills</a>
+    <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Invoices</a>
+    <div class="sb-section">Master Data</div>
+    <a class="sb-item active" href="#"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Produk</a>
+    <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Vendors</a>
+    <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Customers</a>
+    <div class="sb-section">Referensi</div>
+    <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Chart of Accounts</a>
+    <div class="sb-footer"><div class="sb-footer-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Settings</div></div>
+  </nav>
+
+  <div class="main-col">
+    <div class="topbar">
+      <div class="tb-search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Cari atau ketik perintah…">
+        <span class="tb-kbd">⌘K</span>
+      </div>
+      <div class="tb-right">
+        <div class="tb-notif"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>
+        <div class="tb-org"><div class="tb-av">PT</div><span class="tb-org-name">PT Sejahtera Makmur</span><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2"><polyline points="6 9 12 15 18 9"/></svg></div>
+      </div>
+    </div>
+
+    <div class="list-body">
+      <div class="scroll-area">
+
+        <div class="page-head">
+          <div>
+            <div class="page-title">Product Master</div>
+            <div class="page-sub">Katalog produk &amp; jasa · Digunakan di AR, AP, dan Inventory</div>
+          </div>
+          <div class="head-right">
+            <div class="import-wrap">
+              <button class="btn-ghost" onclick="toggleImport(event)"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import</button>
+              <div class="import-menu" id="importMenu">
+                <div class="import-item"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div><div class="import-item-name">Import dari Excel</div><div class="import-item-sub">Template .xlsx tersedia</div></div></div>
+                <div class="import-item"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg><div><div class="import-item-name">Sync dari Accurate</div><div class="import-item-sub">Terakhir sync: 2 hari lalu</div></div></div>
+                <div class="import-div"></div>
+                <div class="import-item"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><div><div class="import-item-name">Download Template</div><div class="import-item-sub">Format standar Klay</div></div></div>
+              </div>
+            </div>
+            <button class="btn-primary" onclick="openForm('create')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Tambah Produk</button>
+          </div>
+        </div>
+
+        <!-- HEALTH CARDS -->
+        <div class="health-row">
+          <div class="hcard" id="card-semua" onclick="filterByCard('semua')">
+            <div class="hcard-label">Total Produk</div>
+            <div class="hcard-val">142</div>
+            <div class="hcard-sub">87 Barang · 55 Jasa</div>
+            <div class="hcard-hint">▲ Menampilkan semua</div>
+            <div class="hcard-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+          </div>
+          <div class="hcard ok" id="card-complete" onclick="filterByCard('complete')">
+            <div class="hcard-label">Mapping Lengkap</div>
+            <div class="hcard-val">127</div>
+            <div class="hcard-sub">89% dari total produk</div>
+            <div class="hcard-hint">▲ Filter produk lengkap</div>
+            <div class="hcard-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </div>
+          <div class="hcard warn" id="card-review" onclick="filterByCard('review')">
+            <div class="hcard-label">Perlu Review</div>
+            <div class="hcard-val">11</div>
+            <div class="hcard-sub">Akun belum lengkap</div>
+            <div class="hcard-hint">▲ Filter perlu review</div>
+            <div class="hcard-icon"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+          </div>
+          <div class="hcard danger" id="card-incomplete" onclick="filterByCard('incomplete')">
+            <div class="hcard-label">Tidak Lengkap</div>
+            <div class="hcard-val">4</div>
+            <div class="hcard-sub">Tidak ada kode pajak/akun</div>
+            <div class="hcard-hint">▲ Filter tidak lengkap</div>
+            <div class="hcard-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+          </div>
+        </div>
+
+        <!-- FILTER BAR -->
+        <div class="filter-bar">
+          <div class="f-search">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Cari SKU atau nama produk…" id="searchInput" oninput="onSearch()">
+          </div>
+          <div class="fsep"></div>
+          <div class="chip-grp">
+            <div class="chip on" id="chip-semua" onclick="filterChip('semua')">Semua</div>
+            <div class="chip" id="chip-barang" onclick="filterChip('barang')">Barang</div>
+            <div class="chip" id="chip-jasa" onclick="filterChip('jasa')">Jasa</div>
+            <div class="chip" id="chip-inactive" onclick="filterChip('inactive')">Nonaktif</div>
+          </div>
+          <div class="f-right">
+            <button class="btn-ghost" id="clearFilterBtn" onclick="clearFilter()" style="display:none;color:var(--color-action);border-color:var(--color-action)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Reset Filter</button>
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>SKU</th><th>Nama Produk</th><th>Tipe</th><th>Kategori</th><th>Satuan</th>
+                <th class="r">Harga Jual</th><th>Akun Pendapatan</th><th>Akun COGS/Beban</th><th>PPN</th><th>Kelengkapan</th>
+              </tr>
+            </thead>
+            <tbody id="productTbody"></tbody>
+          </table>
+          <!-- PAGINATION BAR -->
+          <div class="pagination-bar">
+            <div class="pg-info" id="pgInfo"></div>
+            <div class="pg-center" id="pgButtons"></div>
+            <div class="pg-right">
+              <span class="pg-per-page-label">Baris per halaman</span>
+              <select class="pg-per-page" id="pgPerPage" onchange="onPerPageChange()">
+                <option value="20">20</option>
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /scroll-area -->
+
+      <div class="status-bar">
+        <div class="sb-stat"><span class="sb-stat-label">Tampil</span><span class="sb-stat-val" id="statCount">—</span></div>
+        <div class="sb-sep"></div>
+        <div class="sb-stat"><span class="sb-stat-label">Lengkap</span><span class="sb-stat-val ok">127</span></div>
+        <div class="sb-sep"></div>
+        <div class="sb-stat"><span class="sb-stat-label">Perlu Review</span><span class="sb-stat-val warn">11</span></div>
+        <div class="sb-sep"></div>
+        <div class="sb-stat"><span class="sb-stat-label">Tidak Lengkap</span><span class="sb-stat-val bad">4</span></div>
+        <div class="sb-right"><div class="sb-stat"><span class="sb-stat-label">Last Updated</span><span class="sb-stat-val" style="color:rgba(255,255,255,.4)">Hari ini, 09:14</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- DETAIL DRAWER -->
+<div class="drawer" id="detailDrawer">
+  <div class="d-head">
+    <div class="d-head-left">
+      <div class="d-head-eyebrow">Detail Produk</div>
+      <div class="d-head-title" id="dTitle">—</div>
+      <div class="d-head-meta">
+        <span class="d-head-sku" id="dSku"></span>
+        <span id="dTypeBadge" class="type-badge barang">Barang</span>
+        <span id="dCompBadge" class="comp-pill comp-ok"></span>
+      </div>
+    </div>
+    <div class="d-head-actions">
+      <div class="d-close" onclick="closeDrawer()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+      <button class="d-edit-btn" onclick="goToEdit()"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit Produk</button>
+    </div>
+  </div>
+  <div class="d-tabs">
+    <div class="d-tab on" onclick="switchDTab(this,'dp-umum')">Informasi Umum</div>
+    <div class="d-tab" onclick="switchDTab(this,'dp-akuntansi')">Akuntansi</div>
+    <div class="d-tab" onclick="switchDTab(this,'dp-pajak')">Pajak</div>
+    <div class="d-tab" onclick="switchDTab(this,'dp-harga')">Harga</div>
+    <div class="d-tab" onclick="switchDTab(this,'dp-riwayat')">Riwayat</div>
+  </div>
+  <div class="d-body">
+    <div class="d-pane on" id="dp-umum">
+      <div class="d-section">
+        <div class="d-sec-label">Identitas</div>
+        <div class="info-row"><label>Kode SKU</label><span class="mono" id="dp-sku-val">—</span></div>
+        <div class="info-row"><label>Nama Produk</label><span id="dp-name-val">—</span></div>
+        <div class="info-row"><label>Tipe</label><span id="dp-type-val">—</span></div>
+        <div class="info-row"><label>Kategori</label><span>Elektronik</span></div>
+        <div class="info-row"><label>Satuan</label><span class="mono">PCS</span></div>
+        <div class="info-row"><label>Brand</label><span>Dell</span></div>
+        <div class="info-row"><label>Deskripsi</label><span class="muted" style="font-size:11px;line-height:1.5">Laptop bisnis 15 inci. Intel Core i5, RAM 16GB, SSD 512GB.</span></div>
+      </div>
+      <div class="d-section">
+        <div class="d-sec-label">Penggunaan</div>
+        <div class="info-row"><label>Dijual (AR)</label><span>Ya</span></div>
+        <div class="info-row"><label>Dibeli (AP)</label><span>Ya</span></div>
+      </div>
+    </div>
+    <div class="d-pane" id="dp-akuntansi">
+      <div class="d-section">
+        <div class="d-sec-label">Sisi Penjualan · AR</div>
+        <div class="info-row"><label>Akun Pendapatan</label><span class="mono" id="dp-rev-val">4-1001</span></div>
+        <div class="info-row"><label>Akun Retur Jual</label><span class="mono">4-9001</span></div>
+      </div>
+      <div class="d-section">
+        <div class="d-sec-label">Sisi Pembelian · AP</div>
+        <div class="info-row"><label>Akun COGS</label><span class="mono" id="dp-cogs-val">5-1001</span></div>
+        <div class="info-row"><label>Akun Persediaan</label><span class="mono">1-3001</span></div>
+        <div class="info-row"><label>Akun Retur Beli</label><span class="mono">5-9001</span></div>
+      </div>
+    </div>
+    <div class="d-pane" id="dp-pajak">
+      <div class="d-section">
+        <div class="d-sec-label">PPN</div>
+        <div class="info-row"><label>PPN Keluaran</label><span id="dp-ppn-out" style="color:var(--success-text)">PPN 11% · Standar</span></div>
+        <div class="info-row"><label>PPN Masukan</label><span style="color:var(--success-text)">PPN 11% · Standar</span></div>
+      </div>
+      <div class="d-section">
+        <div class="d-sec-label">PPh</div>
+        <div class="info-row"><label>PPh Pasal 23</label><span class="muted">Tidak dikenakan</span></div>
+      </div>
+    </div>
+    <div class="d-pane" id="dp-harga">
+      <div class="d-section">
+        <div class="d-sec-label">Harga Standar</div>
+        <div class="info-row"><label>Harga Jual Default</label><span class="mono" id="dp-hj-val">—</span></div>
+        <div class="info-row"><label>Harga Beli / HPP</label><span class="mono">Rp 9.800.000</span></div>
+        <div class="info-row"><label>Margin Kotor</label><span style="color:var(--success-text);font-weight:700;font-family:var(--font-mono)">21.6%</span></div>
+        <div class="info-row"><label>Mata Uang</label><span>IDR · Rupiah</span></div>
+      </div>
+    </div>
+    <div class="d-pane" id="dp-riwayat">
+      <div class="d-section">
+        <div class="d-sec-label">Audit Trail</div>
+        <div class="audit-list">
+          <div class="audit-item"><div class="audit-dot ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="audit-action">Mapping akun diverifikasi</div><div class="audit-meta">Budi Santoso · 18 Apr 2025, 14:32</div></div></div>
+          <div class="audit-item"><div class="audit-dot edit"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div><div class="audit-action">Harga jual diubah: Rp11.800.000 → Rp12.500.000</div><div class="audit-meta">Siti Rahayu · 10 Apr 2025, 09:15</div></div></div>
+          <div class="audit-item"><div class="audit-dot edit"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div><div class="audit-action">SKU diubah: DELL-INSP-15 → PRD-001</div><div class="audit-meta">Budi Santoso · 2 Mar 2025, 16:45</div></div></div>
+          <div class="audit-item"><div class="audit-dot neutral"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg></div><div><div class="audit-action">Produk dibuat · Import dari Accurate</div><div class="audit-meta">System · 28 Feb 2025, 08:00</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════
+     FORM PAGE (full screen)
+     No sidebar, no topbar
+════════════════════════ -->
+<div id="viewForm">
+
+  <!-- X close button top-right -->
+  <button class="form-close-x" onclick="closeForm()">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+
+  <div class="form-scroll">
+    <div class="form-inner">
+
+      <div class="form-page-head">
+        <div class="form-page-title" id="formPageTitle">Tambah Produk Baru</div>
+        <div class="form-page-sub" id="formPageSub">Isi semua field yang diperlukan. Field bertanda <span style="color:var(--danger-text)">*</span> wajib diisi sebelum menyimpan.</div>
+      </div>
+
+      <!-- IDENTITAS -->
+      <div class="form-section">
+        <div class="form-section-head">
+          <div class="form-section-icon blue"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+          <div class="form-section-title">Identitas Produk</div>
+        </div>
+        <div class="form-section-body">
+          <div class="f-row">
+            <div class="f-field"><div class="f-label">Kode SKU <span class="req">*</span></div><input class="f-input mono" type="text" placeholder="mis. PRD-005" id="fSku"><div class="f-hint">Kode unik produk. Gunakan format konsisten.</div></div>
+            <div class="f-field"><div class="f-label">Tipe Produk <span class="req">*</span></div><select class="f-select" id="fType"><option value="">Pilih tipe…</option><option value="barang">Barang</option><option value="jasa">Jasa</option></select></div>
+          </div>
+          <div class="f-row col1">
+            <div class="f-field"><div class="f-label">Nama Produk <span class="req">*</span></div><input class="f-input" type="text" placeholder="Nama lengkap produk atau jasa" id="fName"></div>
+          </div>
+          <div class="f-row col1">
+            <div class="f-field"><div class="f-label">Deskripsi</div><textarea class="f-textarea" placeholder="Deskripsi singkat (opsional)"></textarea></div>
+          </div>
+          <div class="f-row col3">
+            <div class="f-field"><div class="f-label">Kategori</div><select class="f-select"><option value="">Pilih kategori…</option><option>Elektronik</option><option>Aksesoris</option><option>Storage</option><option>Konsultasi</option><option>Maintenance</option><option>Training</option></select></div>
+            <div class="f-field"><div class="f-label">Satuan (UoM) <span class="req">*</span></div><select class="f-select"><option value="">Pilih satuan…</option><option>PCS</option><option>UNIT</option><option>JAM</option><option>HARI</option><option>BULAN</option><option>SESI</option><option>KONTRAK</option><option>KG</option><option>LUSIN</option></select></div>
+            <div class="f-field"><div class="f-label">Brand / Merek</div><input class="f-input" type="text" placeholder="Opsional"></div>
+          </div>
+          <div class="f-row">
+            <div class="f-field"><div class="f-label">Barcode</div><input class="f-input mono" type="text" placeholder="Opsional"></div>
+            <div class="f-field"><div class="f-label">Part No. / Internal Ref.</div><input class="f-input mono" type="text" placeholder="Opsional"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PENGGUNAAN -->
+      <div class="form-section">
+        <div class="form-section-head">
+          <div class="form-section-icon orange"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div class="form-section-title">Penggunaan</div>
+        </div>
+        <div class="form-section-body">
+          <div style="display:flex;gap:var(--space-3)">
+            <label style="flex:1;display:flex;align-items:flex-start;gap:10px;padding:13px 15px;border:1.5px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;transition:border-color var(--transition-fast)" onmouseover="this.style.borderColor='#c8c2ba'" onmouseout="this.style.borderColor=''">
+              <input type="checkbox" checked style="margin-top:2px;flex-shrink:0;accent-color:var(--color-action);width:14px;height:14px">
+              <div><div style="font-size:12px;font-weight:600;margin-bottom:2px">Dijual (AR)</div><div style="font-size:11px;color:var(--color-text-tertiary)">Muncul sebagai pilihan di Invoice dan Sales Order</div></div>
+            </label>
+            <label style="flex:1;display:flex;align-items:flex-start;gap:10px;padding:13px 15px;border:1.5px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;transition:border-color var(--transition-fast)" onmouseover="this.style.borderColor='#c8c2ba'" onmouseout="this.style.borderColor=''">
+              <input type="checkbox" checked style="margin-top:2px;flex-shrink:0;accent-color:var(--color-action);width:14px;height:14px">
+              <div><div style="font-size:12px;font-weight:600;margin-bottom:2px">Dibeli (AP)</div><div style="font-size:11px;color:var(--color-text-tertiary)">Muncul sebagai pilihan di Bill dan Purchase Order</div></div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- HARGA -->
+      <div class="form-section">
+        <div class="form-section-head">
+          <div class="form-section-icon green"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div class="form-section-title">Harga</div>
+        </div>
+        <div class="form-section-body">
+          <div class="f-row">
+            <div class="f-field"><div class="f-label">Harga Jual Default <span class="req">*</span></div><div class="f-prefix-wrap"><span class="f-prefix">Rp</span><input class="f-input mono" type="text" placeholder="0"></div><div class="f-hint">Harga sebelum pajak (net)</div></div>
+            <div class="f-field"><div class="f-label">Harga Beli / HPP</div><div class="f-prefix-wrap"><span class="f-prefix">Rp</span><input class="f-input mono" type="text" placeholder="0"></div><div class="f-hint">Rata-rata harga pembelian</div></div>
+          </div>
+          <div class="f-row">
+            <div class="f-field"><div class="f-label">Mata Uang</div><select class="f-select"><option selected>IDR · Rupiah</option><option>USD · Dolar AS</option><option>SGD · Dolar Singapura</option></select></div>
+            <div class="f-field"><div class="f-label">Margin Kotor (otomatis)</div><input class="f-input mono" type="text" value="—" readonly><div class="f-hint">Dihitung dari harga jual dan HPP</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AKUNTANSI -->
+      <div class="form-section">
+        <div class="form-section-head">
+          <div class="form-section-icon blue"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+          <div class="form-section-title">Mapping Akun</div>
+          <span class="form-section-sub">Untuk jurnal otomatis</span>
+        </div>
+        <div class="form-section-body">
+          <div class="form-note">Akun yang dipilih digunakan otomatis saat produk ini muncul di Invoice (AR) atau Bill (AP).</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-action);margin-bottom:var(--space-3)"><span style="background:#EBF0FD;padding:2px 10px;border-radius:var(--radius-full)">Sisi Penjualan · AR</span></div>
+          <div class="acct-row"><div class="acct-row-label">Akun Pendapatan <span style="color:var(--danger-text)">*</span><small>Kredit saat invoice</small></div><select class="f-select"><option value="">Pilih akun…</option><option>4-1001 · Pendapatan Penjualan Barang</option><option>4-1002 · Pendapatan Penjualan Jasa</option><option>4-2001 · Pendapatan Konsultasi</option></select><span class="acct-side-pill tag-ar">AR</span></div>
+          <div class="acct-row"><div class="acct-row-label">Akun Retur Penjualan<small>Debit saat credit note</small></div><select class="f-select"><option>4-9001 · Retur Penjualan</option></select><span class="acct-side-pill tag-ar">AR</span></div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--warning-text);margin:var(--space-4) 0 var(--space-3)"><span style="background:var(--warning-surface);padding:2px 10px;border-radius:var(--radius-full)">Sisi Pembelian · AP</span></div>
+          <div class="acct-row"><div class="acct-row-label">Akun COGS / Beban <span style="color:var(--danger-text)">*</span><small>Debit saat terjual/digunakan</small></div><select class="f-select"><option value="">Pilih akun…</option><option>5-1001 · Harga Pokok Penjualan</option><option>5-1002 · HPP Jasa</option><option>6-1001 · Beban Operasional</option></select><span class="acct-side-pill tag-ap">AP</span></div>
+          <div class="acct-row"><div class="acct-row-label">Akun Persediaan<small>Untuk barang ber-stok</small></div><select class="f-select"><option>1-3001 · Persediaan Barang Dagang</option><option>— Tidak ada (jasa)</option></select><span class="acct-side-pill tag-both">BOTH</span></div>
+          <div class="acct-row"><div class="acct-row-label">Akun Retur Pembelian<small>Kredit saat debit note</small></div><select class="f-select"><option>5-9001 · Retur Pembelian</option></select><span class="acct-side-pill tag-ap">AP</span></div>
+        </div>
+      </div>
+
+      <!-- PAJAK -->
+      <div class="form-section">
+        <div class="form-section-head">
+          <div class="form-section-icon yellow"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+          <div class="form-section-title">Pajak</div>
+        </div>
+        <div class="form-section-body">
+          <div class="form-note">Kode pajak ini diterapkan otomatis saat produk dipilih di transaksi.</div>
+          <div class="f-row">
+            <div class="f-field"><div class="f-label">PPN Keluaran (Penjualan)</div><select class="f-select"><option value="">Tidak ada</option><option selected>PPN 11% · Standar</option><option>PPN 0% · Ekspor</option><option>Bebas PPN</option></select><div class="f-hint">Berlaku saat produk dijual</div></div>
+            <div class="f-field"><div class="f-label">PPN Masukan (Pembelian)</div><select class="f-select"><option value="">Tidak ada</option><option selected>PPN 11% · Standar</option><option>PPN 0%</option><option>Bebas PPN</option></select><div class="f-hint">Berlaku saat produk dibeli</div></div>
+          </div>
+          <div class="f-row">
+            <div class="f-field"><div class="f-label">PPh Pasal 23</div><select class="f-select"><option selected value="">Tidak dikenakan PPh 23</option><option>09-100-01 · Jasa Teknik (2%)</option><option>09-100-02 · Jasa Manajemen (2%)</option><option>09-100-03 · Jasa Konsultan (2%)</option></select><div class="f-hint">Untuk jasa yang dikenakan pemotongan</div></div>
+            <div></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /form-inner -->
+  </div><!-- /form-scroll -->
+
+  <!-- BOTTOM CENTER CTA -->
+  <div class="form-cta-wrap">
+    <div class="form-cta-card">
+      <span class="cta-meta" id="ctaMeta">Produk baru · <strong>belum disimpan</strong></span>
+      <div class="cta-divider"></div>
+      <button class="btn-cta-cancel" onclick="closeForm()">Batal</button>
+      <button class="btn-cta-save">
+        <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span id="ctaSaveLabel">Simpan Produk</span>
+      </button>
+    </div>
+  </div>
+
+</div><!-- /viewForm -->
+
+<script>
+const allProducts = [
+  {sku:'PRD-001',name:'Laptop Dell Inspiron 15',  sub:'Elektronik · Dell',                   type:'barang',cat:'Elektronik', uom:'PCS',    harga:'12.500.000',rev:'4-1001',cogs:'5-1001',ppn:'11%', complete:'ok',  active:true},
+  {sku:'JAS-001',name:'Jasa Konsultasi IT',        sub:'Per jam · Onsite & Remote',           type:'jasa',  cat:'Konsultasi',uom:'JAM',    harga:'750.000',   rev:'4-2001',cogs:'6-1001',ppn:'11%', complete:'ok',  active:true},
+  {sku:'PRD-002',name:'Monitor LG 27" 4K',         sub:'Elektronik · LG',                    type:'barang',cat:'Elektronik', uom:'PCS',    harga:'4.200.000', rev:'4-1001',cogs:'—',    ppn:'11%', complete:'warn',active:true},
+  {sku:'ACC-014',name:'Keyboard Logitech MX Keys', sub:'Import Accurate · Belum diverifikasi',type:'barang',cat:'Aksesoris', uom:'PCS',    harga:'1.850.000', rev:'—',     cogs:'—',    ppn:'—',   complete:'bad', active:true},
+  {sku:'JAS-002',name:'Maintenance Tahunan',        sub:'SLA · Per kontrak',                  type:'jasa',  cat:'Maintenance',uom:'KONTRAK',harga:'18.000.000',rev:'4-2002',cogs:'6-1002',ppn:'11%', complete:'ok',  active:true},
+  {sku:'JAS-003',name:'Pelatihan Karyawan',         sub:'Training · Per sesi',                type:'jasa',  cat:'Training',  uom:'SESI',   harga:'3.500.000', rev:'4-2003',cogs:'6-1003',ppn:'—',   complete:'warn',active:true},
+  {sku:'PRD-004',name:'SSD Samsung 1TB NVMe',       sub:'Storage · Samsung',                  type:'barang',cat:'Storage',   uom:'PCS',    harga:'1.450.000', rev:'4-1001',cogs:'5-1001',ppn:'11%', complete:'ok',  active:true},
+  {sku:'PRD-003',name:'Mouse Logitech G Pro',       sub:'Nonaktif sejak Mar 2025',            type:'barang',cat:'Aksesoris', uom:'PCS',    harga:'550.000',   rev:'4-1001',cogs:'5-1001',ppn:'11%', complete:'ok',  active:false},
+];
+
+let filtered=[...allProducts], currentPage=1, perPage=50, activeCardFilter=null, currentProduct=null;
+
+// ── RENDER ──
+function renderTable(){
+  const start=(currentPage-1)*perPage, end=Math.min(start+perPage,filtered.length);
+  const page=filtered.slice(start,end);
+  document.getElementById('productTbody').innerHTML=page.map(p=>{
+    const dim=!p.active?'opacity:.5':'';
+    const stk=!p.active?'text-decoration:line-through;color:var(--color-text-tertiary)':'';
+    const subClr=p.sku==='ACC-014'?'color:var(--warning-text)':'';
+    let pill='';
+    if(p.complete==='ok') pill=`<span class="comp-pill comp-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Lengkap</span>`;
+    else if(p.complete==='warn') pill=`<span class="comp-pill comp-warn"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Review</span>`;
+    else if(p.complete==='bad') pill=`<span class="comp-pill comp-bad"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Tidak Lengkap</span>`;
+    else pill=`<span class="comp-pill comp-inactive">Nonaktif</span>`;
+    const revH=p.rev==='—'?`<span class="td-acct missing">— Belum diisi</span>`:`<span class="td-acct">${p.rev}</span>`;
+    const cogsH=p.cogs==='—'?`<span class="td-acct missing">— Belum diisi</span>`:`<span class="td-acct">${p.cogs}</span>`;
+    const ppnH=p.ppn==='—'?`<span class="td-acct missing">— Tidak ada</span>`:`<span class="type-badge" style="background:var(--success-surface);color:var(--success-text)">${p.ppn}</span>`;
+    return `<tr onclick="openDrawer('${p.sku}',event)" data-sku="${p.sku}" data-type="${p.type}" data-complete="${p.complete}" data-active="${p.active}" style="${dim}">
+      <td><span class="td-sku">${p.sku}</span></td>
+      <td><div class="td-name" style="${stk}">${p.name}</div><div class="td-name-sub" style="${subClr}">${p.sub}</div></td>
+      <td><span class="type-badge ${p.type}">${p.type==='barang'?'Barang':'Jasa'}</span></td>
+      <td><span class="td-cat">${p.cat}</span></td>
+      <td><span class="td-uom">${p.uom}</span></td>
+      <td class="td-price">${p.harga}</td>
+      <td>${revH}</td><td>${cogsH}</td><td>${ppnH}</td><td>${pill}</td>
+    </tr>`;
+  }).join('');
+  renderPagination();
+  document.getElementById('statCount').textContent=filtered.length+' produk';
+}
+
+function renderPagination(){
+  const total=filtered.length, tp=Math.max(1,Math.ceil(total/perPage));
+  const s=total===0?0:(currentPage-1)*perPage+1, e=Math.min(currentPage*perPage,total);
+  document.getElementById('pgInfo').innerHTML=`Menampilkan <strong>${s}–${e}</strong> dari <strong>${total}</strong> produk`;
+  const btns=document.getElementById('pgButtons');
+  let h=`<button class="pg-btn" onclick="changePage(${currentPage-1})" ${currentPage===1?'disabled':''}><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>`;
+  pageRange(currentPage,tp).forEach(p=>{
+    h+=p==='…'?`<span class="pg-ellipsis">…</span>`:`<button class="pg-btn ${p===currentPage?'on':''}" onclick="changePage(${p})">${p}</button>`;
+  });
+  h+=`<button class="pg-btn" onclick="changePage(${currentPage+1})" ${currentPage===tp?'disabled':''}><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>`;
+  btns.innerHTML=h;
+}
+
+function pageRange(cur,total){
+  if(total<=7) return Array.from({length:total},(_,i)=>i+1);
+  if(cur<=4) return [1,2,3,4,5,'…',total];
+  if(cur>=total-3) return [1,'…',total-4,total-3,total-2,total-1,total];
+  return [1,'…',cur-1,cur,cur+1,'…',total];
+}
+function changePage(p){const t=Math.ceil(filtered.length/perPage);if(p<1||p>t)return;currentPage=p;renderTable();}
+function onPerPageChange(){perPage=parseInt(document.getElementById('pgPerPage').value);currentPage=1;renderTable();}
+
+// ── FILTERS ──
+function filterByCard(type){
+  if(activeCardFilter===type){clearFilter();return;}
+  activeCardFilter=type;
+  ['semua','complete','review','incomplete'].forEach(k=>document.getElementById('card-'+k).classList.remove('active-filter'));
+  document.getElementById('card-'+type).classList.add('active-filter');
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  document.getElementById('chip-semua').classList.add('on');
+  document.getElementById('searchInput').value='';
+  document.getElementById('clearFilterBtn').style.display='';
+  filtered=allProducts.filter(p=>type==='semua'?true:type==='complete'?p.complete==='ok'&&p.active:type==='review'?p.complete==='warn':p.complete==='bad');
+  currentPage=1;renderTable();
+}
+function filterChip(type){
+  ['semua','complete','review','incomplete'].forEach(k=>document.getElementById('card-'+k).classList.remove('active-filter'));
+  activeCardFilter=null;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  document.getElementById('chip-'+type).classList.add('on');
+  document.getElementById('clearFilterBtn').style.display='none';
+  document.getElementById('searchInput').value='';
+  filtered=allProducts.filter(p=>type==='semua'?true:type==='barang'?p.type==='barang'&&p.active:type==='jasa'?p.type==='jasa':!p.active);
+  currentPage=1;renderTable();
+}
+function clearFilter(){
+  activeCardFilter=null;
+  ['semua','complete','review','incomplete'].forEach(k=>document.getElementById('card-'+k).classList.remove('active-filter'));
+  filterChip('semua');
+  document.getElementById('clearFilterBtn').style.display='none';
+}
+function onSearch(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  ['semua','complete','review','incomplete'].forEach(k=>document.getElementById('card-'+k).classList.remove('active-filter'));
+  activeCardFilter=null;
+  document.getElementById('clearFilterBtn').style.display=q?'':'none';
+  filtered=allProducts.filter(p=>(p.sku+p.name+p.cat+p.sub).toLowerCase().includes(q));
+  currentPage=1;renderTable();
+}
+
+// ── DRAWER ──
+function openDrawer(sku,e){
+  if(e)e.stopPropagation();
+  const p=allProducts.find(x=>x.sku===sku);if(!p)return;
+  currentProduct=p;
+  document.getElementById('dTitle').textContent=p.name;
+  document.getElementById('dSku').textContent='SKU: '+p.sku;
+  document.getElementById('dp-sku-val').textContent=p.sku;
+  document.getElementById('dp-name-val').textContent=p.name;
+  document.getElementById('dp-type-val').textContent=p.type==='barang'?'Barang':'Jasa';
+  document.getElementById('dp-hj-val').textContent='Rp '+p.harga;
+  const tb=document.getElementById('dTypeBadge');tb.className='type-badge '+p.type;tb.textContent=p.type==='barang'?'Barang':'Jasa';
+  const cb=document.getElementById('dCompBadge');
+  if(p.complete==='ok'){cb.className='comp-pill comp-ok';cb.innerHTML='<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Lengkap';}
+  else if(p.complete==='warn'){cb.className='comp-pill comp-warn';cb.innerHTML='<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Perlu Review';}
+  else if(p.complete==='bad'){cb.className='comp-pill comp-bad';cb.innerHTML='<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Tidak Lengkap';}
+  document.getElementById('dp-rev-val').innerHTML=p.rev==='—'?'<span class="missing">— Belum diisi</span>':p.rev+' <span style="font-family:var(--font-sans);font-size:11px;color:var(--color-text-tertiary)">Pend. Penjualan</span>';
+  document.getElementById('dp-cogs-val').innerHTML=p.cogs==='—'?'<span class="missing">— Belum diisi</span>':p.cogs;
+  document.getElementById('dp-ppn-out').innerHTML=p.ppn==='—'?'<span class="missing">— Tidak ada</span>':`<span style="color:var(--success-text)">PPN ${p.ppn} · Standar</span>`;
+  switchDTab(document.querySelector('.d-tab'),'dp-umum');
+  document.querySelectorAll('#productTbody tr').forEach(r=>r.classList.remove('active-row'));
+  const row=document.querySelector(`#productTbody tr[data-sku="${sku}"]`);
+  if(row)row.classList.add('active-row');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('detailDrawer').classList.add('open');
+}
+function closeDrawer(){
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('detailDrawer').classList.remove('open');
+  document.querySelectorAll('#productTbody tr').forEach(r=>r.classList.remove('active-row'));
+  currentProduct=null;
+}
+function switchDTab(el,paneId){
+  document.querySelectorAll('.d-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.d-pane').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById(paneId).classList.add('on');
+}
+
+// ── FORM ──
+function openForm(mode,sku){
+  const vf=document.getElementById('viewForm');
+  vf.classList.add('open');
+  vf.querySelector('.form-scroll').scrollTop=0;
+  if(mode==='create'){
+    document.getElementById('formPageTitle').textContent='Tambah Produk Baru';
+    document.getElementById('formPageSub').innerHTML='Isi semua field yang diperlukan. Field bertanda <span style="color:var(--danger-text)">*</span> wajib diisi sebelum menyimpan.';
+    document.getElementById('ctaMeta').innerHTML='Produk baru · <strong>belum disimpan</strong>';
+    document.getElementById('ctaSaveLabel').textContent='Simpan Produk';
+    document.getElementById('fSku').value='';document.getElementById('fName').value='';document.getElementById('fType').value='';
+  } else {
+    const p=allProducts.find(x=>x.sku===sku);
+    document.getElementById('formPageTitle').textContent='Edit Produk';
+    document.getElementById('formPageSub').innerHTML=`Mengedit <strong>${p.name}</strong> · SKU: ${p.sku}`;
+    document.getElementById('ctaMeta').innerHTML=`Edit <strong>${p.sku}</strong>`;
+    document.getElementById('ctaSaveLabel').textContent='Simpan Perubahan';
+    document.getElementById('fSku').value=p.sku;document.getElementById('fName').value=p.name;document.getElementById('fType').value=p.type;
+  }
+}
+function closeForm(){document.getElementById('viewForm').classList.remove('open');}
+function goToEdit(){if(!currentProduct)return;closeDrawer();openForm('edit',currentProduct.sku);}
+
+// ── IMPORT ──
+function toggleImport(e){e.stopPropagation();document.getElementById('importMenu').classList.toggle('open');}
+document.addEventListener('click',()=>document.getElementById('importMenu').classList.remove('open'));
+
+renderTable();
+</script>
+</body>
+</html>

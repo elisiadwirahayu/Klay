@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Purchase Orders — TradeOS</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Manrope:wght@300;400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-brand:#B83D08;--color-brand-hover:#A03206;
+  --color-action:#1A46C8;--color-action-hover:#1338A8;
+  --color-text-primary:#080706;--color-text-secondary:#2E2B27;--color-text-tertiary:#8C857C;
+  --color-surface-base:#FBF8F5;--color-surface-raised:#FFFFFF;--color-surface-sunken:#F4F0EB;--color-surface-deep:#080706;
+  --color-border-default:#E2DDD7;
+  --success-text:#166638;--success-border:#A8D9BC;--success-surface:#E8F5EE;
+  --warning-text:#7A4D00;--warning-border:#E8C870;--warning-surface:#FDF3E0;
+  --danger-text:#A02020;--danger-border:#EAB8B8;--danger-surface:#FBF0F0;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;--radius-full:9999px;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;
+  --transition-fast:0.1s ease;--transition-base:0.15s ease;--transition-slow:0.2s ease;
+  --font-display:'Playfair Display',serif;--font-sans:'Manrope',sans-serif;--font-mono:'Inconsolata',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-surface-base);color:var(--color-text-primary);-webkit-font-smoothing:antialiased;font-size:13px;height:100vh;overflow:hidden}
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sb{width:196px;flex-shrink:0;background:var(--color-surface-raised);border-right:1px solid var(--color-border-default);display:flex;flex-direction:column;overflow-y:auto}
+.sb-top{padding:0 16px;height:52px;display:flex;align-items:center;border-bottom:1px solid var(--color-border-default);gap:8px;flex-shrink:0}
+.sb-logomark{width:26px;height:26px;background:var(--color-brand);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logomark svg{width:12px;height:12px;fill:none;stroke:#fff;stroke-width:1.5}
+.sb-brand{font-size:14px;font-weight:700;letter-spacing:-.02em;color:var(--color-text-primary)}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-border-default);padding:16px 16px 6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 12px;margin:1px 6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:400;color:var(--color-text-tertiary);text-decoration:none;transition:background var(--transition-fast),color var(--transition-fast)}
+.sb-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.sb-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+.sb-item.active{background:var(--color-surface-sunken);color:var(--color-text-primary);font-weight:600;border-left:2px solid var(--color-brand);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-left:0;padding-left:14px}
+.sb-sub{padding-left:32px;font-size:11px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:6px;padding:5px 12px 5px 34px;margin:0 6px;border-radius:var(--radius-sm);cursor:pointer;transition:background var(--transition-fast),color var(--transition-fast)}
+.sb-sub:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+.sb-sub.active{color:var(--color-action);font-weight:600}
+.sb-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--color-surface-sunken)}
+.sb-footer-item{display:flex;align-items:center;gap:8px;padding:6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--color-text-tertiary)}
+.sb-footer-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+.sb-footer-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* ── TOPBAR ── */
+.topbar{height:52px;flex-shrink:0;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 20px;gap:12px;z-index:10}
+.tb-search-wrap{position:relative;flex:1;max-width:380px}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 12px;cursor:text;transition:border-color var(--transition-fast)}
+.tb-search svg{width:13px;height:13px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.tb-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.tb-search input::placeholder{color:var(--color-text-tertiary)}
+.tb-kbd{font-size:10px;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:4px;padding:1px 5px;font-family:var(--font-mono);flex-shrink:0}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-notif{width:30px;height:30px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.tb-notif svg{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--color-brand);border-radius:50%;border:1.5px solid var(--color-surface-raised)}
+.tb-org{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);cursor:pointer}
+.tb-org-name{font-size:12px;font-weight:500;color:var(--color-text-secondary)}
+.tb-av{width:24px;height:24px;border-radius:var(--radius-sm);background:var(--color-action);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── SCROLL AREA ── */
+.scroll-area{flex:1;overflow-y:auto;padding:var(--space-6) var(--space-6) 60px}
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:var(--space-5)}
+.page-title{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.page-sub{font-size:12px;color:var(--color-text-tertiary);margin-top:2px}
+.head-right{display:flex;gap:8px;align-items:center}
+
+/* ── BUTTONS ── */
+.btn-primary{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:8px 16px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base);white-space:nowrap}
+.btn-primary:hover{background:var(--color-action-hover)}
+.btn-primary svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5}
+.btn-ghost{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 13px;cursor:pointer;transition:all var(--transition-fast);white-space:nowrap}
+.btn-ghost:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.btn-ghost svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+.btn-danger-ghost{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--danger-text);background:var(--danger-surface);border:1px solid var(--danger-border);border-radius:var(--radius-md);padding:7px 13px;cursor:pointer;transition:all var(--transition-fast)}
+.btn-danger-ghost:hover{background:#f8e8e8}
+.btn-danger-ghost svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+
+/* ── AI MATCH MONITOR ── */
+.amm-section{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);margin-bottom:var(--space-3);overflow:hidden}
+.amm-head{display:flex;align-items:center;justify-content:space-between;padding:10px var(--space-5);cursor:pointer;transition:background var(--transition-fast)}
+.amm-head:hover{background:var(--color-surface-sunken)}
+.amm-head-left{display:flex;align-items:center;gap:10px;flex:1}
+.amm-icon{width:24px;height:24px;background:linear-gradient(135deg,#1A46C8,#7C3AED);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:ammPulse 3s ease-in-out infinite}
+@keyframes ammPulse{0%,100%{box-shadow:0 0 0 0 rgba(26,70,200,.25)}50%{box-shadow:0 0 0 5px rgba(26,70,200,.0)}}
+.amm-icon svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:1.5}
+.amm-label{font-size:12px;font-weight:600;color:var(--color-text-secondary)}
+.amm-pills{display:flex;gap:5px}
+.amm-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 9px;border-radius:var(--radius-full)}
+.amm-pill-ok{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.amm-pill-warn{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.amm-pill-danger{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.amm-pill-info{background:#EBF0FD;color:var(--color-action);border:1px solid #C8D8FA}
+.amm-chevron{width:15px;height:15px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;transition:transform var(--transition-base);flex-shrink:0}
+.amm-chevron.open{transform:rotate(180deg)}
+.amm-body{border-top:1px solid var(--color-border-default)}
+.amm-body.collapsed{display:none}
+.amm-ai-row{display:flex;align-items:flex-start;gap:10px;padding:11px var(--space-5);background:var(--color-surface-sunken);border-bottom:1px solid var(--color-border-default)}
+.amm-ai-badge{display:flex;align-items:center;gap:4px;flex-shrink:0;padding-top:1px}
+.amm-ai-icon{width:18px;height:18px;border-radius:var(--radius-sm);background:linear-gradient(135deg,#EBF0FD,#EDE9FE);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.amm-ai-icon svg{width:10px;height:10px;stroke:var(--color-action);fill:none;stroke-width:1.5}
+.amm-ai-label{font-size:10px;font-weight:700;color:var(--color-action)}
+.amm-ai-content{flex:1}
+.amm-ai-text{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.amm-ai-text strong{font-weight:600;color:var(--color-text-primary)}
+.amm-ai-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.amm-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--radius-full);white-space:nowrap}
+.amm-chip-ok{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.amm-chip-warn{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.amm-chip-danger{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.amm-chip-info{background:#EBF0FD;color:var(--color-action);border:1px solid #C8D8FA}
+.amm-cards{padding:var(--space-3) var(--space-5);display:flex;flex-direction:column;gap:var(--space-2)}
+.amm-card{border:1px solid var(--color-border-default);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:10px 12px;display:flex;gap:12px;align-items:flex-start}
+.amm-card-body{flex:1;min-width:0}
+.amm-tag{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--radius-full);margin-bottom:4px;letter-spacing:.03em}
+.amm-tag-ok{background:var(--success-surface);color:var(--success-text)}
+.amm-tag-warn{background:var(--warning-surface);color:var(--warning-text)}
+.amm-tag-danger{background:var(--danger-surface);color:var(--danger-text)}
+.amm-tag-info{background:#EBF0FD;color:var(--color-action)}
+.amm-tag-neu{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+.amm-card-title{font-size:12px;font-weight:600;color:var(--color-text-primary);margin-bottom:2px}
+.amm-card-desc{font-size:11px;color:var(--color-text-secondary);line-height:1.4}
+.amm-card-pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.amm-card-pill{font-family:var(--font-mono);font-size:10px;padding:1px 7px;border-radius:var(--radius-full);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);color:var(--color-text-tertiary)}
+.amm-card-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;padding-top:2px}
+.amm-count{font-size:20px;font-weight:700;line-height:1;color:var(--color-text-primary);font-family:var(--font-mono)}
+.amm-count-label{font-size:10px;color:var(--color-text-tertiary);text-align:right}
+.amm-btns{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.amm-btn{font-family:var(--font-sans);font-size:11px;font-weight:500;padding:4px 10px;border-radius:var(--radius-sm);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-secondary);cursor:pointer;transition:all var(--transition-fast)}
+.amm-btn:hover{border-color:#c8c2ba;background:var(--color-surface-sunken)}
+.amm-btn.blue{border:none;background:var(--color-action);color:#fff}
+.amm-btn.blue:hover{background:var(--color-action-hover)}
+.amm-log-head{display:flex;align-items:center;justify-content:space-between;padding:9px var(--space-5);cursor:pointer;border-top:1px solid var(--color-border-default);background:var(--color-surface-sunken)}
+.amm-log-label{font-size:12px;font-weight:600;color:var(--color-text-secondary);display:flex;align-items:center;gap:6px}
+.amm-log-label svg{width:13px;height:13px;stroke:currentColor;fill:none}
+.amm-log-toggle{font-size:11px;color:var(--color-text-tertiary)}
+.amm-log-body{padding:0 var(--space-5) var(--space-3);display:flex;flex-direction:column;gap:5px}
+.amm-log-item{display:flex;align-items:flex-start;gap:9px;padding:7px 10px;background:var(--color-surface-sunken);border-radius:var(--radius-sm)}
+.amm-log-dot{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.amm-dot-ok{background:var(--success-surface);border:1px solid var(--success-border)}
+.amm-dot-ok svg{stroke:var(--success-text);fill:none;width:9px;height:9px;stroke-width:2.5}
+.amm-dot-info{background:#EBF0FD;border:1px solid #C8D8FA}
+.amm-dot-info svg{stroke:var(--color-action);fill:none;width:9px;height:9px;stroke-width:2}
+.amm-log-text{flex:1}
+.amm-log-action{font-size:11px;font-weight:600;color:var(--color-text-primary)}
+.amm-log-meta{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.amm-log-count{font-size:11px;font-weight:600;color:var(--color-text-tertiary);white-space:nowrap;flex-shrink:0;align-self:center;font-family:var(--font-mono)}
+
+/* ── FILTER BAR ── */
+.filter-bar{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);margin-bottom:var(--space-3);display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap}
+.f-search{display:flex;align-items:center;gap:7px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:6px 10px;width:200px;flex-shrink:0;transition:border-color var(--transition-fast)}
+.f-search:focus-within{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.f-search svg{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.f-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.f-search input::placeholder{color:var(--color-text-tertiary)}
+.fsep{width:1px;height:18px;background:var(--color-border-default);flex-shrink:0;margin:0 2px}
+.chip-grp{display:flex;gap:3px}
+.chip{font-family:var(--font-sans);font-size:11px;font-weight:500;padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-tertiary);cursor:pointer;transition:all var(--transition-fast);white-space:nowrap}
+.chip:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.chip.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.chip.on-warn{background:var(--warning-surface);color:var(--warning-text);border-color:var(--warning-border)}
+.chip.on-danger{background:var(--danger-surface);color:var(--danger-text);border-color:var(--danger-border)}
+.chip.on-ok{background:var(--success-surface);color:var(--success-text);border-color:var(--success-border)}
+.f-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+/* ── TABLE ── */
+.table-wrap{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--color-surface-deep)}
+thead th{font-size:10px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.07em;padding:10px 14px;text-align:left;white-space:nowrap;user-select:none}
+thead th.r{text-align:right}
+tbody tr{border-bottom:1px solid var(--color-surface-sunken);transition:background var(--transition-fast);cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#FAFAF9}
+tbody tr.active-row{background:#EBF0FD}
+tbody tr.row-exception{background:#FFF8F8}
+tbody tr.row-exception:hover{background:#FFF2F2}
+tbody tr.row-partial{background:#FFFBEE}
+tbody tr.row-partial:hover{background:#FFF7DD}
+td{padding:10px 14px;vertical-align:middle}
+.td-ref{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.td-vendor{font-size:12px;color:var(--color-text-secondary);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.td-vendor-type{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.td-date{font-size:12px;color:var(--color-text-tertiary);white-space:nowrap;font-family:var(--font-mono)}
+.td-items{font-size:12px;color:var(--color-text-tertiary);text-align:center}
+.td-amount{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--color-text-primary);text-align:right}
+.td-amount-sub{font-size:10px;color:var(--color-text-tertiary);text-align:right;margin-top:1px}
+
+/* Status badges */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:var(--radius-full);font-size:10px;font-weight:700;letter-spacing:.03em;white-space:nowrap}
+.badge svg{width:9px;height:9px;flex-shrink:0}
+.badge-draft{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+.badge-sent{background:#EBF0FD;color:var(--color-action);border:1px solid #C8D8FA}
+.badge-partial{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.badge-full{background:#E8F0FD;color:#1A46C8;border:1px solid #B8CCFA}
+.badge-matched{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.badge-exception{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.badge-closed{background:var(--color-surface-deep);color:rgba(255,255,255,.7);border:none}
+
+/* GR progress bar */
+.gr-bar-wrap{display:flex;align-items:center;gap:7px}
+.gr-bar{flex:1;height:4px;background:var(--color-surface-sunken);border-radius:var(--radius-full);overflow:hidden;min-width:48px}
+.gr-bar-fill{height:100%;border-radius:var(--radius-full);background:var(--color-action);transition:width .4s ease}
+.gr-bar-fill.full{background:var(--success-text)}
+.gr-bar-fill.none{background:var(--color-border-default)}
+.gr-pct{font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--color-text-tertiary);white-space:nowrap}
+
+/* empty state */
+.empty-state{padding:48px 24px;text-align:center}
+.empty-state svg{width:32px;height:32px;stroke:var(--color-border-default);fill:none;stroke-width:1;margin:0 auto 12px;display:block}
+.empty-title{font-size:14px;font-weight:600;color:var(--color-text-secondary);margin-bottom:4px}
+.empty-sub{font-size:12px;color:var(--color-text-tertiary)}
+
+/* ── STATUS BAR ── */
+.status-bar{position:fixed;bottom:0;left:196px;right:0;background:var(--color-surface-deep);border-top:1px solid rgba(255,255,255,.08);padding:9px 20px;display:flex;align-items:center;gap:var(--space-5);z-index:30}
+.sb-stat{display:flex;align-items:center;gap:6px}
+.sb-stat-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.sb-stat-val{font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(255,255,255,.85)}
+.sb-stat-val.ok{color:#86D4A4}
+.sb-stat-val.warn{color:#F5CC6A}
+.sb-stat-val.danger{color:#F59A9A}
+.sb-stat-val.info{color:#93B4F8}
+.sb-sep{width:1px;height:14px;background:rgba(255,255,255,.12)}
+
+/* ── DRAWER ── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(8,7,6,.35);z-index:40;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:480px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow);box-shadow:-4px 0 24px rgba(8,7,6,.1)}
+.drawer.open{transform:translateX(0)}
+.drawer-head{padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--color-border-default);display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-3);flex-shrink:0}
+.d-ref{font-family:var(--font-mono);font-size:15px;font-weight:600;color:var(--color-text-primary)}
+.d-meta{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.d-close{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-tertiary);transition:background var(--transition-fast);flex-shrink:0}
+.d-close:hover{background:var(--color-surface-sunken);color:var(--color-text-primary)}
+.d-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.d-tabs{display:flex;padding:0 var(--space-5);border-bottom:1px solid var(--color-border-default);flex-shrink:0;gap:0;overflow-x:auto}
+.d-tab{padding:10px 0;margin-right:var(--space-5);font-size:12px;font-weight:500;color:var(--color-text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--transition-fast);white-space:nowrap;flex-shrink:0}
+.d-tab:hover{color:var(--color-text-secondary)}
+.d-tab.on{color:var(--color-action);border-bottom-color:var(--color-action);font-weight:600}
+.d-tab .tab-badge{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;font-size:9px;font-weight:700;margin-left:4px;background:var(--danger-surface);color:var(--danger-text)}
+.d-body{flex:1;overflow-y:auto;padding:var(--space-4) var(--space-5)}
+.d-pane{display:none}
+.d-pane.on{display:block}
+
+/* drawer sections */
+.dsec{margin-bottom:var(--space-5)}
+.dsec-last{margin-bottom:var(--space-2)}
+.dlbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:var(--space-3)}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.info-row{display:flex;align-items:baseline;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--color-surface-sunken);gap:var(--space-3)}
+.info-row:last-child{border-bottom:none}
+.info-row label{font-size:11px;color:var(--color-text-tertiary);flex-shrink:0}
+.info-row span{font-size:12px;font-weight:500;color:var(--color-text-primary);text-align:right}
+.info-row .mono{font-family:var(--font-mono)}
+.info-row a{font-size:12px;font-weight:500;color:var(--color-action);text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.info-row a:hover{text-decoration:underline}
+.info-row a svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* drawer action bar */
+.d-actions{display:flex;gap:6px;padding:var(--space-3) 0 var(--space-4);flex-wrap:wrap}
+.d-act-btn{font-family:var(--font-sans);font-size:11px;font-weight:600;padding:6px 12px;border-radius:var(--radius-md);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-secondary);cursor:pointer;transition:all var(--transition-fast);display:inline-flex;align-items:center;gap:5px}
+.d-act-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.5}
+.d-act-btn:hover{border-color:#c8c2ba;background:var(--color-surface-sunken)}
+.d-act-btn.primary{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.d-act-btn.primary:hover{background:var(--color-action-hover)}
+.d-act-btn.success{background:var(--success-surface);color:var(--success-text);border-color:var(--success-border)}
+.d-act-btn.danger{background:var(--danger-surface);color:var(--danger-text);border-color:var(--danger-border)}
+.d-act-btn.warning{background:var(--warning-surface);color:var(--warning-text);border-color:var(--warning-border)}
+
+/* drawer table */
+.d-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.d-tbl thead tr{background:var(--color-surface-sunken)}
+.d-tbl thead th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-tertiary);padding:7px 10px;text-align:left;border-bottom:1px solid var(--color-border-default)}
+.d-tbl thead th.r{text-align:right}
+.d-tbl tbody td{padding:8px 10px;border-bottom:1px solid var(--color-surface-sunken);color:var(--color-text-secondary);vertical-align:middle}
+.d-tbl tbody tr:last-child td{border-bottom:none}
+.d-tbl tfoot td{padding:8px 10px;font-weight:700;color:var(--color-text-primary);border-top:1px solid var(--color-border-default);font-family:var(--font-mono);font-size:12px}
+.d-tbl .r{text-align:right;font-family:var(--font-mono)}
+.d-tbl .mono{font-family:var(--font-mono)}
+
+/* GR tab */
+.gr-timeline{display:flex;flex-direction:column;gap:0}
+.gr-entry{display:flex;gap:12px;padding:12px 0;position:relative}
+.gr-entry:not(:last-child)::after{content:'';position:absolute;left:15px;top:38px;bottom:-12px;width:1px;background:var(--color-border-default)}
+.gr-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid var(--success-border);background:var(--success-surface)}
+.gr-dot svg{width:13px;height:13px;stroke:var(--success-text);fill:none;stroke-width:2}
+.gr-dot.partial{border-color:var(--warning-border);background:var(--warning-surface)}
+.gr-dot.partial svg{stroke:var(--warning-text)}
+.gr-content{flex:1}
+.gr-title{font-size:12px;font-weight:600;color:var(--color-text-primary);margin-bottom:2px}
+.gr-meta{font-size:11px;color:var(--color-text-tertiary);margin-bottom:7px}
+.gr-lines{display:flex;flex-direction:column;gap:3px}
+.gr-line{display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:5px 8px;background:var(--color-surface-sunken);border-radius:var(--radius-sm)}
+.gr-line-name{color:var(--color-text-secondary);flex:1}
+.gr-line-qty{font-family:var(--font-mono);font-weight:600;color:var(--color-text-primary)}
+.gr-line-note{font-size:10px;color:var(--warning-text);margin-left:6px}
+.gr-add-btn{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px dashed var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;font-size:12px;color:var(--color-text-tertiary);transition:all var(--transition-fast);margin-top:var(--space-3)}
+.gr-add-btn:hover{border-color:var(--color-action);color:var(--color-action);background:#EBF0FD}
+.gr-add-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* 3-Way Match tab */
+.match-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-2);margin-bottom:var(--space-4)}
+.match-scard{background:var(--color-surface-sunken);border-radius:var(--radius-md);padding:10px 12px;text-align:center}
+.match-scard-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:4px}
+.match-scard-val{font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--color-text-primary)}
+.match-scard-val.ok{color:var(--success-text)}
+.match-scard-val.warn{color:var(--warning-text)}
+.match-scard-val.danger{color:var(--danger-text)}
+.match-scard-sub{font-size:10px;color:var(--color-text-tertiary);margin-top:2px}
+.match-ai-row{background:linear-gradient(135deg,#EBF0FD,#EDE9FE);border:1px solid #C8D8FA;border-radius:var(--radius-md);padding:10px 12px;margin-bottom:var(--space-4);display:flex;gap:10px;align-items:flex-start}
+.match-ai-icon{width:22px;height:22px;background:linear-gradient(135deg,var(--color-action),#7C3AED);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.match-ai-icon svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:1.5}
+.match-ai-text{font-size:12px;color:var(--color-text-secondary);line-height:1.5;flex:1}
+.match-ai-text strong{font-weight:600;color:var(--color-text-primary)}
+.match-tbl{width:100%;border-collapse:collapse;font-size:11px}
+.match-tbl thead tr{background:var(--color-surface-deep)}
+.match-tbl thead th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.5);padding:8px 10px;text-align:left;white-space:nowrap}
+.match-tbl thead th.r{text-align:right}
+.match-tbl thead th.c{text-align:center}
+.match-tbl tbody tr{border-bottom:1px solid var(--color-surface-sunken);cursor:pointer;transition:background var(--transition-fast)}
+.match-tbl tbody tr:hover{background:#FAFAF9}
+.match-tbl tbody tr.match-ok{}
+.match-tbl tbody tr.match-warn{background:#FFFBEE}
+.match-tbl tbody tr.match-warn:hover{background:#FFF7DD}
+.match-tbl tbody tr.match-danger{background:#FFF8F8}
+.match-tbl tbody tr.match-danger:hover{background:#FFF2F2}
+.match-tbl td{padding:9px 10px;vertical-align:middle;color:var(--color-text-secondary)}
+.match-tbl td.mono{font-family:var(--font-mono)}
+.match-tbl td.r{text-align:right;font-family:var(--font-mono)}
+.match-tbl td.c{text-align:center}
+.match-status-cell{text-align:center}
+.match-icon-ok{width:20px;height:20px;border-radius:50%;background:var(--success-surface);border:1.5px solid var(--success-border);display:inline-flex;align-items:center;justify-content:center}
+.match-icon-ok svg{width:10px;height:10px;stroke:var(--success-text);fill:none;stroke-width:2.5}
+.match-icon-warn{width:20px;height:20px;border-radius:50%;background:var(--warning-surface);border:1.5px solid var(--warning-border);display:inline-flex;align-items:center;justify-content:center}
+.match-icon-warn svg{width:10px;height:10px;fill:var(--warning-text)}
+.match-icon-danger{width:20px;height:20px;border-radius:50%;background:var(--danger-surface);border:1.5px solid var(--danger-border);display:inline-flex;align-items:center;justify-content:center}
+.match-icon-danger svg{width:10px;height:10px;fill:var(--danger-text)}
+.var-chip{display:inline-flex;align-items:center;font-size:9px;font-weight:700;padding:1px 6px;border-radius:var(--radius-full);white-space:nowrap;margin-left:4px}
+.var-chip-warn{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.var-chip-danger{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+
+/* exception expand */
+.exc-expand-row td{padding:0!important}
+.exc-expand-inner{padding:12px 10px 14px;border-top:1px dashed var(--color-border-default);background:inherit}
+.exc-expand-title{font-size:11px;color:var(--color-text-secondary);line-height:1.5;margin-bottom:10px}
+.exc-expand-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.exc-cell{background:var(--color-surface-sunken);border-radius:var(--radius-sm);padding:8px 10px}
+.exc-cell-label{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:2px}
+.exc-cell-val{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--color-text-primary)}
+.exc-cell-val.diff{color:var(--danger-text)}
+.exc-actions{display:flex;gap:5px;flex-wrap:wrap}
+.exc-btn{font-family:var(--font-sans);font-size:11px;font-weight:500;padding:5px 10px;border-radius:var(--radius-sm);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-secondary);cursor:pointer;transition:all var(--transition-fast)}
+.exc-btn:hover{border-color:#c8c2ba;background:var(--color-surface-sunken)}
+.exc-btn.primary{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.exc-btn.primary:hover{background:var(--color-action-hover)}
+.exc-btn.warning{background:var(--warning-surface);color:var(--warning-text);border-color:var(--warning-border)}
+.exc-btn.danger{background:var(--danger-surface);color:var(--danger-text);border-color:var(--danger-border)}
+
+/* audit trail */
+.audit-list{display:flex;flex-direction:column;gap:0}
+.audit-item{display:flex;gap:10px;padding:9px 0;position:relative}
+.audit-item:not(:last-child)::after{content:'';position:absolute;left:11px;top:32px;bottom:-9px;width:1px;background:var(--color-border-default)}
+.audit-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.audit-dot.created{background:var(--color-surface-sunken);border:1.5px solid var(--color-border-default)}
+.audit-dot.created svg{width:9px;height:9px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2}
+.audit-dot.sent{background:#EBF0FD;border:1.5px solid #C8D8FA}
+.audit-dot.sent svg{width:9px;height:9px;stroke:var(--color-action);fill:none;stroke-width:2}
+.audit-dot.gr{background:var(--success-surface);border:1.5px solid var(--success-border)}
+.audit-dot.gr svg{width:9px;height:9px;stroke:var(--success-text);fill:none;stroke-width:2.5}
+.audit-dot.warning{background:var(--warning-surface);border:1.5px solid var(--warning-border)}
+.audit-dot.warning svg{width:9px;height:9px;fill:var(--warning-text)}
+.audit-dot.ai{background:linear-gradient(135deg,#EBF0FD,#EDE9FE);border:1.5px solid #C8D8FA}
+.audit-dot.ai svg{width:9px;height:9px;stroke:var(--color-action);fill:none;stroke-width:1.5}
+.audit-content{flex:1}
+.audit-action{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.audit-meta{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+
+/* ── CREATE PO MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(8,7,6,.45);z-index:60;opacity:0;pointer-events:none;transition:opacity var(--transition-slow);display:flex;align-items:flex-start;justify-content:flex-end;padding:0}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.create-drawer{width:480px;height:100vh;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow);box-shadow:-4px 0 24px rgba(8,7,6,.1)}
+.modal-overlay.open .create-drawer{transform:translateX(0)}
+.create-head{padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.create-title{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.create-body{flex:1;overflow-y:auto;padding:var(--space-5)}
+.create-foot{padding:var(--space-4) var(--space-5);border-top:1px solid var(--color-border-default);display:flex;gap:8px;flex-shrink:0}
+.form-group{margin-bottom:var(--space-4)}
+.form-label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:var(--space-2);display:block}
+.form-input{width:100%;padding:8px 12px;font-family:var(--font-sans);font-size:13px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);outline:none;transition:border-color var(--transition-fast)}
+.form-input:focus{border-color:var(--color-action);background:var(--color-surface-raised);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.form-input::placeholder{color:var(--color-text-tertiary)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)}
+.form-select{width:100%;padding:8px 12px;font-family:var(--font-sans);font-size:13px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238C857C' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.form-select:focus{border-color:var(--color-action);background-color:var(--color-surface-raised)}
+.line-items-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-2)}
+.line-items-tbl{width:100%;border-collapse:collapse;font-size:12px;border:1px solid var(--color-border-default);border-radius:var(--radius-md);overflow:hidden}
+.line-items-tbl thead th{background:var(--color-surface-sunken);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-tertiary);padding:7px 10px;text-align:left;border-bottom:1px solid var(--color-border-default)}
+.line-items-tbl thead th.r{text-align:right}
+.line-items-tbl tbody td{padding:6px 8px;border-bottom:1px solid var(--color-surface-sunken)}
+.line-items-tbl tbody tr:last-child td{border-bottom:none}
+.line-input{width:100%;padding:5px 8px;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;border:1px solid transparent;border-radius:var(--radius-sm);outline:none;transition:border-color var(--transition-fast)}
+.line-input:focus{border-color:var(--color-action);background:var(--color-surface-raised)}
+.line-input.r{text-align:right;font-family:var(--font-mono)}
+.line-del-btn{width:22px;height:22px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-tertiary);transition:all var(--transition-fast);border:none;background:transparent}
+.line-del-btn:hover{background:var(--danger-surface);color:var(--danger-text)}
+.line-del-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2}
+.add-line-btn{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--color-action);cursor:pointer;padding:6px 0;transition:opacity var(--transition-fast)}
+.add-line-btn:hover{opacity:.7}
+.add-line-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
+.form-total{display:flex;align-items:center;justify-content:flex-end;gap:var(--space-4);padding:10px 0;border-top:1px solid var(--color-border-default);margin-top:var(--space-2)}
+.form-total-label{font-size:12px;color:var(--color-text-tertiary)}
+.form-total-val{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--color-text-primary)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sb">
+  <div class="sb-top">
+    <div class="sb-logomark">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <span class="sb-brand">TradeOS</span>
+  </div>
+  <div class="sb-section">Overview</div>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard
+  </a>
+  <div class="sb-section">Keuangan</div>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>General Ledger
+  </a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Journal Entry
+  </a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Bills
+  </a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>Invoices
+  </a>
+  <div class="sb-section">Procurement</div>
+  <a class="sb-item active" href="#">
+    <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>Purchase Orders
+  </a>
+  <a class="sb-sub" href="#">Goods Receipts</a>
+  <a class="sb-sub" href="#">Vendors</a>
+  <div class="sb-section">Master Data</div>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Product Master
+  </a>
+  <div class="sb-footer">
+    <div class="sb-footer-item">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Settings
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-search-wrap">
+      <div class="tb-search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Cari PO, vendor, atau produk…" autocomplete="off">
+        <span class="tb-kbd">⌘K</span>
+      </div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-notif">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="notif-dot"></div>
+      </div>
+      <div class="tb-org">
+        <div class="tb-av">PT</div>
+        <span class="tb-org-name">PT Sejahtera Makmur</span>
+        <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCROLL AREA -->
+  <div class="scroll-area" id="scrollArea">
+
+    <!-- PAGE HEADER -->
+    <div class="page-head">
+      <div>
+        <div class="page-title">Purchase Orders</div>
+        <div class="page-sub">PT Sejahtera Makmur · Jan 2025 — 14 PO aktif</div>
+      </div>
+      <div class="head-right">
+        <button class="btn-ghost" onclick="alert('Export PO')">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+        <button class="btn-primary" onclick="openCreatePO()">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Buat PO Baru
+        </button>
+      </div>
+    </div>
+
+    <!-- AI MATCH MONITOR -->
+    <div class="amm-section">
+      <div class="amm-head" onclick="toggleAMM()">
+        <div class="amm-head-left">
+          <div class="amm-icon">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <span class="amm-label">AI Match Monitor</span>
+          <div class="amm-pills">
+            <span class="amm-pill amm-pill-ok">8 matched</span>
+            <span class="amm-pill amm-pill-danger">2 exception</span>
+            <span class="amm-pill amm-pill-warn">2 partial GR</span>
+            <span class="amm-pill amm-pill-info">2 waiting GR</span>
+          </div>
+        </div>
+        <svg class="amm-chevron open" id="ammChevron" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+      </div>
+
+      <div class="amm-body" id="ammBody">
+        <!-- AI SUMMARY -->
+        <div class="amm-ai-row">
+          <div class="amm-ai-badge">
+            <div class="amm-ai-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            <span class="amm-ai-label">Klay AI</span>
+          </div>
+          <div class="amm-ai-content">
+            <div class="amm-ai-text">
+              Dari <strong>14 PO aktif</strong> bulan ini, <strong>8 sudah ter-match sempurna</strong> dan siap diproses pembayaran. Terdapat <strong>2 exception</strong> yang butuh resolusi — PO-2025-0041 ada price variance +10% pada Pulpen Pilot, dan PO-2025-0036 ada qty variance 5 unit Tinta Printer yang tidak terkonfirmasi di GR. Total nilai exception: <strong>Rp 6.125.000</strong>.
+            </div>
+            <div class="amm-ai-chips">
+              <span class="amm-chip amm-chip-ok">✓ 8 siap bayar</span>
+              <span class="amm-chip amm-chip-danger">⚠ 2 exception aktif</span>
+              <span class="amm-chip amm-chip-warn">2 GR belum lengkap</span>
+              <span class="amm-chip amm-chip-info">Rp 6,1jt nilai selisih</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTION CARDS -->
+        <div class="amm-cards">
+
+          <!-- Exception card -->
+          <div class="amm-card" style="border-left:2px solid var(--danger-border)">
+            <div class="amm-card-body">
+              <div class="amm-tag amm-tag-danger">Perlu Aksi</div>
+              <div class="amm-card-title">2 PO memiliki exception match</div>
+              <div class="amm-card-desc">Harus diselesaikan sebelum invoice bisa diproses untuk pembayaran</div>
+              <div class="amm-card-pills">
+                <span class="amm-card-pill">PO-2025-0041</span>
+                <span class="amm-card-pill">PO-2025-0036</span>
+              </div>
+            </div>
+            <div class="amm-card-right">
+              <div class="amm-count">2</div>
+              <div class="amm-count-label">exception</div>
+              <div class="amm-btns">
+                <button class="amm-btn" onclick="filterStatus('exception')">Filter exception</button>
+                <button class="amm-btn blue" onclick="openPODrawer('PO-2025-0041',2)">Lihat PO-0041</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ready to pay card -->
+          <div class="amm-card" style="border-left:2px solid var(--success-border)">
+            <div class="amm-card-body">
+              <div class="amm-tag amm-tag-ok">Siap Bayar</div>
+              <div class="amm-card-title">8 PO fully matched — siap diproses ke Bills</div>
+              <div class="amm-card-desc">3-way match selesai, tidak ada variance. Bisa di-approve untuk pembayaran.</div>
+            </div>
+            <div class="amm-card-right">
+              <div class="amm-count">8</div>
+              <div class="amm-count-label">matched</div>
+              <div class="amm-btns">
+                <button class="amm-btn" onclick="filterStatus('matched')">Lihat semua</button>
+                <button class="amm-btn blue" onclick="alert('Batch approve ke Bills')">Approve ke Bills</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Partial GR card -->
+          <div class="amm-card" style="border-left:2px solid var(--warning-border)">
+            <div class="amm-card-body">
+              <div class="amm-tag amm-tag-warn">Partial GR</div>
+              <div class="amm-card-title">2 PO baru diterima sebagian</div>
+              <div class="amm-card-desc">Sisa qty belum diterima dari gudang. Belum bisa dilakukan matching.</div>
+              <div class="amm-card-pills">
+                <span class="amm-card-pill">PO-2025-0039</span>
+                <span class="amm-card-pill">PO-2025-0033</span>
+              </div>
+            </div>
+            <div class="amm-card-right">
+              <div class="amm-count">2</div>
+              <div class="amm-count-label">partial</div>
+              <div class="amm-btns">
+                <button class="amm-btn blue" onclick="filterStatus('partial')">Lihat partial</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- SYSTEM LOG -->
+        <div class="amm-log-head" onclick="toggleAMMLog()">
+          <div class="amm-log-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Yang sudah dilakukan sistem hari ini
+          </div>
+          <span class="amm-log-toggle" id="ammLogToggle">Tampilkan ↓</span>
+        </div>
+        <div class="amm-log-body" id="ammLogBody" style="display:none">
+          <div class="amm-log-item">
+            <div class="amm-log-dot amm-dot-ok"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="amm-log-text"><div class="amm-log-action">Auto-match invoice ke PO</div><div class="amm-log-meta">08.15 — cocokkan berdasarkan vendor + nominal ± 5%</div></div>
+            <span class="amm-log-count">11 matched</span>
+          </div>
+          <div class="amm-log-item">
+            <div class="amm-log-dot amm-dot-ok"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="amm-log-text"><div class="amm-log-action">Deteksi price & qty variance</div><div class="amm-log-meta">09.30 — scan 14 PO aktif, 2 exception ditemukan</div></div>
+            <span class="amm-log-count">14 diperiksa</span>
+          </div>
+          <div class="amm-log-item">
+            <div class="amm-log-dot amm-dot-info"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+            <div class="amm-log-text"><div class="amm-log-action">Sinkronisasi status GR dari gudang</div><div class="amm-log-meta">10.45 — update 3 GR baru masuk dari tim operasional</div></div>
+            <span class="amm-log-count">3 diupdate</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <div class="f-search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Cari PO atau vendor…" oninput="applyFilter()" autocomplete="off">
+      </div>
+      <div class="fsep"></div>
+      <div class="chip-grp" id="statusChips">
+        <div class="chip on" data-v="all" onclick="setStatusChip(this)">Semua</div>
+        <div class="chip" data-v="draft" onclick="setStatusChip(this)">Draft</div>
+        <div class="chip" data-v="sent" onclick="setStatusChip(this)">Dikirim</div>
+        <div class="chip" data-v="partial" onclick="setStatusChip(this)">Partial GR</div>
+        <div class="chip" data-v="full" onclick="setStatusChip(this)">Full GR</div>
+        <div class="chip" data-v="matched" onclick="setStatusChip(this)">Matched</div>
+        <div class="chip" data-v="exception" onclick="setStatusChip(this)">Exception</div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>No. PO</th>
+            <th>Vendor</th>
+            <th>Tgl PO</th>
+            <th>Est. Terima</th>
+            <th class="r">Total (Rp)</th>
+            <th>Penerimaan GR</th>
+            <th>Status Match</th>
+            <th>Status PO</th>
+          </tr>
+        </thead>
+        <tbody id="poTableBody"></tbody>
+      </table>
+      <div id="emptyState" class="empty-state" style="display:none">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        <div class="empty-title">Tidak ada PO ditemukan</div>
+        <div class="empty-sub">Coba ubah filter atau pencarian</div>
+      </div>
+    </div>
+
+  </div><!-- /scroll-area -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div class="sb-stat">
+    <span class="sb-stat-label">Total PO</span>
+    <span class="sb-stat-val" id="statTotal">—</span>
+  </div>
+  <div class="sb-sep"></div>
+  <div class="sb-stat">
+    <span class="sb-stat-label">Nilai PO</span>
+    <span class="sb-stat-val info" id="statValue">—</span>
+  </div>
+  <div class="sb-sep"></div>
+  <div class="sb-stat">
+    <span class="sb-stat-label">Matched</span>
+    <span class="sb-stat-val ok" id="statMatched">—</span>
+  </div>
+  <div class="sb-sep"></div>
+  <div class="sb-stat">
+    <span class="sb-stat-label">Exception</span>
+    <span class="sb-stat-val danger" id="statException">—</span>
+  </div>
+  <div class="sb-sep"></div>
+  <div class="sb-stat">
+    <span class="sb-stat-label">Waiting GR</span>
+    <span class="sb-stat-val warn" id="statWaiting">—</span>
+  </div>
+</div>
+
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- DETAIL DRAWER -->
+<div class="drawer" id="poDrawer">
+  <div class="drawer-head">
+    <div>
+      <div class="d-ref" id="dRef">PO-2025-0041</div>
+      <div class="d-meta" id="dMeta">PT Maju Supplier · 10 Jan 2025</div>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <span class="badge badge-exception" id="dBadge">Exception</span>
+      <div class="d-close" onclick="closeDrawer()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+  </div>
+  <div class="d-tabs" id="dTabs">
+    <div class="d-tab on" onclick="switchTab(0,this)">Overview</div>
+    <div class="d-tab" onclick="switchTab(1,this)">Penerimaan (GR)</div>
+    <div class="d-tab" onclick="switchTab(2,this)">3-Way Match<span class="tab-badge" id="excBadge">2</span></div>
+    <div class="d-tab" onclick="switchTab(3,this)">Aktivitas</div>
+  </div>
+  <div class="d-body">
+    <!-- TAB 0: OVERVIEW -->
+    <div class="d-pane on" id="dPane0">
+      <div class="dsec">
+        <div class="dlbl">Aksi</div>
+        <div class="d-actions" id="dActions"></div>
+      </div>
+      <div class="dsec">
+        <div class="dlbl">Informasi PO</div>
+        <div id="dInfoRows"></div>
+      </div>
+      <div class="dsec">
+        <div class="dlbl">Line Items</div>
+        <table class="d-tbl" id="dLineItems">
+          <thead>
+            <tr>
+              <th>Produk</th>
+              <th class="r">Qty</th>
+              <th class="r">Harga Satuan</th>
+              <th class="r">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="dLineBody"></tbody>
+          <tfoot id="dLineFoot"></tfoot>
+        </table>
+      </div>
+      <div class="dsec">
+        <div class="dlbl">Catatan</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);background:var(--color-surface-sunken);padding:10px 12px;border-radius:var(--radius-md);line-height:1.5" id="dNotes">—</div>
+      </div>
+    </div>
+
+    <!-- TAB 1: GR / PENERIMAAN -->
+    <div class="d-pane" id="dPane1">
+      <div class="dsec">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-3)">
+          <div class="dlbl" style="margin-bottom:0">Riwayat Penerimaan</div>
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary)" id="grSummary">—</span>
+        </div>
+        <div class="gr-timeline" id="grTimeline"></div>
+        <div class="gr-add-btn" onclick="alert('Catat penerimaan baru untuk PO ini')">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Catat Penerimaan Baru
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: 3-WAY MATCH -->
+    <div class="d-pane" id="dPane2">
+      <div class="match-summary" id="matchSummary"></div>
+      <div class="match-ai-row" id="matchAIRow">
+        <div class="match-ai-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <div class="match-ai-text" id="matchAIText">—</div>
+      </div>
+      <div style="margin-bottom:var(--space-2)">
+        <div class="dlbl">Perbandingan Per Line Item</div>
+      </div>
+      <table class="match-tbl" id="matchTbl">
+        <thead>
+          <tr>
+            <th style="width:28px">#</th>
+            <th>Produk</th>
+            <th class="r">PO Qty</th>
+            <th class="r">GR Qty</th>
+            <th class="r">INV Qty</th>
+            <th class="r">PO Price</th>
+            <th class="r">INV Price</th>
+            <th class="c">Status</th>
+          </tr>
+        </thead>
+        <tbody id="matchTblBody"></tbody>
+      </table>
+    </div>
+
+    <!-- TAB 3: AKTIVITAS -->
+    <div class="d-pane" id="dPane3">
+      <div class="dsec">
+        <div class="dlbl">Audit Trail</div>
+        <div class="audit-list" id="auditList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE PO MODAL -->
+<div class="modal-overlay" id="createModal">
+  <div class="create-drawer">
+    <div class="create-head">
+      <span class="create-title">Buat Purchase Order Baru</span>
+      <div class="d-close" onclick="closeCreatePO()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="create-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">No. PO</label>
+          <input class="form-input" type="text" value="PO-2025-0048" readonly style="background:var(--color-surface-sunken);color:var(--color-text-tertiary)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tanggal PO</label>
+          <input class="form-input" type="date" value="2025-01-20">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Vendor</label>
+        <select class="form-select">
+          <option>— Pilih Vendor —</option>
+          <option>PT Maju Supplier</option>
+          <option>CV Berkah Logistik</option>
+          <option>PT Indo Kertas</option>
+          <option>CV Sumber Makmur</option>
+          <option>PT Teknindo</option>
+          <option>CV Delta Supplies</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Est. Tanggal Terima</label>
+          <input class="form-input" type="date" value="2025-01-27">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Payment Terms</label>
+          <select class="form-select">
+            <option>Net 30</option>
+            <option>Net 14</option>
+            <option>Net 45</option>
+            <option>COD</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="line-items-header">
+          <label class="form-label" style="margin-bottom:0">Line Items</label>
+        </div>
+        <table class="line-items-tbl">
+          <thead>
+            <tr>
+              <th>Produk / SKU</th>
+              <th class="r" style="width:60px">Qty</th>
+              <th class="r" style="width:110px">Harga Satuan</th>
+              <th class="r" style="width:110px">Subtotal</th>
+              <th style="width:30px"></th>
+            </tr>
+          </thead>
+          <tbody id="createLineBody">
+            <tr>
+              <td><input class="line-input" type="text" placeholder="Nama produk atau SKU" oninput="calcTotal()"></td>
+              <td><input class="line-input r" type="number" placeholder="0" min="1" oninput="calcTotal()" style="width:52px"></td>
+              <td><input class="line-input r" type="number" placeholder="0" min="0" oninput="calcTotal()" style="width:100px"></td>
+              <td><div class="line-input r" style="pointer-events:none;color:var(--color-text-tertiary)">Rp 0</div></td>
+              <td><button class="line-del-btn" onclick="removeLine(this)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="add-line-btn" onclick="addLine()">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Tambah baris
+        </div>
+        <div class="form-total">
+          <span class="form-total-label">Total PO</span>
+          <span class="form-total-val" id="formTotal">Rp 0</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catatan</label>
+        <textarea class="form-input" rows="3" placeholder="Instruksi pengiriman, syarat khusus, atau catatan internal…" style="resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="create-foot">
+      <button class="btn-ghost" onclick="closeCreatePO()" style="flex:1">Batal</button>
+      <button class="btn-ghost" onclick="alert('Disimpan sebagai Draft')" style="flex:1">Simpan Draft</button>
+      <button class="btn-primary" onclick="alert('PO dibuat dan dikirim ke vendor')" style="flex:2">
+        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Buat & Kirim PO
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   DATA
+══════════════════════════════════════════ */
+const PO_DATA = [
+  {
+    id:'PO-2025-0041', vendor:'PT Maju Supplier', vendorType:'Supplier ATK & Perlengkapan',
+    date:'2025-01-10', delivery:'2025-01-20', items:5, total:47500000,
+    poStatus:'exception', grPct:100, matchStatus:'exception',
+    terms:'Net 30', notes:'Pengiriman ke Gudang Utama Lt.1. Pastikan disertai surat jalan.',
+    lines:[
+      {sku:'ATK-001', name:'Kertas HVS A4 80gr', qty:100, unit:'rim', price:75000},
+      {sku:'ATK-015', name:'Tinta Printer HP Black', qty:50, unit:'pcs', price:320000},
+      {sku:'ATK-008', name:'Pulpen Pilot 0.5mm', qty:200, unit:'pcs', price:12500},
+      {sku:'ATK-022', name:'Map Plastik A4', qty:100, unit:'pcs', price:8500},
+      {sku:'ATK-031', name:'Binder Clip A4', qty:50, unit:'pack', price:45000},
+    ],
+    grList:[
+      {id:'GR-2025-0089', date:'2025-01-19', receivedBy:'Agus Gunawan', note:'Semua item diterima lengkap kecuali Tinta HP',
+        lines:[
+          {name:'Kertas HVS A4 80gr', qty:100, poQty:100},
+          {name:'Tinta Printer HP Black', qty:45, poQty:50, partial:true},
+          {name:'Pulpen Pilot 0.5mm', qty:200, poQty:200},
+          {name:'Map Plastik A4', qty:100, poQty:100},
+          {name:'Binder Clip A4', qty:50, poQty:50},
+        ]
+      }
+    ],
+    matchLines:[
+      {name:'Kertas HVS A4 80gr', poQty:100, grQty:100, invQty:100, poPrice:75000, invPrice:75000, status:'ok'},
+      {name:'Tinta Printer HP Black', poQty:50, grQty:45, invQty:50, poPrice:320000, invPrice:320000, status:'warn',
+        excType:'qty', excDesc:'GR menerima 45 unit, tapi invoice menagih 50 unit. Selisih 5 unit × Rp 320.000 = Rp 1.600.000',
+        excCells:[{l:'PO Qty',v:'50 pcs'},{l:'GR Qty',v:'45 pcs'},{l:'INV Qty',v:'50 pcs'},{l:'Selisih',v:'5 pcs',diff:true},{l:'Nilai Selisih',v:'Rp 1.600.000',diff:true},{l:'Toleransi',v:'±0 pcs'}]
+      },
+      {name:'Pulpen Pilot 0.5mm', poQty:200, grQty:200, invQty:200, poPrice:12500, invPrice:13750, status:'danger',
+        excType:'price', excDesc:'Harga invoice Rp 13.750 melebihi harga PO Rp 12.500. Selisih +10% (Rp 1.250 × 200 pcs = Rp 250.000). Melebihi toleransi harga 5%.',
+        excCells:[{l:'PO Price',v:'Rp 12.500'},{l:'INV Price',v:'Rp 13.750'},{l:'Selisih',v:'+Rp 1.250',diff:true},{l:'% Var',v:'+10%',diff:true},{l:'Total Selisih',v:'Rp 250.000',diff:true},{l:'Toleransi',v:'±5%'}]
+      },
+      {name:'Map Plastik A4', poQty:100, grQty:100, invQty:100, poPrice:8500, invPrice:8500, status:'ok'},
+      {name:'Binder Clip A4', poQty:50, grQty:50, invQty:50, poPrice:45000, invPrice:45000, status:'ok'},
+    ],
+    audit:[
+      {type:'ai', action:'AI mendeteksi 2 exception', meta:'24 Jan 2025, 09:30 — price variance +10% & qty variance 5 unit'},
+      {type:'gr', action:'Goods Receipt dicatat', meta:'GR-2025-0089 · 19 Jan 2025 · Agus Gunawan — 45/50 Tinta HP diterima'},
+      {type:'sent', action:'PO dikirim ke vendor', meta:'10 Jan 2025, 14:22 · via email · oleh Sarah Wijaya'},
+      {type:'created', action:'PO dibuat', meta:'10 Jan 2025, 09:11 · oleh Sarah Wijaya'},
+    ]
+  },
+  {
+    id:'PO-2025-0040', vendor:'CV Berkah Logistik', vendorType:'Jasa Ekspedisi & Logistik',
+    date:'2025-01-08', delivery:'2025-01-15', items:3, total:23750000,
+    poStatus:'matched', grPct:100, matchStatus:'matched',
+    terms:'Net 14', notes:'',
+    lines:[
+      {sku:'LOG-001', name:'Jasa Pengiriman Reguler', qty:1, unit:'ls', price:12000000},
+      {sku:'LOG-002', name:'Asuransi Kargo', qty:1, unit:'ls', price:5750000},
+      {sku:'LOG-003', name:'Biaya Pengemasan', qty:1, unit:'ls', price:6000000},
+    ],
+    grList:[
+      {id:'GR-2025-0085', date:'2025-01-15', receivedBy:'Rina Kusuma', note:'Semua jasa diterima dan dikonfirmasi',
+        lines:[
+          {name:'Jasa Pengiriman Reguler', qty:1, poQty:1},
+          {name:'Asuransi Kargo', qty:1, poQty:1},
+          {name:'Biaya Pengemasan', qty:1, poQty:1},
+        ]
+      }
+    ],
+    matchLines:[
+      {name:'Jasa Pengiriman Reguler', poQty:1, grQty:1, invQty:1, poPrice:12000000, invPrice:12000000, status:'ok'},
+      {name:'Asuransi Kargo', poQty:1, grQty:1, invQty:1, poPrice:5750000, invPrice:5750000, status:'ok'},
+      {name:'Biaya Pengemasan', poQty:1, grQty:1, invQty:1, poPrice:6000000, invPrice:6000000, status:'ok'},
+    ],
+    audit:[
+      {type:'ai', action:'AI mengkonfirmasi 3-way match sempurna', meta:'20 Jan 2025, 08.15 — semua line matched, siap bayar'},
+      {type:'gr', action:'Goods Receipt dicatat', meta:'GR-2025-0085 · 15 Jan 2025 · Rina Kusuma'},
+      {type:'sent', action:'PO dikirim ke vendor', meta:'08 Jan 2025, 11.30 · oleh Budi Santoso'},
+      {type:'created', action:'PO dibuat', meta:'08 Jan 2025, 09.00 · oleh Budi Santoso'},
+    ]
+  },
+  {
+    id:'PO-2025-0039', vendor:'PT Indo Kertas', vendorType:'Supplier Kertas & Percetakan',
+    date:'2025-01-05', delivery:'2025-01-12', items:8, total:86200000,
+    poStatus:'partial', grPct:60, matchStatus:'partial',
+    terms:'Net 30', notes:'Delivery bertahap — batch 1 maks 60% dari total order.',
+    lines:[
+      {sku:'KRT-001', name:'Kertas Art Paper 150gr A3', qty:500, unit:'lembar', price:45000},
+      {sku:'KRT-002', name:'Kertas Doorslaq NCR 3ply', qty:200, unit:'rim', price:95000},
+      {sku:'KRT-003', name:'Amplop Coklat Besar', qty:1000, unit:'pcs', price:3500},
+      {sku:'KRT-004', name:'Label Stiker Putih A4', qty:100, unit:'pack', price:28000},
+      {sku:'KRT-005', name:'Buku Nota 3ply', qty:50, unit:'box', price:180000},
+      {sku:'KRT-006', name:'Kertas Foto Glossy A4', qty:20, unit:'pack', price:125000},
+      {sku:'KRT-007', name:'Plastik Laminating A4', qty:10, unit:'box', price:320000},
+      {sku:'KRT-008', name:'Toner Printer Laser', qty:5, unit:'pcs', price:850000},
+    ],
+    grList:[
+      {id:'GR-2025-0082', date:'2025-01-12', receivedBy:'Agus Gunawan', note:'Batch pertama — 60% dari total order',
+        lines:[
+          {name:'Kertas Art Paper 150gr A3', qty:300, poQty:500, partial:true},
+          {name:'Kertas Doorslaq NCR 3ply', qty:120, poQty:200, partial:true},
+          {name:'Amplop Coklat Besar', qty:600, poQty:1000, partial:true},
+          {name:'Label Stiker Putih A4', qty:60, poQty:100, partial:true},
+          {name:'Buku Nota 3ply', qty:30, poQty:50, partial:true},
+          {name:'Kertas Foto Glossy A4', qty:12, poQty:20, partial:true},
+          {name:'Plastik Laminating A4', qty:6, poQty:10, partial:true},
+          {name:'Toner Printer Laser', qty:3, poQty:5, partial:true},
+        ]
+      }
+    ],
+    matchLines:[], audit:[
+      {type:'gr', action:'Partial Goods Receipt dicatat', meta:'GR-2025-0082 · 12 Jan 2025 · Agus Gunawan — batch 1 (60%)'},
+      {type:'sent', action:'PO dikirim ke vendor', meta:'05 Jan 2025, 13.15 · oleh Sarah Wijaya'},
+      {type:'created', action:'PO dibuat', meta:'05 Jan 2025, 10.00 · oleh Sarah Wijaya'},
+    ]
+  },
+  {
+    id:'PO-2025-0038', vendor:'CV Sumber Makmur', vendorType:'Supplier Peralatan Kantor',
+    date:'2025-01-03', delivery:'2025-01-10', items:2, total:12000000,
+    poStatus:'sent', grPct:0, matchStatus:'waiting',
+    terms:'Net 14', notes:'Follow up ke vendor karena belum ada konfirmasi pengiriman per 18 Jan.',
+    lines:[
+      {sku:'KAN-010', name:'Whiteboard 120×90cm', qty:4, unit:'pcs', price:1250000},
+      {sku:'KAN-011', name:'Spidol Whiteboard Set', qty:20, unit:'set', price:125000},
+    ],
+    grList:[], matchLines:[], audit:[
+      {type:'sent', action:'PO dikirim ke vendor', meta:'03 Jan 2025, 15.00 · oleh Andi Prasetyo'},
+      {type:'created', action:'PO dibuat', meta:'03 Jan 2025, 14.30 · oleh Andi Prasetyo'},
+    ]
+  },
+  {
+    id:'PO-2025-0037', vendor:'PT Teknindo', vendorType:'Supplier IT & Elektronik',
+    date:'2025-01-02', delivery:'2025-01-08', items:4, total:34600000,
+    poStatus:'matched', grPct:100, matchStatus:'matched',
+    terms:'Net 30', notes:'',
+    lines:[
+      {sku:'IT-001', name:'Mouse Wireless Logitech', qty:10, unit:'pcs', price:350000},
+      {sku:'IT-002', name:'Keyboard USB Logitech', qty:10, unit:'pcs', price:280000},
+      {sku:'IT-003', name:'Monitor 24" Full HD', qty:3, unit:'pcs', price:3850000},
+      {sku:'IT-004', name:'Kabel HDMI 2m', qty:15, unit:'pcs', price:85000},
+    ],
+    grList:[
+      {id:'GR-2025-0079', date:'2025-01-08', receivedBy:'Budi Santoso', note:'Semua item diterima, kondisi baik',
+        lines:[
+          {name:'Mouse Wireless Logitech', qty:10, poQty:10},
+          {name:'Keyboard USB Logitech', qty:10, poQty:10},
+          {name:'Monitor 24" Full HD', qty:3, poQty:3},
+          {name:'Kabel HDMI 2m', qty:15, poQty:15},
+        ]
+      }
+    ],
+    matchLines:[
+      {name:'Mouse Wireless Logitech', poQty:10, grQty:10, invQty:10, poPrice:350000, invPrice:350000, status:'ok'},
+      {name:'Keyboard USB Logitech', poQty:10, grQty:10, invQty:10, poPrice:280000, invPrice:280000, status:'ok'},
+      {name:'Monitor 24" Full HD', poQty:3, grQty:3, invQty:3, poPrice:3850000, invPrice:3850000, status:'ok'},
+      {name:'Kabel HDMI 2m', poQty:15, grQty:15, invQty:15, poPrice:85000, invPrice:85000, status:'ok'},
+    ],
+    audit:[
+      {type:'ai', action:'AI mengkonfirmasi 3-way match sempurna', meta:'12 Jan 2025, 08.00 — siap bayar'},
+      {type:'gr', action:'Goods Receipt dicatat', meta:'GR-2025-0079 · 08 Jan 2025 · Budi Santoso'},
+      {type:'sent', action:'PO dikirim ke vendor', meta:'02 Jan 2025, 10.45 · oleh Andi Prasetyo'},
+      {type:'created', action:'PO dibuat', meta:'02 Jan 2025, 09.15 · oleh Andi Prasetyo'},
+    ]
+  },
+  {
+    id:'PO-2025-0036', vendor:'CV Delta Supplies', vendorType:'Supplier Consumable Gudang',
+    date:'2024-12-28', delivery:'2025-01-05', items:6, total:55800000,
+    poStatus:'exception', grPct:100, matchStatus:'exception',
+    terms:'Net 30', notes:'',
+    lines:[
+      {sku:'GDG-001', name:'Bubble Wrap 50m', qty:20, unit:'roll', price:85000},
+      {sku:'GDG-002', name:'Lakban Coklat 48mm', qty:100, unit:'pcs', price:18000},
+      {sku:'GDG-003', name:'Kardus Packaging M', qty:500, unit:'pcs', price:3500},
+      {sku:'GDG-004', name:'Tali Rafia 500m', qty:30, unit:'roll', price:45000},
+      {sku:'GDG-005', name:'Pellet Kayu 120×80cm', qty:15, unit:'pcs', price:185000},
+      {sku:'GDG-006', name:'Stretch Film 500m', qty:50, unit:'roll', price:75000},
+    ],
+    grList:[
+      {id:'GR-2025-0071', date:'2025-01-05', receivedBy:'Agus Gunawan', note:'Semua item diterima kecuali Stretch Film kurang 5 roll',
+        lines:[
+          {name:'Bubble Wrap 50m', qty:20, poQty:20},
+          {name:'Lakban Coklat 48mm', qty:100, poQty:100},
+          {name:'Kardus Packaging M', qty:500, poQty:500},
+          {name:'Tali Rafia 500m', qty:30, poQty:30},
+          {name:'Pellet Kayu 120×80cm', qty:15, poQty:15},
+          {name:'Stretch Film 500m', qty:45, poQty:50, partial:true},
+        ]
+      }
+    ],
+    matchLines:[
+      {name:'Bubble Wrap 50m', poQty:20, grQty:20, invQty:20, poPrice:85000, invPrice:85000, status:'ok'},
+      {name:'Lakban Coklat 48mm', poQty:100, grQty:100, invQty:100, poPrice:18000, invPrice:18000, status:'ok'},
+      {name:'Kardus Packaging M', poQty:500, grQty:500, invQty:500, poPrice:3500, invPrice:3500, status:'ok'},
+      {name:'Tali Rafia 500m', poQty:30, grQty:30, invQty:30, poPrice:45000, invPrice:45000, status:'ok'},
+      {name:'Pellet Kayu 120×80cm', poQty:15, grQty:15, invQty:15, poPrice:185000, invPrice:185000, status:'ok'},
+      {name:'Stretch Film 500m', poQty:50, grQty:45, invQty:50, poPrice:75000, invPrice:75000, status:'warn',
+        excType:'qty', excDesc:'GR menerima 45 roll, tapi invoice menagih 50 roll. Selisih 5 roll × Rp 75.000 = Rp 375.000',
+        excCells:[{l:'PO Qty',v:'50 roll'},{l:'GR Qty',v:'45 roll'},{l:'INV Qty',v:'50 roll'},{l:'Selisih',v:'5 roll',diff:true},{l:'Nilai Selisih',v:'Rp 375.000',diff:true},{l:'Toleransi',v:'±0 roll'}]
+      },
+    ],
+    audit:[
+      {type:'ai', action:'AI mendeteksi 1 exception', meta:'10 Jan 2025, 09.30 — qty variance 5 roll Stretch Film'},
+      {type:'gr', action:'Goods Receipt dicatat', meta:'GR-2025-0071 · 05 Jan 2025 · Agus Gunawan — 45/50 Stretch Film'},
+      {type:'sent', action:'PO dikirim ke vendor', meta:'28 Des 2024, 14.00 · oleh Sarah Wijaya'},
+      {type:'created', action:'PO dibuat', meta:'28 Des 2024, 11.30 · oleh Sarah Wijaya'},
+    ]
+  },
+  {
+    id:'PO-2025-0035', vendor:'PT Makmur Jaya', vendorType:'Supplier Umum',
+    date:'2024-12-26', delivery:'2025-01-03', items:1, total:8500000,
+    poStatus:'matched', grPct:100, matchStatus:'matched',
+    terms:'Net 14', notes:'',
+    lines:[{sku:'UMM-001', name:'Alat Kebersihan Set Kantor', qty:10, unit:'set', price:850000}],
+    grList:[
+      {id:'GR-2025-0068', date:'2025-01-03', receivedBy:'Rina Kusuma', note:'Semua lengkap',
+        lines:[{name:'Alat Kebersihan Set Kantor', qty:10, poQty:10}]
+      }
+    ],
+    matchLines:[
+      {name:'Alat Kebersihan Set Kantor', poQty:10, grQty:10, invQty:10, poPrice:850000, invPrice:850000, status:'ok'},
+    ],
+    audit:[
+      {type:'ai', action:'AI mengkonfirmasi match', meta:'05 Jan 2025, 08.00'},
+      {type:'gr', action:'Goods Receipt dicatat', meta:'GR-2025-0068 · 03 Jan 2025 · Rina Kusuma'},
+      {type:'sent', action:'PO dikirim', meta:'26 Des 2024 · oleh Budi Santoso'},
+      {type:'created', action:'PO dibuat', meta:'26 Des 2024 · oleh Budi Santoso'},
+    ]
+  },
+  {
+    id:'PO-2025-0034', vendor:'CV Graha Perkasa', vendorType:'Supplier Furnitur Kantor',
+    date:'2024-12-24', delivery:'2024-12-30', items:3, total:19750000,
+    poStatus:'draft', grPct:0, matchStatus:'-',
+    terms:'Net 30', notes:'Pending approval dari kepala divisi sebelum dikirim ke vendor.',
+    lines:[
+      {sku:'FRN-001', name:'Lemari Arsip Besi 4 Laci', qty:2, unit:'pcs', price:3500000},
+      {sku:'FRN-002', name:'Meja Kerja L-Shape', qty:3, unit:'pcs', price:2750000},
+      {sku:'FRN-003', name:'Kursi Ergonomis Mesh', qty:5, unit:'pcs', price:1250000},
+    ],
+    grList:[], matchLines:[], audit:[
+      {type:'created', action:'PO dibuat sebagai draft', meta:'24 Des 2024, 10.00 · oleh Andi Prasetyo'},
+    ]
+  },
+];
+
+let currentFilter = 'all';
+let currentPO = null;
+let expandedExc = new Set();
+
+/* ══════════════════════════════════════════
+   RENDER TABLE
+══════════════════════════════════════════ */
+function renderTable(filter){
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  let data = PO_DATA.filter(po => {
+    const matchFilter = filter === 'all' || po.matchStatus === filter || po.poStatus === filter;
+    const matchSearch = !search || po.id.toLowerCase().includes(search) || po.vendor.toLowerCase().includes(search);
+    return matchFilter && matchSearch;
+  });
+
+  const body = document.getElementById('poTableBody');
+  const empty = document.getElementById('emptyState');
+
+  if(data.length === 0){
+    body.innerHTML = '';
+    empty.style.display = 'block';
+    updateStatusBar(data);
+    return;
+  }
+  empty.style.display = 'none';
+
+  body.innerHTML = data.map(po => {
+    const rowClass = po.matchStatus === 'exception' ? 'row-exception' : po.grPct < 100 && po.grPct > 0 ? 'row-partial' : '';
+    const grPctFill = po.grPct;
+    const grClass = grPctFill === 100 ? 'full' : grPctFill === 0 ? 'none' : '';
+    return `
+    <tr class="${rowClass}" onclick="openPODrawer('${po.id}',0)">
+      <td><span class="td-ref">${po.id}</span></td>
+      <td>
+        <div class="td-vendor">${po.vendor}</div>
+        <div class="td-vendor-type">${po.vendorType}</div>
+      </td>
+      <td><span class="td-date">${formatDate(po.date)}</span></td>
+      <td><span class="td-date">${formatDate(po.delivery)}</span></td>
+      <td class="td-amount">
+        ${fmtRp(po.total)}
+        <div class="td-amount-sub">${po.items} item</div>
+      </td>
+      <td style="min-width:120px">
+        <div class="gr-bar-wrap">
+          <div class="gr-bar"><div class="gr-bar-fill ${grClass}" style="width:${grPctFill}%"></div></div>
+          <span class="gr-pct">${grPctFill}%</span>
+        </div>
+      </td>
+      <td>${renderMatchBadge(po.matchStatus)}</td>
+      <td>${renderPOBadge(po.poStatus)}</td>
+    </tr>`;
+  }).join('');
+
+  updateStatusBar(data);
+}
+
+function renderMatchBadge(s){
+  const map = {
+    'matched': '<span class="badge badge-matched"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" style="width:9px;height:9px;stroke:var(--success-text)"><polyline points="20 6 9 17 4 12"/></svg>Matched</span>',
+    'exception': '<span class="badge badge-exception">⚠ Exception</span>',
+    'partial': '<span class="badge badge-partial">Partial</span>',
+    'waiting': '<span class="badge badge-sent">Waiting GR</span>',
+    '-': '<span style="font-size:11px;color:var(--color-text-tertiary)">—</span>',
+  };
+  return map[s] || '—';
+}
+
+function renderPOBadge(s){
+  const map = {
+    'draft': '<span class="badge badge-draft">Draft</span>',
+    'sent': '<span class="badge badge-sent">Dikirim</span>',
+    'partial': '<span class="badge badge-partial">Partial GR</span>',
+    'full': '<span class="badge badge-full">Full GR</span>',
+    'matched': '<span class="badge badge-matched">Matched</span>',
+    'exception': '<span class="badge badge-exception">Exception</span>',
+    'closed': '<span class="badge badge-closed">Closed</span>',
+  };
+  return map[s] || s;
+}
+
+function updateStatusBar(data){
+  const total = data.length;
+  const value = data.reduce((s,p)=>s+p.total,0);
+  const matched = data.filter(p=>p.matchStatus==='matched').length;
+  const exception = data.filter(p=>p.matchStatus==='exception').length;
+  const waiting = data.filter(p=>p.matchStatus==='waiting').length;
+  document.getElementById('statTotal').textContent = total + ' PO';
+  document.getElementById('statValue').textContent = 'Rp ' + fmtNum(value);
+  document.getElementById('statMatched').textContent = matched;
+  document.getElementById('statException').textContent = exception;
+  document.getElementById('statWaiting').textContent = waiting;
+}
+
+/* ══════════════════════════════════════════
+   FILTER
+══════════════════════════════════════════ */
+function setStatusChip(el){
+  document.querySelectorAll('#statusChips .chip').forEach(c=>{
+    c.className = 'chip';
+  });
+  const v = el.dataset.v;
+  currentFilter = v;
+  if(v==='all') el.classList.add('on');
+  else if(v==='exception') el.classList.add('on-danger');
+  else if(v==='matched') el.classList.add('on-ok');
+  else if(v==='partial') el.classList.add('on-warn');
+  else el.classList.add('on');
+  renderTable(currentFilter);
+}
+
+function filterStatus(s){
+  currentFilter = s;
+  document.querySelectorAll('#statusChips .chip').forEach(c=>{
+    c.className = 'chip';
+    if(c.dataset.v === s){
+      if(s==='exception') c.classList.add('on-danger');
+      else if(s==='matched') c.classList.add('on-ok');
+      else if(s==='partial') c.classList.add('on-warn');
+      else c.classList.add('on');
+    }
+  });
+  renderTable(s);
+  document.querySelector('.table-wrap')?.scrollIntoView({behavior:'smooth'});
+}
+
+function applyFilter(){
+  renderTable(currentFilter);
+}
+
+/* ══════════════════════════════════════════
+   DRAWER
+══════════════════════════════════════════ */
+function openPODrawer(poId, tabIdx){
+  currentPO = PO_DATA.find(p=>p.id===poId);
+  if(!currentPO) return;
+  expandedExc = new Set();
+
+  // Head
+  document.getElementById('dRef').textContent = currentPO.id;
+  document.getElementById('dMeta').textContent = currentPO.vendor + ' · ' + formatDate(currentPO.date);
+
+  // Badge
+  const badgeEl = document.getElementById('dBadge');
+  badgeEl.className = 'badge badge-' + (currentPO.matchStatus === 'matched' ? 'matched' : currentPO.matchStatus === 'exception' ? 'exception' : currentPO.matchStatus === 'partial' ? 'partial' : 'sent');
+  badgeEl.textContent = {matched:'Matched ✓',exception:'Exception ⚠',partial:'Partial GR',waiting:'Waiting GR','-':'Draft'}[currentPO.matchStatus] || currentPO.matchStatus;
+
+  // Exception badge on tab
+  const excCount = (currentPO.matchLines||[]).filter(l=>l.status!=='ok').length;
+  const excBadge = document.getElementById('excBadge');
+  excBadge.textContent = excCount;
+  excBadge.style.display = excCount > 0 ? 'inline-flex' : 'none';
+
+  buildOverviewTab();
+  buildGRTab();
+  buildMatchTab();
+  buildAuditTab();
+
+  // activate correct tab
+  const tabs = document.querySelectorAll('.d-tab');
+  const panes = ['dPane0','dPane1','dPane2','dPane3'];
+  tabs.forEach((t,i)=>{
+    t.classList.toggle('on', i===tabIdx);
+  });
+  panes.forEach((id,i)=>{
+    document.getElementById(id).classList.toggle('on', i===tabIdx);
+  });
+
+  // highlight row
+  document.querySelectorAll('#poTableBody tr').forEach(tr=>{
+    tr.classList.remove('active-row');
+    if(tr.onclick && tr.onclick.toString().includes(poId)) tr.classList.add('active-row');
+  });
+
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('poDrawer').classList.add('open');
+}
+
+function closeDrawer(){
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('poDrawer').classList.remove('open');
+  document.querySelectorAll('#poTableBody tr').forEach(tr=>tr.classList.remove('active-row'));
+}
+
+function switchTab(idx, el){
+  document.querySelectorAll('.d-tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  ['dPane0','dPane1','dPane2','dPane3'].forEach((id,i)=>{
+    document.getElementById(id).classList.toggle('on', i===idx);
+  });
+}
+
+/* ── Overview Tab ── */
+function buildOverviewTab(){
+  const po = currentPO;
+
+  // Actions
+  const actMap = {
+    draft: `
+      <button class="d-act-btn primary" onclick="alert('Edit PO')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit PO</button>
+      <button class="d-act-btn success" onclick="alert('Kirim PO ke vendor')"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Kirim ke Vendor</button>
+      <button class="d-act-btn danger" onclick="alert('Hapus draft PO')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Hapus Draft</button>`,
+    sent: `
+      <button class="d-act-btn primary" onclick="openPODrawer('${po.id}',1)"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Catat Penerimaan</button>
+      <button class="d-act-btn" onclick="alert('Batalkan PO')">Batalkan PO</button>`,
+    partial: `
+      <button class="d-act-btn primary" onclick="openPODrawer('${po.id}',1)"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Catat Penerimaan Lagi</button>
+      <button class="d-act-btn" onclick="openPODrawer('${po.id}',1)">Lihat GR</button>`,
+    matched: `
+      <button class="d-act-btn success" onclick="alert('Approve ke Bills — siap bayar')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Approve ke Bills</button>
+      <button class="d-act-btn" onclick="openPODrawer('${po.id}',2)">Lihat Match Detail</button>`,
+    exception: `
+      <button class="d-act-btn danger" onclick="openPODrawer('${po.id}',2)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Lihat Exception</button>
+      <button class="d-act-btn" onclick="openPODrawer('${po.id}',1)">Lihat GR</button>`,
+  };
+  document.getElementById('dActions').innerHTML = actMap[po.poStatus] || '';
+
+  // Info rows
+  document.getElementById('dInfoRows').innerHTML = `
+    <div class="info-row"><label>No. PO</label><span class="mono">${po.id}</span></div>
+    <div class="info-row"><label>Vendor</label><span>${po.vendor}</span></div>
+    <div class="info-row"><label>Tanggal PO</label><span>${formatDate(po.date)}</span></div>
+    <div class="info-row"><label>Est. Terima</label><span>${formatDate(po.delivery)}</span></div>
+    <div class="info-row"><label>Payment Terms</label><span>${po.terms}</span></div>
+    <div class="info-row"><label>Status PO</label><span>${renderPOBadge(po.poStatus)}</span></div>
+    <div class="info-row"><label>3-Way Match</label><span>${renderMatchBadge(po.matchStatus)}</span></div>
+    <div class="info-row"><label>GR Progress</label><span class="mono">${po.grPct}% diterima</span></div>
+    <div class="info-row"><label>Dibuat oleh</label><span>${po.audit[po.audit.length-1].meta.split('·').pop().trim()}</span></div>
+  `;
+
+  // Line items
+  const lineBody = document.getElementById('dLineBody');
+  let grandTotal = 0;
+  lineBody.innerHTML = po.lines.map(l=>{
+    const sub = l.qty * l.price;
+    grandTotal += sub;
+    return `<tr>
+      <td>
+        <div style="font-size:12px;font-weight:500;color:var(--color-text-primary)">${l.name}</div>
+        <div style="font-size:10px;color:var(--color-text-tertiary)">${l.sku}</div>
+      </td>
+      <td class="r">${l.qty} ${l.unit}</td>
+      <td class="r">${fmtRp(l.price)}</td>
+      <td class="r">${fmtRp(sub)}</td>
+    </tr>`;
+  }).join('');
+
+  const tax = Math.round(grandTotal * 0.11);
+  document.getElementById('dLineFoot').innerHTML = `
+    <tr><td colspan="3" style="text-align:right;font-size:11px;color:var(--color-text-tertiary)">Subtotal</td><td class="r">${fmtRp(grandTotal)}</td></tr>
+    <tr><td colspan="3" style="text-align:right;font-size:11px;color:var(--color-text-tertiary)">PPN 11%</td><td class="r">${fmtRp(tax)}</td></tr>
+    <tr><td colspan="3" style="text-align:right">Total</td><td class="r">${fmtRp(grandTotal + tax)}</td></tr>
+  `;
+
+  document.getElementById('dNotes').textContent = po.notes || 'Tidak ada catatan.';
+}
+
+/* ── GR Tab ── */
+function buildGRTab(){
+  const po = currentPO;
+  const timeline = document.getElementById('grTimeline');
+
+  if(po.grList.length === 0){
+    timeline.innerHTML = `<div style="padding:24px;text-align:center;color:var(--color-text-tertiary);font-size:12px;background:var(--color-surface-sunken);border-radius:var(--radius-md)">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" style="width:28px;height:28px;stroke:var(--color-border-default);display:block;margin:0 auto 8px"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      Belum ada penerimaan dicatat untuk PO ini
+    </div>`;
+    document.getElementById('grSummary').textContent = '0% diterima';
+    return;
+  }
+
+  const totalPOQty = po.lines.reduce((s,l)=>s+l.qty,0);
+  const totalReceived = po.grList.reduce((s,gr)=>s+gr.lines.reduce((ss,l)=>ss+l.qty,0),0);
+  document.getElementById('grSummary').textContent = totalReceived + ' / ' + totalPOQty + ' unit diterima';
+
+  timeline.innerHTML = po.grList.map(gr=>{
+    const isPartial = gr.lines.some(l=>l.partial);
+    return `<div class="gr-entry">
+      <div class="gr-dot ${isPartial?'partial':''}">
+        <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      </div>
+      <div class="gr-content">
+        <div class="gr-title">${gr.id} ${isPartial?'<span class="badge badge-partial" style="font-size:9px;padding:1px 7px">Partial</span>':''}</div>
+        <div class="gr-meta">${formatDate(gr.date)} · Diterima oleh ${gr.receivedBy} · ${gr.note}</div>
+        <div class="gr-lines">
+          ${gr.lines.map(l=>`
+            <div class="gr-line">
+              <span class="gr-line-name">${l.name}</span>
+              <span class="gr-line-qty">${l.qty} / ${l.poQty}</span>
+              ${l.partial?`<span class="gr-line-note">kurang ${l.poQty-l.qty}</span>`:''}
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── 3-Way Match Tab ── */
+function buildMatchTab(){
+  const po = currentPO;
+  const lines = po.matchLines || [];
+
+  if(lines.length === 0){
+    document.getElementById('matchSummary').innerHTML = '';
+    document.getElementById('matchAIRow').style.display = 'none';
+    document.getElementById('matchTblBody').innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--color-text-tertiary);font-size:12px">Match belum tersedia — menunggu GR & Invoice masuk</td></tr>`;
+    return;
+  }
+
+  document.getElementById('matchAIRow').style.display = 'flex';
+
+  const matched = lines.filter(l=>l.status==='ok').length;
+  const warns = lines.filter(l=>l.status==='warn').length;
+  const dangers = lines.filter(l=>l.status==='danger').length;
+  const total = lines.length;
+
+  document.getElementById('matchSummary').innerHTML = `
+    <div class="match-scard">
+      <div class="match-scard-label">Matched</div>
+      <div class="match-scard-val ok">${matched}</div>
+      <div class="match-scard-sub">dari ${total} line</div>
+    </div>
+    <div class="match-scard">
+      <div class="match-scard-label">Warning</div>
+      <div class="match-scard-val ${warns>0?'warn':''}">${warns}</div>
+      <div class="match-scard-sub">qty/price variance</div>
+    </div>
+    <div class="match-scard">
+      <div class="match-scard-label">Exception</div>
+      <div class="match-scard-val ${dangers>0?'danger':''}">${dangers}</div>
+      <div class="match-scard-sub">perlu resolusi</div>
+    </div>
+  `;
+
+  const excs = warns + dangers;
+  let aiText = '';
+  if(excs === 0){
+    aiText = `<strong>3-way match sempurna</strong> — semua ${total} line item cocok antara PO, GR, dan Invoice. Nilai total <strong>${fmtRp(po.total)}</strong> siap diproses untuk pembayaran.`;
+  } else {
+    const excLines = lines.filter(l=>l.status!=='ok').map(l=>`<strong>${l.name}</strong>`).join(' dan ');
+    aiText = `Ditemukan <strong>${excs} exception</strong> pada ${excLines}. Harus diselesaikan sebelum invoice bisa disetujui untuk pembayaran. ${matched} dari ${total} line sudah matched.`;
+  }
+  document.getElementById('matchAIText').innerHTML = aiText;
+
+  document.getElementById('matchTblBody').innerHTML = lines.map((l,i)=>{
+    const rowClass = l.status === 'ok' ? '' : l.status === 'warn' ? 'match-warn' : 'match-danger';
+    const statusIcon = l.status === 'ok'
+      ? `<div class="match-icon-ok"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>`
+      : l.status === 'warn'
+      ? `<div class="match-icon-warn"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" fill="currentColor"/></svg></div>`
+      : `<div class="match-icon-danger"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor"/><line x1="15" y1="9" x2="9" y2="15" stroke="white" stroke-width="2"/><line x1="9" y1="9" x2="15" y2="15" stroke="white" stroke-width="2"/></svg></div>`;
+
+    const qtyWarn = l.grQty !== l.invQty;
+    const priceWarn = l.poPrice !== l.invPrice;
+    const priceDiff = l.invPrice - l.poPrice;
+    const pricePct = Math.round((priceDiff / l.poPrice) * 100);
+
+    const excRow = l.status !== 'ok' ? `
+      <tr class="exc-expand-row ${rowClass}" id="exc-row-${po.id}-${i}" style="display:none">
+        <td colspan="8">
+          <div class="exc-expand-inner">
+            <div class="exc-expand-title">${l.excDesc}</div>
+            <div class="exc-expand-grid">
+              ${l.excCells.map(c=>`
+                <div class="exc-cell">
+                  <div class="exc-cell-label">${c.l}</div>
+                  <div class="exc-cell-val ${c.diff?'diff':''}">${c.v}</div>
+                </div>`).join('')}
+            </div>
+            <div class="exc-actions">
+              ${l.excType==='qty'?`
+                <button class="exc-btn warning" onclick="alert('Minta credit note untuk ${l.name}')">Minta Credit Note</button>
+                <button class="exc-btn" onclick="alert('Tahan pembayaran item ini')">Tahan Pembayaran</button>
+                <button class="exc-btn primary" onclick="resolveException(this, '${po.id}', ${i})">Setujui Selisih</button>
+              `:`
+                <button class="exc-btn" onclick="alert('Negosiasi harga dengan vendor')">Negosiasi Harga</button>
+                <button class="exc-btn warning" onclick="alert('Minta credit note harga')">Minta Credit Note</button>
+                <button class="exc-btn primary" onclick="resolveException(this, '${po.id}', ${i})">Approve Variance</button>
+              `}
+            </div>
+          </div>
+        </td>
+      </tr>` : '';
+
+    return `
+    <tr class="${rowClass}" onclick="toggleExcRow('${po.id}',${i},'${l.status}')">
+      <td class="mono" style="color:var(--color-text-tertiary)">${i+1}</td>
+      <td style="font-size:12px;font-weight:500;color:var(--color-text-primary)">${l.name}</td>
+      <td class="r">${l.poQty}</td>
+      <td class="r" style="${qtyWarn&&l.grQty!==l.poQty?'color:var(--warning-text);font-weight:700':''}">${l.grQty}</td>
+      <td class="r" style="${qtyWarn?'color:var(--danger-text);font-weight:700':''}">${l.invQty}${qtyWarn?`<span class="var-chip var-chip-warn">+${Math.abs(l.invQty-l.grQty)}</span>`:''}</td>
+      <td class="r">${fmtRpShort(l.poPrice)}</td>
+      <td class="r" style="${priceWarn?'color:var(--danger-text);font-weight:700':''}">${fmtRpShort(l.invPrice)}${priceWarn?`<span class="var-chip var-chip-danger">${pricePct>0?'+':''}${pricePct}%</span>`:''}</td>
+      <td class="match-status-cell">${statusIcon}</td>
+    </tr>
+    ${excRow}`;
+  }).join('');
+}
+
+function toggleExcRow(poId, idx, status){
+  if(status === 'ok') return;
+  const rowId = `exc-row-${poId}-${idx}`;
+  const row = document.getElementById(rowId);
+  if(!row) return;
+  const isOpen = row.style.display !== 'none';
+  row.style.display = isOpen ? 'none' : 'table-row';
+}
+
+function resolveException(btn, poId, idx){
+  const po = PO_DATA.find(p=>p.id===poId);
+  if(!po) return;
+  po.matchLines[idx].status = 'ok';
+  const remaining = po.matchLines.filter(l=>l.status!=='ok').length;
+  if(remaining === 0){
+    po.matchStatus = 'matched';
+    po.poStatus = 'matched';
+  }
+  buildMatchTab();
+  buildOverviewTab();
+  document.getElementById('dBadge').className = 'badge badge-' + (remaining===0?'matched':'exception');
+  document.getElementById('dBadge').textContent = remaining===0?'Matched ✓':'Exception ⚠';
+  renderTable(currentFilter);
+  alert('Exception diselesaikan. ' + (remaining===0?'PO sekarang fully matched!':'Masih ada '+remaining+' exception tersisa.'));
+}
+
+/* ── Audit Tab ── */
+function buildAuditTab(){
+  document.getElementById('auditList').innerHTML = currentPO.audit.map(a=>`
+    <div class="audit-item">
+      <div class="audit-dot ${a.type}">
+        ${a.type==='created'?'<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="4"/></svg>':
+          a.type==='sent'?'<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>':
+          a.type==='gr'?'<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>':
+          a.type==='ai'?'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>':
+          '<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>'}
+      </div>
+      <div class="audit-content">
+        <div class="audit-action">${a.action}</div>
+        <div class="audit-meta">${a.meta}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════════
+   AI MATCH MONITOR TOGGLE
+══════════════════════════════════════════ */
+function toggleAMM(){
+  const body = document.getElementById('ammBody');
+  const chev = document.getElementById('ammChevron');
+  body.classList.toggle('collapsed');
+  chev.classList.toggle('open');
+}
+function toggleAMMLog(){
+  const b = document.getElementById('ammLogBody');
+  const t = document.getElementById('ammLogToggle');
+  const open = b.style.display === 'none';
+  b.style.display = open ? 'block' : 'none';
+  t.textContent = open ? 'Sembunyikan ↑' : 'Tampilkan ↓';
+}
+
+/* ══════════════════════════════════════════
+   CREATE PO
+══════════════════════════════════════════ */
+function openCreatePO(){
+  document.getElementById('createModal').classList.add('open');
+}
+function closeCreatePO(){
+  document.getElementById('createModal').classList.remove('open');
+}
+function addLine(){
+  const tbody = document.getElementById('createLineBody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input class="line-input" type="text" placeholder="Nama produk atau SKU" oninput="calcTotal()"></td>
+    <td><input class="line-input r" type="number" placeholder="0" min="1" oninput="calcTotal()" style="width:52px"></td>
+    <td><input class="line-input r" type="number" placeholder="0" min="0" oninput="calcTotal()" style="width:100px"></td>
+    <td><div class="line-input r" style="pointer-events:none;color:var(--color-text-tertiary)">Rp 0</div></td>
+    <td><button class="line-del-btn" onclick="removeLine(this)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></td>
+  `;
+  tbody.appendChild(tr);
+}
+function removeLine(btn){
+  const tbody = document.getElementById('createLineBody');
+  if(tbody.rows.length > 1) btn.closest('tr').remove();
+  calcTotal();
+}
+function calcTotal(){
+  let total = 0;
+  document.querySelectorAll('#createLineBody tr').forEach(tr=>{
+    const inputs = tr.querySelectorAll('input');
+    const qty = parseFloat(inputs[1]?.value)||0;
+    const price = parseFloat(inputs[2]?.value)||0;
+    const sub = qty * price;
+    total += sub;
+    const subCell = tr.querySelector('.r:last-of-type');
+    if(subCell) subCell.textContent = sub > 0 ? fmtRp(sub) : 'Rp 0';
+  });
+  document.getElementById('formTotal').textContent = fmtRp(total);
+}
+
+/* ══════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════ */
+function fmtNum(n){
+  return n.toLocaleString('id-ID');
+}
+function fmtRp(n){
+  return 'Rp ' + n.toLocaleString('id-ID');
+}
+function fmtRpShort(n){
+  if(n >= 1000000) return 'Rp ' + (n/1000000).toFixed(n%1000000===0?0:2).replace('.',',') + 'jt';
+  if(n >= 1000) return 'Rp ' + (n/1000).toFixed(n%1000===0?0:1).replace('.',',') + 'rb';
+  return 'Rp ' + n.toLocaleString('id-ID');
+}
+function formatDate(d){
+  if(!d) return '—';
+  const parts = d.split('-');
+  const months = ['','Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  return parseInt(parts[2]) + ' ' + months[parseInt(parts[1])] + ' ' + parts[0];
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', ()=>{
+  renderTable('all');
+});
+</script>
+</body>
+</html>

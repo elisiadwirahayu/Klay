@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Trial Balance — Klay</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Manrope:wght@300;400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-brand:#B83D08;--color-brand-hover:#A03206;
+  --color-action:#1A46C8;--color-action-hover:#1338A8;
+  --color-text-primary:#080706;--color-text-secondary:#2E2B27;--color-text-tertiary:#8C857C;
+  --color-surface-base:#FBF8F5;--color-surface-raised:#FFFFFF;--color-surface-sunken:#F4F0EB;--color-surface-deep:#080706;
+  --color-border-default:#E2DDD7;
+  --success-text:#166638;--success-border:#A8D9BC;--success-surface:#E8F5EE;
+  --warning-text:#7A4D00;--warning-border:#E8C870;--warning-surface:#FDF3E0;
+  --danger-text:#A02020;--danger-border:#EAB8B8;--danger-surface:#FBF0F0;
+  --ai-surface:#EBF0FD;--ai-border:#C8D8FA;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;--radius-full:9999px;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;
+  --transition-fast:0.1s ease;--transition-base:0.15s ease;--transition-slow:0.2s ease;
+  --font-sans:'Manrope',sans-serif;--font-mono:'Inconsolata',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-surface-base);color:var(--color-text-primary);-webkit-font-smoothing:antialiased;font-size:13px;height:100vh;overflow:hidden}
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sb{width:196px;flex-shrink:0;background:var(--color-surface-raised);border-right:1px solid var(--color-border-default);display:flex;flex-direction:column;overflow-y:auto}
+.sb-top{padding:0 16px;height:52px;display:flex;align-items:center;border-bottom:1px solid var(--color-border-default);gap:8px;flex-shrink:0}
+.sb-logomark{width:26px;height:26px;background:var(--color-brand);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logomark svg{width:12px;height:12px;fill:#fff}
+.sb-brand{font-size:14px;font-weight:700;letter-spacing:-.02em;color:var(--color-text-primary)}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-border-default);padding:16px 16px 6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 12px;margin:1px 6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:400;color:var(--color-text-tertiary);text-decoration:none;transition:background var(--transition-fast),color var(--transition-fast)}
+.sb-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.sb-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+.sb-item.active{background:var(--color-surface-sunken);color:var(--color-text-primary);font-weight:600;border-left:2px solid var(--color-brand);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-left:0;padding-left:14px}
+.sb-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--color-surface-sunken)}
+.sb-footer-item{display:flex;align-items:center;gap:8px;padding:6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--color-text-tertiary)}
+.sb-footer-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* ── TOPBAR ── */
+.topbar{height:52px;flex-shrink:0;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 20px;gap:12px;z-index:10}
+.tb-search-wrap{position:relative;flex:1;max-width:400px}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 12px}
+.tb-search svg{width:13px;height:13px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.tb-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.tb-search input::placeholder{color:var(--color-text-tertiary)}
+.tb-kbd{font-size:10px;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:4px;padding:1px 5px;font-family:var(--font-mono);flex-shrink:0}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-notif{width:30px;height:30px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.tb-notif svg{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--color-brand);border-radius:50%;border:1.5px solid #fff}
+.tb-org{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);cursor:pointer}
+.tb-org-name{font-size:12px;font-weight:500;color:var(--color-text-secondary)}
+.tb-av{width:24px;height:24px;border-radius:var(--radius-sm);background:var(--color-action);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tb-caret{width:11px;height:11px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2}
+
+/* ── SCROLL AREA ── */
+.scroll-area{flex:1;overflow-y:auto;padding:20px 24px 16px}
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.page-title{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.page-subtitle{font-size:12px;color:var(--color-text-tertiary);margin-top:2px}
+.head-right{display:flex;gap:8px;align-items:center;position:relative}
+
+/* ── BUTTONS ── */
+.btn-primary{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:8px 16px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base)}
+.btn-primary:hover{background:var(--color-action-hover)}
+.btn-ghost{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 13px;cursor:pointer;transition:all var(--transition-fast);position:relative}
+.btn-ghost svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+.btn-ghost:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+
+/* ── EXPORT ── */
+.exp-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);box-shadow:0 6px 20px rgba(0,0,0,.1);width:232px;z-index:200;display:none;padding:12px}
+.exp-menu.open{display:block}
+.em-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:6px}
+.em-chips{display:flex;gap:4px;margin-bottom:10px}
+.em-chip{font-family:var(--font-sans);font-size:11px;font-weight:500;flex:1;text-align:center;padding:5px 8px;border-radius:var(--radius-sm);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-tertiary);cursor:pointer;transition:all var(--transition-fast)}
+.em-chip.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.em-div{height:1px;background:var(--color-border-default);margin:8px 0}
+.em-dl{width:100%;font-family:var(--font-sans);font-size:12px;font-weight:600;padding:8px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background var(--transition-fast)}
+.em-dl:hover{background:var(--color-action-hover)}
+.em-dl svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2}
+
+/* ── INSIGHT CARDS ── */
+.insight-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.ic{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);padding:14px 16px;cursor:pointer;transition:border-color var(--transition-base),box-shadow var(--transition-base);position:relative;overflow:hidden;display:flex;flex-direction:column;gap:0}
+.ic:hover{border-color:#c8c2ba;box-shadow:0 2px 8px rgba(8,7,6,.06)}
+.ic.active{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.09)}
+/* state variants */
+.ic.ic-ok{border-color:var(--success-border);background:var(--success-surface)}
+.ic.ic-ok:hover{border-color:var(--success-text)}
+.ic.ic-warn{border-color:var(--warning-border);background:var(--warning-surface)}
+.ic.ic-warn:hover{border-color:var(--warning-text)}
+.ic.ic-danger{border-color:var(--danger-border);background:var(--danger-surface)}
+.ic.ic-danger:hover{border-color:var(--danger-text)}
+/* icon row */
+.ic-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ic-icon{width:32px;height:32px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ic-icon svg{width:15px;height:15px;stroke-width:1.5;fill:none;stroke:currentColor}
+.ic-icon.ok{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.ic-icon.warn{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.ic-icon.danger{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.ic-icon.neutral{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+.ic-icon.profit{background:#E8F5EE;color:#166638;border:1px solid #A8D9BC}
+.ic-icon.loss{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.ic-icon.blue{background:var(--ai-surface);color:var(--color-action);border:1px solid var(--ai-border)}
+.ic-action{font-size:10px;font-weight:600;color:var(--color-text-tertiary);display:flex;align-items:center;gap:3px;opacity:.7;transition:opacity var(--transition-fast)}
+.ic-action svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2}
+.ic:hover .ic-action{opacity:1;color:var(--color-action)}
+/* label */
+.ic-label{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:4px}
+/* value */
+.ic-value{font-family:var(--font-mono);font-size:17px;font-weight:700;color:var(--color-text-primary);letter-spacing:-.01em;line-height:1.15}
+.ic-value.ok{color:var(--success-text)}
+.ic-value.danger{color:var(--danger-text)}
+.ic-value.profit{color:var(--success-text)}
+.ic-value.loss{color:var(--danger-text)}
+.ic-value.blue{color:var(--color-action)}
+/* sub text */
+.ic-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:4px;line-height:1.4}
+.ic-sub strong{font-weight:600;color:var(--color-text-secondary)}
+/* anomaly pills */
+.ic-pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.ic-pill{font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--radius-full);letter-spacing:.04em;border:1px solid}
+.ic-pill.warn{background:var(--warning-surface);color:var(--warning-text);border-color:var(--warning-border)}
+.ic-pill.danger{background:var(--danger-surface);color:var(--danger-text);border-color:var(--danger-border)}
+.ic-pill.neutral{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border-color:var(--color-border-default)}
+
+/* ── FILTER BAR (Bills pattern) ── */
+.filter-bar{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.f-search{display:flex;align-items:center;gap:7px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:6px 10px;width:210px;flex-shrink:0;transition:border-color var(--transition-fast),box-shadow var(--transition-fast)}
+.f-search:focus-within{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.f-search svg{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.f-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.f-search input::placeholder{color:var(--color-text-tertiary)}
+.fsep{width:1px;height:18px;background:var(--color-border-default);flex-shrink:0;margin:0 2px}
+.chip-grp{display:flex;gap:3px}
+.chip{font-family:var(--font-sans);font-size:11px;font-weight:500;padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-tertiary);cursor:pointer;transition:all var(--transition-fast);white-space:nowrap}
+.chip:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.chip.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.f-right{margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.f-filter-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:6px 11px;cursor:pointer;transition:all var(--transition-fast)}
+.f-filter-btn:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.f-filter-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5}
+.f-filter-count{background:var(--color-action);color:#fff;border-radius:var(--radius-full);font-size:9px;font-weight:700;padding:1px 5px;margin-left:2px;display:none}
+.f-filter-count.show{display:inline}
+
+/* ── TABLE ── */
+.tbl-wrap{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:60px}
+.tbl-wrap table{width:100%;border-collapse:collapse}
+.tbl-wrap thead tr{background:var(--color-surface-deep)}
+.tbl-wrap thead th{font-size:11px;font-weight:600;color:rgba(255,255,255,.45);padding:10px 14px;text-align:left;white-space:nowrap;letter-spacing:.05em;text-transform:uppercase;user-select:none}
+.tbl-wrap thead th.sortable{cursor:pointer;transition:color var(--transition-fast)}
+.tbl-wrap thead th.sortable:hover{color:rgba(255,255,255,.85)}
+.tbl-wrap thead th.r{text-align:right}
+.sort-arrow::after{content:'⇅';margin-left:3px;font-size:9px;opacity:.35}
+th.sort-asc .sort-arrow::after{content:'↑';opacity:1;color:#82BFFF}
+th.sort-desc .sort-arrow::after{content:'↓';opacity:1;color:#82BFFF}
+.tbl-wrap tbody tr.data-row{border-bottom:1px solid var(--color-surface-sunken);cursor:pointer;transition:background var(--transition-fast)}
+.tbl-wrap tbody tr.data-row:last-child{border-bottom:none}
+.tbl-wrap tbody tr.data-row:hover{background:#FAFAF9}
+.tbl-wrap tbody tr.data-row.highlighted{background:var(--ai-surface);box-shadow:inset 3px 0 0 var(--color-action)}
+.tbl-wrap tbody td{padding:9px 14px;font-size:12px;color:var(--color-text-secondary);vertical-align:middle}
+td.code{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--color-text-tertiary);letter-spacing:.05em;white-space:nowrap}
+td.name{font-weight:500;color:var(--color-text-primary);min-width:200px}
+td.num{text-align:right;font-family:var(--font-mono);font-size:12px;white-space:nowrap}
+td.num-open{text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--color-text-tertiary);white-space:nowrap}
+td.num-dr{text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--color-text-secondary);white-space:nowrap}
+td.num-cr{text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--color-text-secondary);white-space:nowrap}
+td.num-close{text-align:right;font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--color-text-primary);white-space:nowrap}
+td.num-close.neg{color:var(--danger-text)}
+
+/* Type badge */
+.type-badge{display:inline-flex;align-items:center;font-size:9px;font-weight:700;padding:1px 7px;border-radius:var(--radius-full);margin-left:7px;letter-spacing:.04em;text-transform:uppercase;vertical-align:middle;border:1px solid}
+.tb-asset{background:var(--success-surface);color:var(--success-text);border-color:var(--success-border)}
+.tb-contra{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border-color:var(--color-border-default)}
+.tb-liab{background:var(--warning-surface);color:var(--warning-text);border-color:var(--warning-border)}
+.tb-equity{background:var(--ai-surface);color:var(--color-action);border-color:var(--ai-border)}
+.tb-rev{background:#F0FAFA;color:#166666;border-color:#B3DEDE}
+.tb-exp{background:var(--danger-surface);color:var(--danger-text);border-color:var(--danger-border)}
+
+/* Group rows */
+tr.group-row td{background:var(--color-surface-sunken);padding:6px 14px;border-bottom:1px solid var(--color-border-default);cursor:pointer;user-select:none;border-top:2px solid var(--color-border-default)}
+tr.group-row:first-of-type td{border-top:none}
+.group-inner{display:flex;align-items:center;gap:8px}
+.group-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-tertiary)}
+.group-count{font-family:var(--font-mono);font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--radius-full);background:var(--color-surface-raised);border:1px solid var(--color-border-default);color:var(--color-text-tertiary)}
+.group-chev{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;transition:transform var(--transition-fast);margin-left:auto}
+.group-chev.collapsed{transform:rotate(-90deg)}
+
+/* Subtotal row */
+tr.subtotal-row td{background:var(--color-surface-base);border-top:1.5px solid var(--color-border-default);border-bottom:none;padding:8px 14px}
+tr.subtotal-row td.name{font-size:11px;font-weight:700;color:var(--color-text-secondary);letter-spacing:.03em;text-transform:uppercase;text-align:right;padding-right:16px}
+tr.subtotal-row td.num{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--color-text-primary)}
+
+/* Grand total */
+tr.grand-row td{background:var(--color-surface-deep);padding:11px 14px;border-top:none}
+tr.grand-row td.name{font-size:11px;font-weight:700;color:rgba(255,255,255,.55);text-align:right;padding-right:16px;text-transform:uppercase;letter-spacing:.04em}
+tr.grand-row td.num-dr{color:#82BFFF;font-family:var(--font-mono);font-size:13px;font-weight:700;text-align:right}
+tr.grand-row td.num-cr{color:#A8D9BC;font-family:var(--font-mono);font-size:13px;font-weight:700;text-align:right}
+tr.grand-row td.bal-cell{text-align:right;padding-right:14px}
+
+/* Balance badge */
+.bal-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 11px;border-radius:var(--radius-full)}
+.bal-badge.ok{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.bal-badge.err{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.bal-badge svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5}
+
+/* Empty */
+.empty-state{padding:48px 24px;text-align:center}
+.empty-state svg{width:36px;height:36px;stroke:var(--color-border-default);fill:none;stroke-width:1;margin-bottom:12px}
+.empty-title{font-size:14px;font-weight:600;color:var(--color-text-secondary);margin-bottom:4px}
+.empty-sub{font-size:12px;color:var(--color-text-tertiary)}
+
+/* ── STICKY STATUS BAR ── */
+.status-bar{position:fixed;bottom:0;left:196px;right:0;height:44px;background:var(--color-surface-deep);display:flex;align-items:center;padding:0 20px;gap:0;z-index:20;box-shadow:0 -1px 0 rgba(255,255,255,.06)}
+.sbs{display:flex;align-items:center;gap:6px}
+.sbs-lbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.sbs-val{font-family:var(--font-mono);font-size:12px;font-weight:600;color:rgba(255,255,255,.85)}
+.sbs-val.dr{color:#82BFFF}
+.sbs-val.cr{color:#A8D9BC}
+.sbs-val.ok{color:#6BCF9F}
+.sbs-val.bad{color:#EF9F9F}
+.sbsep{width:1px;height:20px;background:rgba(255,255,255,.1);margin:0 16px;flex-shrink:0}
+.sbs-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+
+/* ── DRAWER ── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(8,7,6,.35);z-index:38;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:400px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow);box-shadow:-4px 0 32px rgba(8,7,6,.1)}
+.drawer.open{transform:translateX(0)}
+.dh{padding:16px 18px;border-bottom:1px solid var(--color-border-default);display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0}
+.dh-info{}
+.dh-code{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--color-text-tertiary);letter-spacing:.06em;margin-bottom:3px}
+.dh-name{font-size:15px;font-weight:700;color:var(--color-text-primary);line-height:1.3}
+.dclose{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--color-surface-sunken);border:none;flex-shrink:0;margin-top:2px}
+.dclose svg{width:13px;height:13px;stroke:var(--color-text-secondary);fill:none;stroke-width:2}
+.dclose:hover{background:var(--color-border-default)}
+.dtab-bar{display:flex;border-bottom:1px solid var(--color-border-default);flex-shrink:0;padding:0 18px}
+.dtab{padding:10px 0;margin-right:18px;font-size:12px;font-weight:500;color:var(--color-text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--transition-fast);white-space:nowrap}
+.dtab:hover{color:var(--color-text-secondary)}
+.dtab.active{color:var(--color-action);border-bottom-color:var(--color-action);font-weight:600}
+.dbody{flex:1;overflow-y:auto}
+.dpane{display:none;padding:16px 18px}
+.dpane.active{display:block}
+
+/* Drawer internals */
+.d-sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.d-sum-card{background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:10px 12px}
+.d-sum-lbl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:4px}
+.d-sum-val{font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--color-text-primary)}
+.d-sum-val.dr{color:var(--color-action)}
+.d-sum-val.cr{color:var(--success-text)}
+.dsec{margin-bottom:16px}
+.dsec-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:10px}
+.info-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--color-surface-sunken)}
+.info-row:last-child{border-bottom:none}
+.info-row label{font-size:11px;color:var(--color-text-tertiary)}
+.info-row span{font-size:12px;font-weight:500;color:var(--color-text-primary);text-align:right}
+.info-row span.mono{font-family:var(--font-mono)}
+.info-row span.ok{color:var(--success-text)}
+.info-row span.dr{color:var(--color-action)}
+.info-row span.cr{color:var(--success-text)}
+.txn-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--color-surface-sunken)}
+.txn-item:last-child{border-bottom:none}
+.txn-icon{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.txn-icon.d{background:var(--ai-surface);border:1px solid var(--ai-border)}
+.txn-icon.d svg{stroke:var(--color-action)}
+.txn-icon.c{background:var(--success-surface);border:1px solid var(--success-border)}
+.txn-icon.c svg{stroke:var(--success-text)}
+.txn-icon svg{width:12px;height:12px;fill:none;stroke-width:2.5}
+.txn-info{flex:1;min-width:0}
+.txn-ref{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--color-text-secondary)}
+.txn-desc{font-size:11px;color:var(--color-text-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.txn-date{font-size:10px;color:var(--color-text-tertiary);margin-top:2px}
+.txn-amt{font-family:var(--font-mono);font-size:12px;font-weight:700;flex-shrink:0;text-align:right}
+.txn-amt.d{color:var(--color-action)}
+.txn-amt.c{color:var(--success-text)}
+.audit-item{display:flex;gap:10px;padding:8px 0;position:relative}
+.audit-item:not(:last-child)::after{content:'';position:absolute;left:10px;top:28px;bottom:-8px;width:1px;background:var(--color-border-default)}
+.audit-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.audit-dot.posted{background:var(--success-surface);border:1.5px solid var(--success-border)}
+.audit-dot.posted svg{width:9px;height:9px;stroke:var(--success-text);fill:none;stroke-width:2.5}
+.audit-dot.info{background:var(--color-surface-sunken);border:1.5px solid var(--color-border-default)}
+.audit-dot.info svg{width:8px;height:8px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2}
+.audit-content{flex:1}
+.audit-action{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.audit-meta{font-size:11px;color:var(--color-text-tertiary);margin-top:2px;line-height:1.5}
+
+/* ── FILTER DRAWER (Bills pattern) ── */
+.filter-overlay{position:fixed;inset:0;background:rgba(8,7,6,.3);z-index:38;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.filter-overlay.open{opacity:1;pointer-events:all}
+.filter-drawer{position:fixed;top:0;right:0;height:100vh;width:320px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow)}
+.filter-drawer.open{transform:translateX(0)}
+.fd-head{padding:16px 18px;border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.fd-title{font-size:14px;font-weight:700;color:var(--color-text-primary)}
+.fd-clear{font-size:11px;font-weight:600;color:var(--color-action);cursor:pointer}
+.fd-body{flex:1;overflow-y:auto;padding:16px 18px}
+.fd-section{margin-bottom:20px}
+.fd-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:8px}
+.fd-shortcuts{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.fd-sc{font-size:11px;font-weight:500;padding:4px 10px;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-tertiary);cursor:pointer;transition:all var(--transition-fast)}
+.fd-sc:hover{border-color:var(--color-action);color:var(--color-action)}
+.fd-sc.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.fd-date-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fd-sublabel{font-size:10px;color:var(--color-text-tertiary);font-weight:600;margin-bottom:4px}
+.fd-input{font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:7px 10px;width:100%;outline:none;transition:border-color var(--transition-fast)}
+.fd-input:focus{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.fd-select{font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:7px 10px;width:100%;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none}
+/* Toggle in filter drawer */
+.fd-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0}
+.fd-toggle-label{font-size:12px;color:var(--color-text-secondary)}
+.toggle-sw{position:relative;width:28px;height:16px;flex-shrink:0;display:inline-block}
+.toggle-sw input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:var(--color-border-default);border-radius:var(--radius-full);transition:background var(--transition-base)}
+.toggle-sw input:checked+.toggle-track{background:var(--color-action)}
+.toggle-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;background:#fff;border-radius:50%;transition:left var(--transition-base);pointer-events:none}
+.toggle-sw input:checked~.toggle-thumb{left:14px}
+/* Filter drawer footer */
+.fd-foot{padding:14px 18px;border-top:1px solid var(--color-border-default);display:flex;gap:8px;flex-shrink:0}
+.fd-apply{flex:1;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-fast)}
+.fd-apply:hover{background:var(--color-action-hover)}
+.fd-cancel-btn{font-family:var(--font-sans);font-size:13px;font-weight:500;padding:9px 14px;background:var(--color-surface-raised);color:var(--color-text-tertiary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sb">
+  <div class="sb-top">
+    <div class="sb-logomark"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <span class="sb-brand">Klay</span>
+  </div>
+  <div class="sb-section">Overview</div>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+  <div class="sb-section">Keuangan</div>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>General Ledger</a>
+  <a class="sb-item active" href="#"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Trial Balance</a>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Journal Entry</a>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Bills</a>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Invoices</a>
+  <div class="sb-section">Operasional</div>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Vendors</a>
+  <a class="sb-item" href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Customers</a>
+  <div class="sb-footer">
+    <div class="sb-footer-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Settings</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-search-wrap">
+      <div class="tb-search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Cari akun atau ketik perintah…" autocomplete="off">
+        <span class="tb-kbd">⌘K</span>
+      </div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-notif"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>
+      <div class="tb-org">
+        <div class="tb-av">PT</div>
+        <span class="tb-org-name">PT Sejahtera Makmur</span>
+        <svg class="tb-caret" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-area">
+
+    <!-- PAGE HEADER -->
+    <div class="page-head">
+      <div>
+        <div class="page-title">Trial Balance</div>
+        <div class="page-subtitle" id="pageSubtitle">PT Sejahtera Makmur · Per 30 April 2025</div>
+      </div>
+      <div class="head-right">
+        <div style="position:relative">
+          <button class="btn-ghost" onclick="toggleExp(event)">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export
+            <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="exp-menu" id="expMenu">
+            <div class="em-lbl">Scope</div>
+            <div class="em-chips" id="scopeChips">
+              <button class="em-chip on" data-v="visible" onclick="setExpChip('scope',this)">Hanya terlihat</button>
+              <button class="em-chip" data-v="all" onclick="setExpChip('scope',this)">Semua</button>
+            </div>
+            <div class="em-lbl">Format</div>
+            <div class="em-chips" id="fmtChips">
+              <button class="em-chip on" data-v="xlsx" onclick="setExpChip('fmt',this)">Excel (.xlsx)</button>
+              <button class="em-chip" data-v="csv" onclick="setExpChip('fmt',this)">CSV (.csv)</button>
+            </div>
+            <div class="em-div"></div>
+            <button class="em-dl" onclick="doExport()">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSIGHT CARDS -->
+    <div class="insight-grid" id="insightGrid">
+
+      <!-- Card 1: Balance Status -->
+      <div class="ic" id="ic-balance" onclick="onCardBalance()">
+        <div class="ic-top">
+          <div class="ic-icon ok" id="ic-balance-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <span class="ic-action">Lihat baris<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </div>
+        <div class="ic-label">Keseimbangan</div>
+        <div class="ic-value ok" id="ic-balance-val">Seimbang</div>
+        <div class="ic-sub" id="ic-balance-sub">Total DR = Total CR</div>
+      </div>
+
+      <!-- Card 2: Net Income/Loss -->
+      <div class="ic" id="ic-net" onclick="onCardNet()">
+        <div class="ic-top">
+          <div class="ic-icon profit" id="ic-net-icon">
+            <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+          <span class="ic-action">Filter P&amp;L<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </div>
+        <div class="ic-label">Laba / Rugi Periode</div>
+        <div class="ic-value profit" id="ic-net-val">—</div>
+        <div class="ic-sub" id="ic-net-sub">—</div>
+      </div>
+
+      <!-- Card 3: Anomaly Detection -->
+      <div class="ic" id="ic-anom" onclick="onCardAnom()">
+        <div class="ic-top">
+          <div class="ic-icon neutral" id="ic-anom-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <span class="ic-action" id="ic-anom-action">Lihat detail<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </div>
+        <div class="ic-label">Anomali Terdeteksi</div>
+        <div class="ic-value" id="ic-anom-val">—</div>
+        <div class="ic-pills" id="ic-anom-pills"></div>
+      </div>
+
+      <!-- Card 4: Dormant Accounts -->
+      <div class="ic" id="ic-dormant" onclick="onCardDormant()">
+        <div class="ic-top">
+          <div class="ic-icon blue" id="ic-dormant-icon">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          </div>
+          <span class="ic-action">Filter akun<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </div>
+        <div class="ic-label">Tidak Aktif</div>
+        <div class="ic-value blue" id="ic-dormant-val">—</div>
+        <div class="ic-sub" id="ic-dormant-sub">Akun ada saldo, tanpa movement</div>
+      </div>
+
+    </div>
+
+    <!-- FILTER BAR (Bills pattern) -->
+    <div class="filter-bar">
+      <div class="f-search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Cari kode atau nama akun…" autocomplete="off" oninput="renderTable()">
+      </div>
+      <div class="fsep"></div>
+      <div class="chip-grp" id="typeChips">
+        <button class="chip on" data-v="" onclick="setTypeChip(this)">Semua</button>
+        <button class="chip" data-v="asset,contra_asset" onclick="setTypeChip(this)">Aset</button>
+        <button class="chip" data-v="liability" onclick="setTypeChip(this)">Liabilitas</button>
+        <button class="chip" data-v="equity" onclick="setTypeChip(this)">Ekuitas</button>
+        <button class="chip" data-v="revenue" onclick="setTypeChip(this)">Pendapatan</button>
+        <button class="chip" data-v="expense" onclick="setTypeChip(this)">Beban</button>
+      </div>
+      <div class="f-right">
+        <button class="f-filter-btn" onclick="openFilterDrawer()">
+          <svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+          Filter Lainnya
+          <span class="f-filter-count" id="filterCount">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="tbl-wrap" id="tblWrap">
+      <table id="tbTable">
+        <thead>
+          <tr>
+            <th class="sortable" data-col="code" style="width:88px">Kode<span class="sort-arrow"></span></th>
+            <th class="sortable" data-col="name">Nama Akun<span class="sort-arrow"></span></th>
+            <th class="sortable r" data-col="opening_balance" style="width:152px">Saldo Awal<span class="sort-arrow"></span></th>
+            <th class="sortable r" data-col="period_debit" style="width:152px">Debit Periode<span class="sort-arrow"></span></th>
+            <th class="sortable r" data-col="period_credit" style="width:152px">Kredit Periode<span class="sort-arrow"></span></th>
+            <th class="sortable r" data-col="closing_balance" style="width:160px">Saldo Akhir<span class="sort-arrow"></span></th>
+          </tr>
+        </thead>
+        <tbody id="tbBody"></tbody>
+      </table>
+      <div id="emptyState" class="empty-state" style="display:none">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        <div class="empty-title">Tidak ada data</div>
+        <div class="empty-sub">Coba ubah filter atau rentang tanggal</div>
+      </div>
+    </div>
+
+  </div><!-- /scroll-area -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div class="sbs"><span class="sbs-lbl">Akun</span><span class="sbs-val" id="stAkun">—</span></div>
+  <div class="sbsep"></div>
+  <div class="sbs"><span class="sbs-lbl">Total Debit</span><span class="sbs-val dr" id="stDr">—</span></div>
+  <div class="sbsep"></div>
+  <div class="sbs"><span class="sbs-lbl">Total Kredit</span><span class="sbs-val cr" id="stCr">—</span></div>
+  <div class="sbsep"></div>
+  <div class="sbs"><span class="sbs-lbl">Selisih</span><span class="sbs-val" id="stVar">—</span></div>
+  <div class="sbs-right">
+    <span id="balBadge" class="bal-badge ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Seimbang</span>
+  </div>
+</div>
+
+<!-- DETAIL DRAWER -->
+<div class="drawer-overlay" id="dOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="dh">
+    <div class="dh-info">
+      <div class="dh-code" id="dCode">—</div>
+      <div class="dh-name" id="dName">—</div>
+    </div>
+    <button class="dclose" onclick="closeDrawer()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="dtab-bar">
+    <div class="dtab active" onclick="switchDTab(0,this)">Detail</div>
+    <div class="dtab" onclick="switchDTab(1,this)">Transaksi</div>
+    <div class="dtab" onclick="switchDTab(2,this)">Audit Trail</div>
+  </div>
+  <div class="dbody">
+    <div class="dpane active" id="dp0"></div>
+    <div class="dpane" id="dp1"></div>
+    <div class="dpane" id="dp2"></div>
+  </div>
+</div>
+
+<!-- FILTER DRAWER (Bills pattern) -->
+<div class="filter-overlay" id="fdOverlay" onclick="closeFilterDrawer()"></div>
+<div class="filter-drawer" id="filterDrawer">
+  <div class="fd-head">
+    <span class="fd-title">Filter</span>
+    <span class="fd-clear" onclick="clearFilters()">Reset semua</span>
+  </div>
+  <div class="fd-body">
+    <div class="fd-section">
+      <div class="fd-label">Per Tanggal (As-of Date)</div>
+      <div class="fd-shortcuts" id="fdShortcuts">
+        <div class="fd-sc on" data-r="ytd" onclick="setDateSC(this)">YTD Apr 2025</div>
+        <div class="fd-sc" data-r="q1" onclick="setDateSC(this)">Per Mar 2025</div>
+        <div class="fd-sc" data-r="feb" onclick="setDateSC(this)">Per Feb 2025</div>
+        <div class="fd-sc" data-r="jan" onclick="setDateSC(this)">Per Jan 2025</div>
+      </div>
+      <div class="fd-date-row">
+        <div>
+          <div class="fd-sublabel">Awal Periode</div>
+          <input type="date" class="fd-input" id="fdFrom" value="2025-01-01">
+        </div>
+        <div>
+          <div class="fd-sublabel">Per Tanggal</div>
+          <input type="date" class="fd-input" id="fdTo" value="2025-04-30">
+        </div>
+      </div>
+    </div>
+    <div class="fd-section">
+      <div class="fd-label">Tipe Akun</div>
+      <select class="fd-select" id="fdType">
+        <option value="">Semua Tipe</option>
+        <option value="asset">Aset</option>
+        <option value="contra_asset">Kontra Aset</option>
+        <option value="liability">Liabilitas</option>
+        <option value="equity">Ekuitas</option>
+        <option value="revenue">Pendapatan</option>
+        <option value="expense">Beban</option>
+      </select>
+    </div>
+    <div class="fd-section">
+      <div class="fd-label">Tampilan</div>
+      <div class="fd-toggle-row">
+        <span class="fd-toggle-label">Sembunyikan saldo nol</span>
+        <label class="toggle-sw"><input type="checkbox" id="fdHideZero"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+      </div>
+      <div class="fd-toggle-row" style="margin-top:6px">
+        <span class="fd-toggle-label">Kelompokkan per tipe akun</span>
+        <label class="toggle-sw"><input type="checkbox" id="fdGroup" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+      </div>
+    </div>
+  </div>
+  <div class="fd-foot">
+    <button class="fd-cancel-btn" onclick="closeFilterDrawer()">Batal</button>
+    <button class="fd-apply" onclick="applyFilterDrawer()">Terapkan Filter</button>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   COA
+═══════════════════════════════════════════════════ */
+const COA = [{"code":"1-1000","name":"Kas","type":"asset","normal_balance":"debit","is_active":true},{"code":"1-1100","name":"Kas & Bank","type":"asset","normal_balance":"debit","parent":"1-1000","is_active":true},{"code":"1-1200","name":"Piutang Usaha","type":"asset","normal_balance":"debit","is_active":true},{"code":"1-1300","name":"Cadangan Piutang Ragu","type":"contra_asset","normal_balance":"credit","is_active":true},{"code":"1-1400","name":"Uang Muka Pembelian","type":"asset","normal_balance":"debit","is_active":true},{"code":"1-2000","name":"Aset Tetap","type":"asset","normal_balance":"debit","is_active":true},{"code":"1-2100","name":"Peralatan Kantor","type":"asset","normal_balance":"debit","parent":"1-2000","is_active":true},{"code":"1-2110","name":"Akum. Penyusutan Peralatan","type":"contra_asset","normal_balance":"credit","is_active":true},{"code":"1-2200","name":"Kendaraan Operasional","type":"asset","normal_balance":"debit","parent":"1-2000","is_active":true},{"code":"1-2210","name":"Akum. Penyusutan Kendaraan","type":"contra_asset","normal_balance":"credit","is_active":true},{"code":"2-1000","name":"Kewajiban Lancar","type":"liability","normal_balance":"credit","is_active":true},{"code":"2-1100","name":"Utang Usaha","type":"liability","normal_balance":"credit","parent":"2-1000","is_active":true},{"code":"2-1200","name":"Utang Pajak","type":"liability","normal_balance":"credit","is_active":true},{"code":"2-1300","name":"Utang Gaji & Tunjangan","type":"liability","normal_balance":"credit","parent":"2-1000","is_active":true},{"code":"2-2000","name":"Kewajiban Jangka Panjang","type":"liability","normal_balance":"credit","is_active":true},{"code":"3-1000","name":"Ekuitas Pemilik","type":"equity","normal_balance":"credit","is_active":true},{"code":"3-1100","name":"Modal Disetor","type":"equity","normal_balance":"credit","parent":"3-1000","is_active":true},{"code":"3-1200","name":"Laba Ditahan","type":"equity","normal_balance":"credit","is_active":true},{"code":"4-1000","name":"Pendapatan Penjualan","type":"revenue","normal_balance":"credit","is_active":true},{"code":"4-1010","name":"Penjualan Produk - Divisi A","type":"revenue","normal_balance":"credit","parent":"4-1000","is_active":true},{"code":"4-1020","name":"Penjualan Produk - Divisi B","type":"revenue","normal_balance":"credit","parent":"4-1000","is_active":true},{"code":"4-1030","name":"Penjualan Jasa Tambahan","type":"revenue","normal_balance":"credit","parent":"4-1000","is_active":true},{"code":"4-2000","name":"Pendapatan Lainnya","type":"revenue","normal_balance":"credit","is_active":true},{"code":"5-1000","name":"Beban Operasional","type":"expense","normal_balance":"debit","is_active":true},{"code":"5-1010","name":"Beban Gaji & Tunjangan","type":"expense","normal_balance":"debit","parent":"5-1000","is_active":true},{"code":"5-1020","name":"Beban Sewa Kantor","type":"expense","normal_balance":"debit","parent":"5-1000","is_active":true},{"code":"5-1030","name":"Beban Iklan & Pemasaran","type":"expense","normal_balance":"debit","parent":"5-1000","is_active":true},{"code":"5-1040","name":"Beban Penyusutan","type":"expense","normal_balance":"debit","parent":"5-1000","is_active":true},{"code":"5-1050","name":"Beban Listrik, Air & Utilitas","type":"expense","normal_balance":"debit","parent":"5-1000","is_active":true},{"code":"5-1060","name":"Beban Pemeliharaan Aset","type":"expense","normal_balance":"debit","parent":"5-1000","is_active":true},{"code":"5-1070","name":"Biaya Konsultan & Profesional","type":"expense","normal_balance":"debit","parent":"5-1000","is_active":true},{"code":"5-2000","name":"Beban Pajak & Cukai","type":"expense","normal_balance":"debit","is_active":true},{"code":"5-2100","name":"Beban PPh 21","type":"expense","normal_balance":"debit","parent":"5-2000","is_active":true},{"code":"5-2200","name":"Beban PPN Masukan","type":"expense","normal_balance":"debit","parent":"5-2000","is_active":true},{"code":"6-1000","name":"Biaya Pokok Penjualan","type":"expense","normal_balance":"debit","is_active":true}];
+
+/* ═══════════════════════════════════════════════════
+   JOURNAL ENTRIES
+═══════════════════════════════════════════════════ */
+const JE = [{"je_number":"JE-2025-0001","je_date":"2025-01-18","status":"posted","memo":"Penerimaan pembayaran invoice INV001","created_by":"system","posted_by":"Ahmad Fauzi","posted_date":"2025-01-18","reference_type":"invoice","reference_id":"INV-C001-20250118","lines":[{"account_code":"1-1100","account_name":"Kas & Bank","debit":33000000,"credit":0,"description":"Kas masuk dari pelanggan"},{"account_code":"1-1200","account_name":"Piutang Usaha","debit":0,"credit":33000000,"description":"Pelunasan piutang usaha"}]},{"je_number":"JE-2025-0002","je_date":"2025-01-15","status":"posted","memo":"Pembelian peralatan dari PT Teknologi Prima","created_by":"system","posted_by":"Ahmad Fauzi","posted_date":"2025-01-15","reference_type":"bill","reference_id":"BILL-V001-20250115","lines":[{"account_code":"6-1000","account_name":"Biaya Pokok Penjualan","debit":75000000,"credit":0,"description":"Pembelian persediaan/peralatan"},{"account_code":"5-2200","account_name":"Beban PPN Masukan","debit":7500000,"credit":0,"description":"PPN masukan 10%"},{"account_code":"2-1100","account_name":"Utang Usaha","debit":0,"credit":82500000,"description":"Utang ke PT Teknologi Prima"}]},{"je_number":"JE-2025-0003","je_date":"2025-01-20","status":"posted","memo":"Pembelian kendaraan dari CV Logistik Nusantara","created_by":"system","posted_by":"Ahmad Fauzi","posted_date":"2025-01-20","reference_type":"bill","reference_id":"BILL-V002-20250120","lines":[{"account_code":"1-2100","account_name":"Peralatan Kantor","debit":19200000,"credit":0,"description":"Pembelian peralatan kantor"},{"account_code":"5-2200","account_name":"Beban PPN Masukan","debit":1920000,"credit":0,"description":"PPN masukan 10%"},{"account_code":"2-1100","account_name":"Utang Usaha","debit":0,"credit":21120000,"description":"Utang ke CV Logistik Nusantara"}]},{"je_number":"JE-2025-0004","je_date":"2025-02-08","status":"posted","memo":"Pembayaran jasa konsultan","created_by":"system","posted_by":"Siti Rahayu","posted_date":"2025-02-08","reference_type":"bill","reference_id":"BILL-V003-20250208","lines":[{"account_code":"5-1070","account_name":"Biaya Konsultan & Profesional","debit":12500000,"credit":0,"description":"Jasa konsultan bisnis Q1"},{"account_code":"5-2200","account_name":"Beban PPN Masukan","debit":1250000,"credit":0,"description":"PPN masukan 10%"},{"account_code":"2-1100","account_name":"Utang Usaha","debit":0,"credit":13750000,"description":"Utang ke Konsultan Bisnis Indonesia"}]},{"je_number":"JE-2025-0005","je_date":"2025-01-25","status":"posted","memo":"Invoice penjualan INV002 ke CV Retail Sukses","created_by":"system","posted_by":"Ahmad Fauzi","posted_date":"2025-01-25","reference_type":"invoice","reference_id":"INV-C002-20250125","lines":[{"account_code":"1-1200","account_name":"Piutang Usaha","debit":9625000,"credit":0,"description":"Piutang penjualan INV002"},{"account_code":"4-1020","account_name":"Penjualan Produk - Divisi B","debit":0,"credit":8750000,"description":"Penjualan produk Divisi B"},{"account_code":"2-1200","account_name":"Utang Pajak","debit":0,"credit":875000,"description":"PPN keluaran 10%"}]},{"je_number":"JE-2025-0006","je_date":"2025-02-10","status":"posted","memo":"Invoice penjualan INV003 ke PT Distribusi Handal","created_by":"system","posted_by":"Siti Rahayu","posted_date":"2025-02-10","reference_type":"invoice","reference_id":"INV-C003-20250210","lines":[{"account_code":"1-1200","account_name":"Piutang Usaha","debit":24200000,"credit":0,"description":"Piutang penjualan INV003"},{"account_code":"4-1010","account_name":"Penjualan Produk - Divisi A","debit":0,"credit":22000000,"description":"Penjualan produk Divisi A"},{"account_code":"2-1200","account_name":"Utang Pajak","debit":0,"credit":2200000,"description":"PPN keluaran 10%"}]},{"je_number":"JE-2025-0007","je_date":"2025-02-20","status":"posted","memo":"Invoice penjualan INV004 ke Hypermarket Sentosa","created_by":"system","posted_by":"Siti Rahayu","posted_date":"2025-02-20","reference_type":"invoice","reference_id":"INV-C004-20250220","lines":[{"account_code":"1-1200","account_name":"Piutang Usaha","debit":18562500,"credit":0,"description":"Piutang penjualan INV004"},{"account_code":"4-1020","account_name":"Penjualan Produk - Divisi B","debit":0,"credit":16875000,"description":"Penjualan produk Divisi B"},{"account_code":"2-1200","account_name":"Utang Pajak","debit":0,"credit":1687500,"description":"PPN keluaran 10%"}]},{"je_number":"JE-2025-0008","je_date":"2025-03-15","status":"posted","memo":"Pembelian bahan baku dari Koperasi Tani Maju","created_by":"system","posted_by":"Ahmad Fauzi","posted_date":"2025-03-15","reference_type":"bill","reference_id":"BILL-V004-20250315","lines":[{"account_code":"6-1000","account_name":"Biaya Pokok Penjualan","debit":12500000,"credit":0,"description":"Pembelian bahan baku"},{"account_code":"5-2200","account_name":"Beban PPN Masukan","debit":1250000,"credit":0,"description":"PPN masukan 10%"},{"account_code":"2-1100","account_name":"Utang Usaha","debit":0,"credit":13750000,"description":"Utang ke Koperasi Tani Maju"}]},{"je_number":"JE-2025-0009","je_date":"2025-03-15","status":"posted","memo":"Biaya operasional Maret 2025","created_by":"system","posted_by":"Siti Rahayu","posted_date":"2025-03-15","reference_type":"journal","reference_id":"JE-2025-0009","lines":[{"account_code":"5-1000","account_name":"Beban Operasional","debit":12500000,"credit":0,"description":"Beban operasional Maret"},{"account_code":"2-1100","account_name":"Utang Usaha","debit":0,"credit":12500000,"description":"Akrual beban operasional"}]},{"je_number":"JE-2025-0010","je_date":"2025-03-15","status":"posted","memo":"Invoice penjualan INV005 ke Hypermarket Sentosa","created_by":"system","posted_by":"Ahmad Fauzi","posted_date":"2025-03-15","reference_type":"invoice","reference_id":"INV-C004-20250315","lines":[{"account_code":"1-1200","account_name":"Piutang Usaha","debit":48400000,"credit":0,"description":"Piutang penjualan INV005"},{"account_code":"4-1010","account_name":"Penjualan Produk - Divisi A","debit":0,"credit":42000000,"description":"Penjualan produk Divisi A"},{"account_code":"2-1200","account_name":"Utang Pajak","debit":0,"credit":4200000,"description":"PPN keluaran 10%"},{"account_code":"4-1030","account_name":"Penjualan Jasa Tambahan","debit":0,"credit":2000000,"description":"Jasa instalasi tambahan"}]},{"je_number":"JE-2025-0011","je_date":"2025-02-10","status":"posted","memo":"Pembayaran utang ke PT Teknologi Prima","created_by":"system","posted_by":"Ahmad Fauzi","posted_date":"2025-02-10","reference_type":"bill","reference_id":"BILL-V001-20250115","lines":[{"account_code":"2-1100","account_name":"Utang Usaha","debit":82500000,"credit":0,"description":"Pelunasan utang BILL001"},{"account_code":"1-1100","account_name":"Kas & Bank","debit":0,"credit":82500000,"description":"Kas keluar pembayaran vendor"}]},{"je_number":"JE-2025-0012","je_date":"2025-02-05","status":"posted","memo":"Pembayaran utang ke CV Logistik Nusantara","created_by":"system","posted_by":"Siti Rahayu","posted_date":"2025-02-05","reference_type":"bill","reference_id":"BILL-V002-20250120","lines":[{"account_code":"2-1100","account_name":"Utang Usaha","debit":21120000,"credit":0,"description":"Pelunasan utang BILL002"},{"account_code":"1-1100","account_name":"Kas & Bank","debit":0,"credit":21120000,"description":"Kas keluar pembayaran vendor"}]},{"je_number":"JE-2025-0013","je_date":"2025-02-16","status":"posted","memo":"Pembayaran jasa konsultan BILL003","created_by":"system","posted_by":"Ahmad Fauzi","posted_date":"2025-02-16","reference_type":"bill","reference_id":"BILL-V003-20250208","lines":[{"account_code":"2-1100","account_name":"Utang Usaha","debit":13750000,"credit":0,"description":"Pelunasan utang konsultan"},{"account_code":"1-1100","account_name":"Kas & Bank","debit":0,"credit":13750000,"description":"Kas keluar pembayaran konsultan"}]},{"je_number":"JE-2025-0014","je_date":"2025-04-10","status":"posted","memo":"Pembelian bahan baku dari CV Bahan Baku Lokal","created_by":"system","posted_by":"Siti Rahayu","posted_date":"2025-04-10","reference_type":"bill","reference_id":"BILL-V005-20250410","lines":[{"account_code":"6-1000","account_name":"Biaya Pokok Penjualan","debit":25000000,"credit":0,"description":"Pembelian bahan baku April"},{"account_code":"5-2200","account_name":"Beban PPN Masukan","debit":2500000,"credit":0,"description":"PPN masukan 10%"},{"account_code":"2-1100","account_name":"Utang Usaha","debit":0,"credit":27500000,"description":"Utang ke CV Bahan Baku Lokal"}]},{"je_number":"JE-2025-0015","je_date":"2025-03-09","status":"posted","memo":"Penerimaan pembayaran INV002","created_by":"system","posted_by":"Ahmad Fauzi","posted_date":"2025-03-09","reference_type":"invoice","reference_id":"INV-C002-20250125","lines":[{"account_code":"1-1100","account_name":"Kas & Bank","debit":9625000,"credit":0,"description":"Penerimaan pembayaran INV002"},{"account_code":"1-1200","account_name":"Piutang Usaha","debit":0,"credit":9625000,"description":"Pelunasan piutang"}]},{"je_number":"JE-2025-0016","je_date":"2025-03-10","status":"posted","memo":"Penerimaan pembayaran INV003","created_by":"system","posted_by":"Siti Rahayu","posted_date":"2025-03-10","reference_type":"invoice","reference_id":"INV-C003-20250210","lines":[{"account_code":"1-1100","account_name":"Kas & Bank","debit":24200000,"credit":0,"description":"Penerimaan pembayaran INV003"},{"account_code":"1-1200","account_name":"Piutang Usaha","debit":0,"credit":24200000,"description":"Pelunasan piutang"}]},{"je_number":"JE-2025-0017","je_date":"2025-03-11","status":"posted","memo":"Penerimaan pembayaran INV004","created_by":"system","posted_by":"Ahmad Fauzi","posted_date":"2025-03-11","reference_type":"invoice","reference_id":"INV-C004-20250220","lines":[{"account_code":"1-1100","account_name":"Kas & Bank","debit":18562500,"credit":0,"description":"Penerimaan pembayaran INV004"},{"account_code":"1-1200","account_name":"Piutang Usaha","debit":0,"credit":18562500,"description":"Pelunasan piutang"}]},{"je_number":"JE-2025-0018","je_date":"2025-02-12","status":"posted","memo":"Biaya konsultasi lanjutan Q1","created_by":"system","posted_by":"Siti Rahayu","posted_date":"2025-02-12","reference_type":"invoice","reference_id":"INV-C001-20250118","lines":[{"account_code":"5-1070","account_name":"Biaya Konsultan & Profesional","debit":12500000,"credit":0,"description":"Biaya konsultasi lanjutan Q1"},{"account_code":"1-1100","account_name":"Kas & Bank","debit":0,"credit":12500000,"description":"Pelunasan"}]}];
+
+/* ═══════════════════════════════════════════════════
+   OPENING BALANCES — balanced: DR(500M+50M) = CR(550M) ✓
+═══════════════════════════════════════════════════ */
+const OPENING = {
+  '1-1100': 500000000,  // Kas & Bank (DR)
+  '1-2100': 50000000,   // Peralatan Kantor (DR)  ← opening asset
+  '3-1100': 550000000,  // Modal Disetor (CR)
+};
+
+/* ═══════════════════════════════════════════════════
+   PARENT CODES (header-only, no transactions)
+═══════════════════════════════════════════════════ */
+const PARENT_SET = new Set(COA.filter(a=>a.parent).map(a=>a.parent));
+const LEAF = COA.filter(a => !PARENT_SET.has(a.code));
+
+/* ═══════════════════════════════════════════════════
+   COMPUTE TRIAL BALANCE
+   dateFrom: start of period movement display
+   dateTo  : as-of date (closing balance)
+═══════════════════════════════════════════════════ */
+function computeTB(dateFrom, dateTo) {
+  const acc = {};
+  LEAF.forEach(a => { acc[a.code] = {preDr:0,preCr:0,perDr:0,perCr:0,entries:[]}; });
+  JE.forEach(je => {
+    if (je.status !== 'posted') return;
+    je.lines.forEach(line => {
+      const a = acc[line.account_code];
+      if (!a) return;
+      const dr = line.debit||0, cr = line.credit||0;
+      if (je.je_date < dateFrom) {
+        a.preDr += dr; a.preCr += cr;
+      } else if (je.je_date >= dateFrom && je.je_date <= dateTo) {
+        a.perDr += dr; a.perCr += cr;
+        a.entries.push({je_ref:je.je_number,date:je.je_date,debit:dr,credit:cr,
+          description:line.description,memo:je.memo,
+          posted_by:je.posted_by,posted_date:je.posted_date,
+          reference_type:je.reference_type,reference_id:je.reference_id});
+      }
+    });
+  });
+  return LEAF.map(acct => {
+    const a = acc[acct.code], ini = OPENING[acct.code]||0;
+    const openBal = acct.normal_balance==='debit'
+      ? ini + a.preDr - a.preCr
+      : ini + a.preCr - a.preDr;
+    const closeBal = acct.normal_balance==='debit'
+      ? openBal + a.perDr - a.perCr
+      : openBal + a.perCr - a.perDr;
+    return {
+      code:acct.code, name:acct.name, type:acct.type,
+      normal_balance:acct.normal_balance,
+      opening_balance:openBal, period_debit:a.perDr, period_credit:a.perCr,
+      closing_balance:closeBal, entries:a.entries,
+      has_activity: a.perDr>0||a.perCr>0||openBal!==0||closeBal!==0
+    };
+  });
+}
+
+/* Balance check: sum all closing balances by sign convention */
+function checkBalance(rows) {
+  let dr=0, cr=0;
+  rows.forEach(r => {
+    const cb = r.closing_balance;
+    if (r.normal_balance==='debit')  { cb>=0 ? dr+=cb : cr+=Math.abs(cb); }
+    else                              { cb>=0 ? cr+=cb : dr+=Math.abs(cb); }
+  });
+  return {dr, cr, variance: Math.abs(dr-cr), balanced: Math.abs(dr-cr) < 1};
+}
+
+/* ═══════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════ */
+let dateFrom='2025-01-01', dateTo='2025-04-30';
+let hideZero=false, groupMode=true;
+let typeFilter='', searchQ='', drawerTypeFilter='';
+let sortCol='code', sortDir='asc';
+let collapsedGroups=new Set();
+let ALL_TB=[], DISPLAYED_TB=[];
+let expScope='visible', expFmt='xlsx';
+let highlightCodes=null, activeCardFilter=null;
+let anomalyCodes=new Set(), dormantCodes=new Set();
+
+/* ═══════════════════════════════════════════════════
+   FORMATTING
+═══════════════════════════════════════════════════ */
+const rp = v => {
+  if (v===0||v===null||v===undefined) return '—';
+  const abs=Math.abs(v);
+  return (v<0?'(':'')+'Rp\u00A0'+abs.toLocaleString('id-ID')+(v<0?')':'');
+};
+const rpZ = v => {
+  if (v===undefined||v===null) return '—';
+  const abs=Math.abs(v);
+  return (v<0?'(':'')+'Rp\u00A0'+abs.toLocaleString('id-ID')+(v<0?')':'');
+};
+
+const TYPE_LABELS = {asset:'ASET',contra_asset:'KONTRA ASET',liability:'LIABILITAS',equity:'EKUITAS',revenue:'PENDAPATAN',expense:'BEBAN'};
+const TYPE_ORDER  = ['asset','contra_asset','liability','equity','revenue','expense'];
+
+function typeBadge(t) {
+  const m={asset:'tb-asset',contra_asset:'tb-contra',liability:'tb-liab',equity:'tb-equity',revenue:'tb-rev',expense:'tb-exp'};
+  return `<span class="type-badge ${m[t]||'tb-contra'}">${TYPE_LABELS[t]||t}</span>`;
+}
+
+/* ═══════════════════════════════════════════════════
+   RENDER
+═══════════════════════════════════════════════════ */
+function renderTable() {
+  searchQ = (document.getElementById('searchInput').value||'').toLowerCase();
+  ALL_TB  = computeTB(dateFrom, dateTo);
+
+  let rows = [...ALL_TB];
+  if (hideZero) rows = rows.filter(r => r.has_activity);
+  if (searchQ)  rows = rows.filter(r => r.code.toLowerCase().includes(searchQ)||r.name.toLowerCase().includes(searchQ));
+  if (typeFilter) {
+    const types = typeFilter.split(',');
+    rows = rows.filter(r => types.includes(r.type));
+  }
+  // Highlight codes from card filter (dormant / anomaly)
+  if (highlightCodes && highlightCodes.size > 0) {
+    rows = rows.filter(r => highlightCodes.has(r.code));
+  }
+
+  rows.sort((a,b) => {
+    let va=a[sortCol]||0, vb=b[sortCol]||0;
+    if (sortCol==='code'||sortCol==='name'){va=a[sortCol];vb=b[sortCol];}
+    const cmp=va<vb?-1:va>vb?1:0;
+    return sortDir==='asc'?cmp:-cmp;
+  });
+
+  DISPLAYED_TB = rows;
+
+  const tbody = document.getElementById('tbBody');
+  const empty = document.getElementById('emptyState');
+
+  if (rows.length===0){tbody.innerHTML='';empty.style.display='block';updateStatusBar([]);updateSummaryCards();return;}
+  empty.style.display='none';
+
+  let html='';
+  if (groupMode) {
+    TYPE_ORDER.forEach(type => {
+      const grp = rows.filter(r=>r.type===type);
+      if (!grp.length) return;
+      const col = collapsedGroups.has(type);
+      const sumDr=grp.reduce((s,r)=>s+r.period_debit,0);
+      const sumCr=grp.reduce((s,r)=>s+r.period_credit,0);
+      const sumOpen=grp.reduce((s,r)=>s+r.opening_balance,0);
+      const sumClose=grp.reduce((s,r)=>s+r.closing_balance,0);
+      html+=`<tr class="group-row" onclick="toggleGroup('${type}')">
+        <td colspan="6"><div class="group-inner">
+          <span class="group-lbl">${TYPE_LABELS[type]}</span>
+          <span class="group-count">${grp.length} akun</span>
+          <svg class="group-chev${col?' collapsed':''}" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+        </div></td>
+      </tr>`;
+      if (!col) {
+        grp.forEach(r=>{ html+=buildRow(r); });
+        html+=`<tr class="subtotal-row">
+          <td class="code"></td>
+          <td class="name">Subtotal ${TYPE_LABELS[type]}</td>
+          <td class="num" style="text-align:right;color:var(--color-text-tertiary)">${sumOpen?rp(sumOpen):'—'}</td>
+          <td class="num" style="text-align:right;color:var(--color-action)">${sumDr?rp(sumDr):'—'}</td>
+          <td class="num" style="text-align:right;color:var(--success-text)">${sumCr?rp(sumCr):'—'}</td>
+          <td class="num" style="text-align:right;font-weight:700">${rp(sumClose)}</td>
+        </tr>`;
+      }
+    });
+    // Grand total
+    const allTB = computeTB(dateFrom,dateTo);
+    const bal = checkBalance(allTB);
+    const totDr=rows.reduce((s,r)=>s+r.period_debit,0);
+    const totCr=rows.reduce((s,r)=>s+r.period_credit,0);
+    const badge=bal.balanced
+      ?`<span class="bal-badge ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Seimbang</span>`
+      :`<span class="bal-badge err"><svg viewBox="0 0 24 24"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Selisih ${rp(bal.variance)}</span>`;
+    html+=`<tr class="grand-row">
+      <td class="code"></td>
+      <td class="name" style="text-align:right;padding-right:16px">TOTAL</td>
+      <td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:rgba(255,255,255,.45)">—</td>
+      <td class="num-dr">${rp(totDr)}</td>
+      <td class="num-cr">${rp(totCr)}</td>
+      <td class="bal-cell">${badge}</td>
+    </tr>`;
+  } else {
+    rows.forEach(r=>{ html+=buildRow(r); });
+  }
+
+  tbody.innerHTML = html;
+  tbody.querySelectorAll('tr.data-row').forEach(tr=>{
+    tr.addEventListener('click',()=>openDrawer(tr.dataset.code));
+  });
+
+  updateStatusBar(rows);
+  updateInsightCards();
+}
+
+function buildRow(r) {
+  const neg = r.closing_balance<0 ? ' neg':'';
+  return `<tr class="data-row" data-code="${r.code}">
+    <td class="code">${r.code}</td>
+    <td class="name">${r.name}${typeBadge(r.type)}</td>
+    <td class="num-open">${rp(r.opening_balance)}</td>
+    <td class="num-dr">${r.period_debit?rp(r.period_debit):'<span style="color:var(--color-border-default)">—</span>'}</td>
+    <td class="num-cr">${r.period_credit?rp(r.period_credit):'<span style="color:var(--color-border-default)">—</span>'}</td>
+    <td class="num-close${neg}">${rpZ(r.closing_balance)}</td>
+  </tr>`;
+}
+
+/* ═══════════════════════════════════════════════════
+   INSIGHT CARDS
+═══════════════════════════════════════════════════ */
+
+// State for card filters
+
+
+function detectAnomalies(tb) {
+  const flags = [];
+  tb.forEach(r => {
+    // Rule 1: expense with credit closing balance (money flowing IN to expense — wrong)
+    if ((r.type === 'expense') && r.closing_balance < 0 && r.has_activity) {
+      flags.push({ code: r.code, name: r.name, rule: 'Beban bersaldo kredit', severity: 'danger' });
+    }
+    // Rule 2: non-contra asset with credit (negative) closing balance
+    if (r.type === 'asset' && r.closing_balance < 0) {
+      flags.push({ code: r.code, name: r.name, rule: 'Aset bersaldo negatif', severity: 'danger' });
+    }
+    // Rule 3: revenue with debit closing balance (revenue should be credit-normal)
+    if (r.type === 'revenue' && r.closing_balance > 0 && r.normal_balance === 'credit') {
+      // closing_balance for credit-normal is stored as positive when CR > DR
+      // actually if closing_balance < 0 for revenue that's wrong — means more debits than credits
+    }
+    if (r.type === 'revenue' && r.closing_balance < 0) {
+      flags.push({ code: r.code, name: r.name, rule: 'Pendapatan bersaldo debit', severity: 'warn' });
+    }
+    // Rule 4: large swing — period movement > 300% of opening (floor: opening > 5M)
+    const totalMovement = r.period_debit + r.period_credit;
+    const absOpen = Math.abs(r.opening_balance);
+    if (absOpen > 5000000 && totalMovement > absOpen * 3) {
+      flags.push({ code: r.code, name: r.name, rule: `Movement ${Math.round(totalMovement/absOpen*100)}% dari saldo awal`, severity: 'warn' });
+    }
+    // Rule 5: account has BOTH significant debit and credit in same period (unusual for most accounts)
+    if (r.period_debit > 10000000 && r.period_credit > 10000000 &&
+        r.type !== 'liability' && r.type !== 'asset') {
+      // Only flag if the lesser side is > 30% of the greater
+      const ratio = Math.min(r.period_debit, r.period_credit) / Math.max(r.period_debit, r.period_credit);
+      if (ratio > 0.3) {
+        flags.push({ code: r.code, name: r.name, rule: 'Aktivitas DR & CR dua arah', severity: 'warn' });
+      }
+    }
+  });
+  // Deduplicate by code (keep most severe)
+  const seen = new Map();
+  flags.forEach(f => {
+    if (!seen.has(f.code) || f.severity === 'danger') seen.set(f.code, f);
+  });
+  return [...seen.values()];
+}
+
+function updateInsightCards() {
+  const tb = computeTB(dateFrom, dateTo);
+  const bal = checkBalance(tb);
+
+  // — Card 1: Balance —
+  const bIcon  = document.getElementById('ic-balance-icon');
+  const bVal   = document.getElementById('ic-balance-val');
+  const bSub   = document.getElementById('ic-balance-sub');
+  const bCard  = document.getElementById('ic-balance');
+  if (bal.balanced) {
+    bCard.className = 'ic ic-ok';
+    bIcon.className = 'ic-icon ok';
+    bIcon.innerHTML = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+    bVal.className  = 'ic-value ok';
+    bVal.textContent = 'Seimbang';
+    bSub.innerHTML  = `Total DR = Total CR`;
+  } else {
+    bCard.className = 'ic ic-danger';
+    bIcon.className = 'ic-icon danger';
+    bIcon.innerHTML = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+    bVal.className  = 'ic-value danger';
+    bVal.textContent = 'Tidak Seimbang';
+    bSub.innerHTML  = `Selisih <strong>${rp(bal.variance)}</strong>`;
+  }
+
+  // — Card 2: Net Income —
+  const rev    = tb.filter(r => r.type === 'revenue').reduce((s,r) => s + Math.abs(r.closing_balance), 0);
+  const exp    = tb.filter(r => r.type === 'expense').reduce((s,r) => s + r.closing_balance, 0);
+  const net    = rev - exp;
+  const isProfit = net >= 0;
+  const nIcon  = document.getElementById('ic-net-icon');
+  const nVal   = document.getElementById('ic-net-val');
+  const nSub   = document.getElementById('ic-net-sub');
+  nIcon.className = `ic-icon ${isProfit ? 'profit' : 'loss'}`;
+  nIcon.innerHTML = isProfit
+    ? `<svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>`
+    : `<svg viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>`;
+  nVal.className  = `ic-value ${isProfit ? 'profit' : 'loss'}`;
+  nVal.textContent = (isProfit ? '' : '(') + rp(Math.abs(net)) + (isProfit ? '' : ')');
+  nSub.innerHTML  = `Rev <strong>${rp(rev)}</strong> · Beban <strong>${rp(exp)}</strong>`;
+
+  // — Card 3: Anomalies —
+  const anoms  = detectAnomalies(tb);
+  anomalyCodes = new Set(anoms.map(a => a.code));
+  const aCard  = document.getElementById('ic-anom');
+  const aIcon  = document.getElementById('ic-anom-icon');
+  const aVal   = document.getElementById('ic-anom-val');
+  const aPills = document.getElementById('ic-anom-pills');
+  if (anoms.length === 0) {
+    aCard.className = 'ic ic-ok';
+    aIcon.className = 'ic-icon ok';
+    aIcon.innerHTML = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+    aVal.className  = 'ic-value ok';
+    aVal.textContent = 'Bersih';
+    aPills.innerHTML = `<span class="ic-pill neutral">Tidak ada anomali</span>`;
+  } else {
+    const hasDanger = anoms.some(a => a.severity === 'danger');
+    aCard.className = hasDanger ? 'ic ic-danger' : 'ic ic-warn';
+    aIcon.className = hasDanger ? 'ic-icon danger' : 'ic-icon warn';
+    aIcon.innerHTML = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+    aVal.className  = `ic-value ${hasDanger ? 'danger' : ''}`;
+    aVal.textContent = `${anoms.length} akun`;
+    aPills.innerHTML = anoms.slice(0, 3).map(a =>
+      `<span class="ic-pill ${a.severity}">${a.code}</span>`
+    ).join('') + (anoms.length > 3 ? `<span class="ic-pill neutral">+${anoms.length-3}</span>` : '');
+  }
+
+  // — Card 4: Dormant —
+  const dormant = tb.filter(r =>
+    Math.abs(r.opening_balance) > 0 &&
+    r.period_debit === 0 &&
+    r.period_credit === 0
+  );
+  dormantCodes = new Set(dormant.map(r => r.code));
+  const dVal  = document.getElementById('ic-dormant-val');
+  const dSub  = document.getElementById('ic-dormant-sub');
+  dVal.className  = dormant.length > 0 ? 'ic-value blue' : 'ic-value ok';
+  dVal.textContent = dormant.length > 0 ? `${dormant.length} akun` : 'Semua aktif';
+  dSub.textContent = dormant.length > 0
+    ? `Saldo bawa dari sebelum ${new Date(dateFrom+'T00:00:00').toLocaleDateString('id-ID',{month:'short',year:'numeric'})}`
+    : 'Semua akun bergerak di periode ini';
+}
+
+/* Card click handlers */
+
+function onCardBalance() {
+  // Scroll to grand total row in table
+  const grand = document.querySelector('tr.grand-row');
+  if (grand) grand.scrollIntoView({behavior:'smooth', block:'center'});
+  pulseElement('ic-balance');
+}
+
+function onCardNet() {
+  // Toggle P&L filter
+  if (activeCardFilter === 'net') {
+    activeCardFilter = null;
+    typeFilter = '';
+    highlightCodes = null;
+    document.querySelectorAll('#typeChips .chip').forEach(c=>c.classList.remove('on'));
+    document.querySelector('#typeChips .chip[data-v=""]')?.classList.add('on');
+    document.getElementById('ic-net').classList.remove('active');
+  } else {
+    activeCardFilter = 'net';
+    typeFilter = 'revenue,expense';
+    highlightCodes = null;
+    syncChips('revenue');  // approximate - shows revenue chip
+    document.getElementById('ic-net').classList.add('active');
+    document.querySelectorAll('.ic').forEach(c=>{ if(c.id!=='ic-net') c.classList.remove('active'); });
+  }
+  renderTable();
+}
+
+function onCardAnom() {
+  if (anomalyCodes.size === 0) return;
+  if (activeCardFilter === 'anom') {
+    activeCardFilter = null;
+    highlightCodes = null;
+    document.getElementById('ic-anom').classList.remove('active');
+  } else {
+    activeCardFilter = 'anom';
+    highlightCodes = anomalyCodes;
+    document.getElementById('ic-anom').classList.add('active');
+    document.querySelectorAll('.ic').forEach(c=>{ if(c.id!=='ic-anom') c.classList.remove('active'); });
+    // Clear type filter so all types show
+    typeFilter = '';
+    document.querySelectorAll('#typeChips .chip').forEach(c=>c.classList.remove('on'));
+    document.querySelector('#typeChips .chip[data-v=""]')?.classList.add('on');
+  }
+  renderTable();
+}
+
+function onCardDormant() {
+  if (dormantCodes.size === 0) return;
+  if (activeCardFilter === 'dormant') {
+    activeCardFilter = null;
+    highlightCodes = null;
+    document.getElementById('ic-dormant').classList.remove('active');
+  } else {
+    activeCardFilter = 'dormant';
+    highlightCodes = dormantCodes;
+    document.getElementById('ic-dormant').classList.add('active');
+    document.querySelectorAll('.ic').forEach(c=>{ if(c.id!=='ic-dormant') c.classList.remove('active'); });
+    typeFilter = '';
+    document.querySelectorAll('#typeChips .chip').forEach(c=>c.classList.remove('on'));
+    document.querySelector('#typeChips .chip[data-v=""]')?.classList.add('on');
+  }
+  renderTable();
+}
+
+function pulseElement(id) {
+  const el = document.getElementById(id);
+  el.style.transition = 'box-shadow .15s ease';
+  el.style.boxShadow  = '0 0 0 4px rgba(22,102,56,.25)';
+  setTimeout(() => { el.style.boxShadow = ''; }, 500);
+}
+
+/* ═══════════════════════════════════════════════════
+   STATUS BAR
+═══════════════════════════════════════════════════ */
+function updateStatusBar(rows) {
+  const allTB = computeTB(dateFrom,dateTo);
+  const bal   = checkBalance(allTB);
+  const totDr = rows.reduce((s,r)=>s+r.period_debit,0);
+  const totCr = rows.reduce((s,r)=>s+r.period_credit,0);
+
+  document.getElementById('stAkun').textContent = rows.length+' akun';
+  document.getElementById('stDr').textContent   = rp(totDr);
+  document.getElementById('stCr').textContent   = rp(totCr);
+  document.getElementById('stVar').textContent  = bal.balanced?'Rp\u00A00':rp(bal.variance);
+  document.getElementById('stVar').className    = 'sbs-val '+(bal.balanced?'ok':'bad');
+
+  const badge = document.getElementById('balBadge');
+  if (bal.balanced) {
+    badge.className='bal-badge ok';
+    badge.innerHTML='<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Seimbang';
+  } else {
+    badge.className='bal-badge err';
+    badge.innerHTML='<svg viewBox="0 0 24 24"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Tidak Seimbang';
+  }
+}
+
+
+
+/* ═══════════════════════════════════════════════════
+   FILTER CHIPS
+═══════════════════════════════════════════════════ */
+function setTypeChip(el) {
+  document.querySelectorAll('#typeChips .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  typeFilter = el.dataset.v;
+  // Clear any card highlight state when user manually selects a chip
+  activeCardFilter = null;
+  highlightCodes = null;
+  document.querySelectorAll('.ic').forEach(c=>c.classList.remove('active'));
+  renderTable();
+}
+
+/* ═══════════════════════════════════════════════════
+   SORT
+═══════════════════════════════════════════════════ */
+document.querySelectorAll('th.sortable').forEach(th=>{
+  th.addEventListener('click',()=>{
+    const col=th.dataset.col;
+    if(sortCol===col) sortDir=sortDir==='asc'?'desc':'asc';
+    else{sortCol=col;sortDir='asc';}
+    document.querySelectorAll('th.sortable').forEach(t=>t.classList.remove('sort-asc','sort-desc'));
+    th.classList.add(sortDir==='asc'?'sort-asc':'sort-desc');
+    renderTable();
+  });
+});
+
+/* ═══════════════════════════════════════════════════
+   GROUP TOGGLE
+═══════════════════════════════════════════════════ */
+function toggleGroup(type) {
+  if(collapsedGroups.has(type)) collapsedGroups.delete(type);
+  else collapsedGroups.add(type);
+  renderTable();
+}
+
+/* ═══════════════════════════════════════════════════
+   FILTER DRAWER
+═══════════════════════════════════════════════════ */
+function openFilterDrawer()  { document.getElementById('filterDrawer').classList.add('open'); document.getElementById('fdOverlay').classList.add('open'); }
+function closeFilterDrawer() { document.getElementById('filterDrawer').classList.remove('open'); document.getElementById('fdOverlay').classList.remove('open'); }
+
+function applyFilterDrawer() {
+  dateFrom = document.getElementById('fdFrom').value;
+  dateTo   = document.getElementById('fdTo').value;
+  hideZero = document.getElementById('fdHideZero').checked;
+  groupMode= document.getElementById('fdGroup').checked;
+  // Sync type filter from select
+  const fdT = document.getElementById('fdType').value;
+  if (fdT) { typeFilter=fdT; syncChips(fdT); }
+  updatePageSubtitle();
+  updateFilterCount();
+  renderTable();
+  closeFilterDrawer();
+}
+
+function setDateSC(el) {
+  document.querySelectorAll('.fd-sc').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+  const r=el.dataset.r;
+  if(r==='ytd'){document.getElementById('fdFrom').value='2025-01-01';document.getElementById('fdTo').value='2025-04-30';}
+  else if(r==='q1'){document.getElementById('fdFrom').value='2025-01-01';document.getElementById('fdTo').value='2025-03-31';}
+  else if(r==='feb'){document.getElementById('fdFrom').value='2025-01-01';document.getElementById('fdTo').value='2025-02-28';}
+  else if(r==='jan'){document.getElementById('fdFrom').value='2025-01-01';document.getElementById('fdTo').value='2025-01-31';}
+}
+
+function clearFilters() {
+  document.getElementById('fdFrom').value='2025-01-01';
+  document.getElementById('fdTo').value='2025-04-30';
+  document.getElementById('fdType').value='';
+  document.getElementById('fdHideZero').checked=false;
+  document.getElementById('fdGroup').checked=true;
+  document.querySelectorAll('.fd-sc').forEach(s=>s.classList.remove('on'));
+  document.querySelector('.fd-sc[data-r="ytd"]')?.classList.add('on');
+}
+
+function syncChips(v) {
+  document.querySelectorAll('#typeChips .chip').forEach(c=>c.classList.remove('on'));
+  const el=document.querySelector(`#typeChips .chip[data-v="${v}"]`);
+  if(el) el.classList.add('on');
+  else document.querySelector('#typeChips .chip[data-v=""]')?.classList.add('on');
+}
+
+function updateFilterCount() {
+  let cnt=0;
+  if(dateFrom!=='2025-01-01'||dateTo!=='2025-04-30') cnt++;
+  if(typeFilter) cnt++;
+  if(hideZero) cnt++;
+  const el=document.getElementById('filterCount');
+  el.textContent=cnt;
+  cnt>0 ? el.classList.add('show') : el.classList.remove('show');
+}
+
+function updatePageSubtitle() {
+  const d=new Date(dateTo+'T00:00:00');
+  document.getElementById('pageSubtitle').textContent =
+    'PT Sejahtera Makmur · Per '+d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+}
+
+/* ═══════════════════════════════════════════════════
+   DETAIL DRAWER
+═══════════════════════════════════════════════════ */
+function openDrawer(code) {
+  const row = ALL_TB.find(r=>r.code===code);
+  if (!row) return;
+  const acct = LEAF.find(a=>a.code===code);
+
+  document.getElementById('dCode').textContent = row.code;
+  document.getElementById('dName').textContent = row.name;
+  document.getElementById('dOverlay').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+
+  // TAB 0 — Detail
+  document.getElementById('dp0').innerHTML=`
+    <div class="d-sum-grid">
+      <div class="d-sum-card"><div class="d-sum-lbl">Saldo Awal</div><div class="d-sum-val" style="color:var(--color-text-tertiary)">${rp(row.opening_balance)}</div></div>
+      <div class="d-sum-card"><div class="d-sum-lbl">Saldo Akhir</div><div class="d-sum-val ${row.closing_balance<0?'cr':''}">${rpZ(row.closing_balance)}</div></div>
+      <div class="d-sum-card"><div class="d-sum-lbl">Debit Periode</div><div class="d-sum-val dr">${rp(row.period_debit)}</div></div>
+      <div class="d-sum-card"><div class="d-sum-lbl">Kredit Periode</div><div class="d-sum-val cr">${rp(row.period_credit)}</div></div>
+    </div>
+    <div class="dsec">
+      <div class="dsec-title">Informasi Akun</div>
+      <div class="info-row"><label>Kode</label><span class="mono">${row.code}</span></div>
+      <div class="info-row"><label>Nama</label><span>${row.name}</span></div>
+      <div class="info-row"><label>Tipe</label><span>${typeBadge(row.type)}</span></div>
+      <div class="info-row"><label>Saldo Normal</label><span>${row.normal_balance==='debit'?'Debit':'Kredit'}</span></div>
+      <div class="info-row"><label>Kategori</label><span>${acct?.category||'—'}</span></div>
+      <div class="info-row"><label>Status</label><span class="ok">Aktif</span></div>
+    </div>
+    <div class="dsec">
+      <div class="dsec-title">Periode</div>
+      <div class="info-row"><label>As-of Date</label><span class="mono">${new Date(dateTo+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</span></div>
+      <div class="info-row"><label>Awal Periode</label><span class="mono">${new Date(dateFrom+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</span></div>
+      <div class="info-row"><label>Jumlah Transaksi</label><span>${row.entries.length} JE</span></div>
+    </div>`;
+
+  // TAB 1 — Transactions
+  let txnH='';
+  if(!row.entries.length){
+    txnH='<div style="padding:32px 0;text-align:center;color:var(--color-text-tertiary);font-size:12px">Tidak ada transaksi dalam periode ini</div>';
+  } else {
+    [...row.entries].sort((a,b)=>a.date<b.date?-1:1).forEach(e=>{
+      const isDr=e.debit>0;
+      const amt=isDr?e.debit:e.credit;
+      const icon=isDr
+        ?`<svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`
+        :`<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`;
+      const dl=new Date(e.date).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+      txnH+=`<div class="txn-item">
+        <div class="txn-icon ${isDr?'d':'c'}">${icon}</div>
+        <div class="txn-info">
+          <div class="txn-ref">${e.je_ref}</div>
+          <div class="txn-desc">${e.description}</div>
+          <div class="txn-date">${dl} · ${(e.reference_type||'JE').toUpperCase()}</div>
+        </div>
+        <div class="txn-amt ${isDr?'d':'c'}">${rp(amt)}</div>
+      </div>`;
+    });
+  }
+  document.getElementById('dp1').innerHTML=txnH;
+
+  // TAB 2 — Audit Trail
+  const fe=row.entries[0], le=row.entries[row.entries.length-1];
+  let aud=`<div class="dsec-title" style="margin-bottom:12px">Log Aktivitas</div>
+    <div class="audit-item">
+      <div class="audit-dot posted"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="audit-content">
+        <div class="audit-action">Akun aktif dalam periode</div>
+        <div class="audit-meta">${row.entries.length} journal entry · ${row.period_debit?rp(row.period_debit)+' DR':''}${row.period_debit&&row.period_credit?' · ':''}${row.period_credit?rp(row.period_credit)+' CR':''}</div>
+      </div>
+    </div>`;
+  if(fe) aud+=`<div class="audit-item">
+    <div class="audit-dot info"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+    <div class="audit-content">
+      <div class="audit-action">Transaksi pertama periode ini</div>
+      <div class="audit-meta">${fe.je_ref} · ${new Date(fe.date).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}<br>by ${fe.posted_by||'system'}</div>
+    </div>
+  </div>`;
+  if(le&&le!==fe) aud+=`<div class="audit-item">
+    <div class="audit-dot info"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+    <div class="audit-content">
+      <div class="audit-action">Transaksi terakhir periode ini</div>
+      <div class="audit-meta">${le.je_ref} · ${new Date(le.date).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}<br>by ${le.posted_by||'system'}</div>
+    </div>
+  </div>`;
+  aud+=`<div class="audit-item">
+    <div class="audit-dot posted"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <div class="audit-content">
+      <div class="audit-action">Akun dibuat & aktif</div>
+      <div class="audit-meta">system · Jan 2025 · entity_id: 1001</div>
+    </div>
+  </div>`;
+  document.getElementById('dp2').innerHTML=aud;
+
+  document.querySelectorAll('.dtab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  document.querySelectorAll('.dpane').forEach((p,i)=>p.classList.toggle('active',i===0));
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('dOverlay').classList.remove('open');
+}
+
+function switchDTab(idx,el) {
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.dpane').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('dp'+idx).classList.add('active');
+}
+
+/* ═══════════════════════════════════════════════════
+   EXPORT
+═══════════════════════════════════════════════════ */
+function toggleExp(e){e.stopPropagation();document.getElementById('expMenu').classList.toggle('open');}
+document.addEventListener('click',()=>document.getElementById('expMenu').classList.remove('open'));
+
+function setExpChip(type,el){
+  el.closest('.em-chips').querySelectorAll('.em-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  if(type==='scope') expScope=el.dataset.v;
+  else expFmt=el.dataset.v;
+}
+
+function doExport(){
+  document.getElementById('expMenu').classList.remove('open');
+  const rows=expScope==='visible'?DISPLAYED_TB:ALL_TB;
+  const hdr=['Kode Akun','Nama Akun','Tipe','Saldo Normal','Saldo Awal (Rp)','Debit Periode (Rp)','Kredit Periode (Rp)','Saldo Akhir (Rp)'];
+  const lines=[hdr];
+  rows.forEach(r=>lines.push([r.code,r.name,r.type,r.normal_balance,r.opening_balance,r.period_debit,r.period_credit,r.closing_balance]));
+  const bal=checkBalance(computeTB(dateFrom,dateTo));
+  lines.push([]);
+  lines.push(['TOTAL DR','','','','','',bal.dr,'']);
+  lines.push(['TOTAL CR','','','','','','',bal.cr]);
+  lines.push(['SELISIH','','','','','','',bal.variance]);
+  lines.push(['SEIMBANG','','','','','','',bal.balanced?'YA':'TIDAK']);
+  const csv=lines.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download=`TrialBalance_PTSejahteraMakmur_per${dateTo}.csv`;
+  a.click();
+}
+
+/* ═══════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════ */
+document.querySelector('th[data-col="code"]').classList.add('sort-asc');
+renderTable();
+</script>
+</body>
+</html>

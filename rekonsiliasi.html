@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Rekonsiliasi Bank — TradeOS</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Manrope:wght@300;400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-brand:#B83D08;--color-brand-hover:#A03206;
+  --color-action:#1A46C8;--color-action-hover:#1338A8;
+  --color-text-primary:#080706;--color-text-secondary:#2E2B27;--color-text-tertiary:#8C857C;
+  --color-surface-base:#FBF8F5;--color-surface-raised:#FFFFFF;--color-surface-sunken:#F4F0EB;--color-surface-deep:#080706;
+  --color-border-default:#E2DDD7;
+  --success-text:#166638;--success-border:#A8D9BC;--success-surface:#E8F5EE;
+  --warning-text:#7A4D00;--warning-border:#E8C870;--warning-surface:#FDF3E0;
+  --danger-text:#A02020;--danger-border:#EAB8B8;--danger-surface:#FBF0F0;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;--radius-full:9999px;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;
+  --transition-fast:0.1s ease;--transition-base:0.15s ease;--transition-slow:0.2s ease;
+  --font-display:'Playfair Display',serif;--font-sans:'Manrope',sans-serif;--font-mono:'Inconsolata',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-surface-base);color:var(--color-text-primary);-webkit-font-smoothing:antialiased;font-size:13px;height:100vh;overflow:hidden}
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sb{width:196px;flex-shrink:0;background:var(--color-surface-raised);border-right:1px solid var(--color-border-default);display:flex;flex-direction:column;overflow-y:auto}
+.sb-top{padding:0 16px;height:52px;display:flex;align-items:center;border-bottom:1px solid var(--color-border-default);gap:8px;flex-shrink:0}
+.sb-logomark{width:26px;height:26px;background:var(--color-brand);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logomark svg{width:12px;height:12px;fill:none;stroke:#fff;stroke-width:1.8}
+.sb-brand{font-size:14px;font-weight:700;letter-spacing:-.02em;color:var(--color-text-primary)}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-border-default);padding:16px 16px 6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 12px;margin:1px 6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:400;color:var(--color-text-tertiary);text-decoration:none;transition:background var(--transition-fast),color var(--transition-fast)}
+.sb-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.sb-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+.sb-item.active{background:var(--color-surface-sunken);color:var(--color-text-primary);font-weight:600;border-left:2px solid var(--color-brand);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-left:0;padding-left:14px}
+.sb-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--color-surface-sunken)}
+.sb-footer-item{display:flex;align-items:center;gap:8px;padding:6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--color-text-tertiary)}
+.sb-footer-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+.sb-footer-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* ── TOPBAR ── */
+.topbar{height:52px;flex-shrink:0;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 20px;gap:12px}
+.tb-search-wrap{position:relative;flex:1;max-width:400px}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 12px;cursor:text}
+.tb-search svg{width:13px;height:13px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.tb-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.tb-search input::placeholder{color:var(--color-text-tertiary)}
+.tb-kbd{font-size:10px;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:4px;padding:1px 5px;font-family:var(--font-mono);flex-shrink:0}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-notif{width:30px;height:30px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.tb-notif svg{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--color-brand);border-radius:50%;border:1.5px solid var(--color-surface-raised)}
+.tb-org{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);cursor:pointer}
+.tb-org-name{font-size:12px;font-weight:500;color:var(--color-text-secondary)}
+.tb-av{width:24px;height:24px;border-radius:var(--radius-sm);background:var(--color-action);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tb-caret{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2}
+
+/* ── CONTENT ROW ── */
+.content-row{display:flex;flex:1;min-height:0;overflow:hidden}
+.content-main{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column}
+.scroll-area{flex:1;overflow-y:auto;padding:var(--space-5) var(--space-6) 56px}
+
+/* ── PAGE HEAD ── */
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:var(--space-5)}
+.page-title{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.page-sub{font-size:12px;color:var(--color-text-tertiary);margin-top:2px}
+.head-right{display:flex;gap:8px;align-items:center}
+.btn-primary{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:8px 16px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base)}
+.btn-primary:hover{background:var(--color-action-hover)}
+.btn-primary svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
+.btn-ghost{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 13px;cursor:pointer;transition:all var(--transition-fast)}
+.btn-ghost svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+.btn-ghost:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+
+/* ── AI REKON ENGINE BANNER ── */
+.rekon-engine{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);margin-bottom:var(--space-3);overflow:hidden}
+.re-head{display:flex;align-items:center;gap:10px;padding:10px var(--space-5);cursor:pointer;transition:background var(--transition-fast)}
+.re-head:hover{background:var(--color-surface-sunken)}
+.re-icon{width:26px;height:26px;background:linear-gradient(135deg,#1A46C8,#7C3AED);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:aiPulse 3s ease-in-out infinite}
+@keyframes aiPulse{0%,100%{box-shadow:0 0 0 0 rgba(26,70,200,.3)}50%{box-shadow:0 0 0 6px rgba(26,70,200,0)}}
+.re-icon svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:1.5}
+.re-title{font-size:12px;font-weight:700;color:var(--color-text-primary)}
+.re-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.re-prog-wrap{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.re-prog-track{flex:1;height:5px;background:var(--color-surface-sunken);border-radius:var(--radius-full);overflow:hidden;max-width:160px}
+.re-prog-fill{height:100%;background:linear-gradient(90deg,#1A46C8,#7C3AED);border-radius:var(--radius-full);transition:width .6s ease}
+.re-pct{font-size:12px;font-weight:700;color:var(--color-action);white-space:nowrap;font-family:var(--font-mono)}
+.re-period{font-size:11px;color:var(--color-text-tertiary);white-space:nowrap;margin-left:4px}
+.re-chevron{width:15px;height:15px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;transition:transform var(--transition-base);flex-shrink:0}
+.re-chevron.open{transform:rotate(180deg)}
+.re-body{border-top:1px solid var(--color-border-default)}
+.re-body.collapsed{display:none}
+
+/* AI insight row */
+.re-ai-row{display:flex;align-items:flex-start;gap:10px;padding:10px var(--space-5);background:var(--color-surface-sunken);border-bottom:1px solid var(--color-border-default)}
+.re-ai-badge{display:flex;align-items:center;gap:4px;flex-shrink:0;padding-top:2px;white-space:nowrap}
+.re-ai-icon{width:18px;height:18px;border-radius:var(--radius-sm);background:#EBF0FD;display:flex;align-items:center;justify-content:center}
+.re-ai-icon svg{width:10px;height:10px;stroke:var(--color-action);fill:none}
+.re-ai-label{font-size:10px;font-weight:700;color:var(--color-action)}
+.re-ai-text{font-size:12px;color:var(--color-text-secondary);line-height:1.5;flex:1}
+.re-ai-text strong{font-weight:600;color:var(--color-text-primary)}
+.re-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.re-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:3px 9px;border-radius:var(--radius-full);white-space:nowrap}
+.re-chip svg{width:9px;height:9px;flex-shrink:0}
+.re-chip-ok{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.re-chip-ok svg{stroke:var(--success-text);fill:none}
+.re-chip-warn{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.re-chip-warn svg{stroke:var(--warning-text);fill:none}
+.re-chip-err{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.re-chip-err svg{stroke:var(--danger-text);fill:none}
+
+/* Stat cards */
+.re-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid var(--color-border-default)}
+.re-stat{padding:12px var(--space-5);border-right:1px solid var(--color-border-default)}
+.re-stat:last-child{border-right:none}
+.re-stat-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:4px}
+.re-stat-val{font-family:var(--font-mono);font-size:18px;font-weight:600;color:var(--color-text-primary);line-height:1}
+.re-stat-val.green{color:var(--success-text)}
+.re-stat-val.orange{color:var(--warning-text)}
+.re-stat-val.red{color:var(--danger-text)}
+.re-stat-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:3px}
+
+/* Bulk action bar */
+.re-action-row{display:flex;align-items:center;justify-content:space-between;padding:10px var(--space-5)}
+.re-action-left{display:flex;align-items:center;gap:8px}
+.re-action-text{font-size:12px;color:var(--color-text-secondary)}
+.re-action-text strong{font-weight:700;color:var(--color-text-primary)}
+.re-approve-all{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:700;padding:6px 14px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base)}
+.re-approve-all:hover{background:var(--color-action-hover)}
+.re-approve-all svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.5}
+.re-action-hint{font-size:11px;color:var(--color-text-tertiary)}
+
+/* ── PERIOD SELECTOR ── */
+.period-bar{display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3)}
+.period-label{font-size:11px;font-weight:600;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em}
+.period-select{font-family:var(--font-sans);font-size:12px;font-weight:600;color:var(--color-text-primary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:6px 10px;cursor:pointer;outline:none;transition:border-color var(--transition-fast)}
+.period-select:focus{border-color:var(--color-action)}
+.period-bank-label{font-size:12px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:6px}
+.period-bank-label svg{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.period-bank-name{font-weight:600;color:var(--color-text-secondary)}
+.period-upload-btn{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--color-action);background:#EBF0FD;border:1px solid #C8D8FA;border-radius:var(--radius-md);padding:6px 12px;cursor:pointer;transition:all var(--transition-fast)}
+.period-upload-btn:hover{background:#d8e4fc}
+.period-upload-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* ── FILTER BAR ── */
+.filter-bar{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);margin-bottom:var(--space-3);display:flex;align-items:center;gap:var(--space-2)}
+.f-search{display:flex;align-items:center;gap:7px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:6px 10px;width:200px;flex-shrink:0;transition:border-color var(--transition-fast)}
+.f-search:focus-within{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.f-search svg{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.f-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.f-search input::placeholder{color:var(--color-text-tertiary)}
+.fsep{width:1px;height:18px;background:var(--color-border-default);flex-shrink:0;margin:0 2px}
+.chip-grp{display:flex;gap:3px}
+.chip{font-family:var(--font-sans);font-size:11px;font-weight:500;padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-tertiary);cursor:pointer;transition:all var(--transition-fast);white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.chip .chip-cnt{font-size:9px;font-weight:700;background:rgba(255,255,255,.6);padding:1px 5px;border-radius:var(--radius-full)}
+.chip:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.chip.on{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.chip.on .chip-cnt{background:rgba(255,255,255,.25)}
+.chip.warn-on{background:var(--warning-surface);color:var(--warning-text);border-color:var(--warning-border)}
+.chip.warn-on .chip-cnt{background:rgba(255,255,255,.6)}
+.chip.err-on{background:var(--danger-surface);color:var(--danger-text);border-color:var(--danger-border)}
+.chip.err-on .chip-cnt{background:rgba(255,255,255,.6)}
+.f-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.f-filter-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:6px 11px;cursor:pointer;transition:all var(--transition-fast)}
+.f-filter-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5}
+.f-filter-btn:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+
+/* ── TABLE — DUAL COLUMN MATCH ── */
+.table-wrap{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:var(--space-6)}
+.tbl-scroll{overflow-y:auto}
+
+/* Dual header */
+.tbl-col-header{display:grid;grid-template-columns:1fr 90px 1fr 80px;background:var(--color-surface-deep);border-bottom:1px solid rgba(255,255,255,.08)}
+.tbl-col-header-cell{padding:9px 14px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.tbl-col-header-cell.center{text-align:center}
+.tbl-col-header-cell.right{text-align:right}
+.tbl-sub-header{display:grid;grid-template-columns:1fr 90px 1fr 80px;background:var(--color-surface-sunken);border-bottom:1px solid var(--color-border-default)}
+.tbl-sub-header-cell{padding:6px 14px;display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+.tbl-sub-col{font-size:10px;font-weight:700;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:4px 0;white-space:nowrap}
+.tbl-sub-col.right{text-align:right}
+
+/* Match rows */
+.match-row{display:grid;grid-template-columns:1fr 90px 1fr 80px;border-bottom:1px solid var(--color-surface-sunken);cursor:pointer;transition:background var(--transition-fast)}
+.match-row:last-child{border-bottom:none}
+.match-row:hover{background:#FAFAF9}
+.match-row.active-row{background:#EBF0FD}
+.match-row.warn-row{background:#FFFBEE}
+.match-row.warn-row:hover{background:#FFF5CC}
+.match-row.unmatched-row{background:#FFF5F5}
+.match-row.unmatched-row:hover{background:#FFEBEB}
+.match-row.matched-row{background:var(--color-surface-raised)}
+
+/* Bank cell */
+.bank-cell{padding:10px 14px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.bc-top{display:flex;align-items:center;gap:8px}
+.bc-date{font-size:11px;color:var(--color-text-tertiary);font-family:var(--font-mono);white-space:nowrap;flex-shrink:0}
+.bc-desc{font-size:12px;font-weight:500;color:var(--color-text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bc-ref{font-size:10px;color:var(--color-text-tertiary);font-family:var(--font-mono)}
+.bc-amount{font-family:var(--font-mono);font-size:13px;font-weight:600}
+.bc-amount.debit{color:#A02020}
+.bc-amount.credit{color:#166638}
+
+/* Confidence cell */
+.conf-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 8px;gap:6px;border-left:1px solid var(--color-surface-sunken);border-right:1px solid var(--color-surface-sunken)}
+.conf-line{width:24px;height:1px;background:var(--color-border-default)}
+.conf-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:3px 7px;border-radius:var(--radius-full);white-space:nowrap;letter-spacing:.03em}
+.conf-badge.high{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.conf-badge.medium{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.conf-badge.low{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.conf-badge.none{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+.conf-badge svg{width:8px;height:8px;fill:none;stroke-width:2.5}
+
+/* GL cell */
+.gl-cell{padding:10px 14px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.gl-ref{font-family:var(--font-mono);font-size:11px;color:var(--color-action);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gl-desc{font-size:12px;color:var(--color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gl-acct{font-size:10px;color:var(--color-text-tertiary);font-family:var(--font-mono)}
+.gl-amount{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--color-text-primary)}
+.gl-placeholder{font-size:12px;color:var(--color-text-tertiary);font-style:italic}
+.gl-add-btn{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--color-action);background:#EBF0FD;border:1px solid #C8D8FA;border-radius:var(--radius-sm);padding:3px 9px;cursor:pointer;margin-top:3px;transition:background var(--transition-fast);align-self:flex-start}
+.gl-add-btn:hover{background:#d8e4fc}
+.gl-add-btn svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* Action cell */
+.action-cell{display:flex;align-items:center;justify-content:flex-end;gap:5px;padding:10px 14px;flex-shrink:0}
+.act-approve{width:28px;height:28px;border-radius:var(--radius-sm);border:none;background:var(--success-surface);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--transition-fast)}
+.act-approve svg{width:13px;height:13px;stroke:var(--success-text);fill:none;stroke-width:2.5}
+.act-approve:hover{background:var(--success-text);border-color:var(--success-text)}
+.act-approve:hover svg{stroke:#fff}
+.act-reject{width:28px;height:28px;border-radius:var(--radius-sm);border:none;background:var(--danger-surface);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--transition-fast)}
+.act-reject svg{width:11px;height:11px;stroke:var(--danger-text);fill:none;stroke-width:2.5}
+.act-reject:hover{background:var(--danger-text)}
+.act-reject:hover svg{stroke:#fff}
+.act-matched{width:28px;height:28px;border-radius:var(--radius-sm);border:1px solid var(--success-border);background:var(--success-surface);display:flex;align-items:center;justify-content:center}
+.act-matched svg{width:13px;height:13px;stroke:var(--success-text);fill:none;stroke-width:2.5}
+
+/* ── EXPAND ROW ── */
+.expand-row{border-bottom:1px solid var(--color-surface-sunken);display:none}
+.expand-row.open{display:block}
+.expand-inner{padding:12px 14px 14px;border-top:1px dashed var(--color-border-default);background:var(--color-surface-sunken)}
+.expand-ai-label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--color-action);margin-bottom:8px}
+.expand-ai-label svg{width:12px;height:12px;stroke:var(--color-action);fill:none}
+.expand-reason{font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:10px}
+.expand-reason code{font-family:var(--font-mono);font-size:11px;background:var(--color-surface-raised);padding:1px 5px;border-radius:4px;border:1px solid var(--color-border-default);color:var(--color-text-primary)}
+.expand-match-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.expand-cell{background:var(--color-surface-raised);border-radius:var(--radius-sm);padding:8px 10px;border:1px solid var(--color-border-default)}
+.expand-cell-label{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:3px}
+.expand-cell-val{font-size:12px;font-weight:700;color:var(--color-text-primary);font-family:var(--font-mono)}
+.expand-cell-badge{display:inline-flex;font-size:9px;font-weight:700;padding:2px 6px;border-radius:var(--radius-full)}
+.expand-cell-badge.ok{background:var(--success-surface);color:var(--success-text)}
+.expand-cell-badge.close{background:var(--warning-surface);color:var(--warning-text)}
+.expand-cell-badge.miss{background:var(--danger-surface);color:var(--danger-text)}
+.expand-actions{display:flex;gap:6px}
+.expand-btn{font-family:var(--font-sans);font-size:11px;font-weight:600;padding:5px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:all var(--transition-fast)}
+.expand-btn-ghost{border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-secondary)}
+.expand-btn-ghost:hover{border-color:#c8c2ba;background:var(--color-surface-sunken)}
+.expand-btn-approve{border:none;background:var(--color-action);color:#fff}
+.expand-btn-approve:hover{background:var(--color-action-hover)}
+.expand-btn-manual{border:1px solid #C8D8FA;background:#EBF0FD;color:var(--color-action)}
+.expand-btn-manual:hover{background:#d8e4fc}
+
+/* ── SECTION LABELS ── */
+.tbl-section-row{display:grid;grid-template-columns:1fr 90px 1fr 80px;background:var(--color-surface-sunken);border-bottom:1px solid var(--color-border-default)}
+.tbl-section-cell{padding:5px 14px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary)}
+
+/* ── STATUS BAR ── */
+.status-bar{background:var(--color-surface-deep);border-top:1px solid rgba(255,255,255,.08);padding:9px 20px;display:flex;align-items:center;gap:var(--space-5);flex-shrink:0;position:relative;z-index:20}
+.sb-stat{display:flex;align-items:center;gap:6px}
+.sb-stat-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.sb-stat-val{font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(255,255,255,.85)}
+.sb-stat-val.green{color:#86D4A4}
+.sb-stat-val.orange{color:#F5C27A}
+.sb-stat-val.red{color:#F59A9A}
+.sb-stat-val.blue{color:#93B4F8}
+.sb-sep{width:1px;height:14px;background:rgba(255,255,255,.12)}
+.sb-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.sb-diff-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.5);letter-spacing:.02em}
+.sb-diff-val{font-family:var(--font-mono);font-size:12px;font-weight:700;color:#F5C27A}
+.sb-diff-val.balanced{color:#86D4A4}
+
+/* ── DRAWER — MANUAL MATCH ── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(8,7,6,.35);z-index:40;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:400px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow);box-shadow:-4px 0 24px rgba(8,7,6,.12)}
+.drawer.open{transform:translateX(0)}
+.drawer-head{padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--color-border-default);display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-3);flex-shrink:0}
+.d-title{font-size:14px;font-weight:700;color:var(--color-text-primary)}
+.d-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.d-close{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-tertiary);transition:background var(--transition-fast);flex-shrink:0}
+.d-close:hover{background:var(--color-surface-sunken);color:var(--color-text-primary)}
+.d-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.d-body{flex:1;overflow-y:auto;padding:var(--space-4) var(--space-5)}
+.dsec{margin-bottom:var(--space-5)}
+.dlbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:var(--space-3)}
+
+/* Bank statement preview card in drawer */
+.d-bank-card{background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:var(--space-4)}
+.d-bank-card-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.d-bank-card-desc{font-size:13px;font-weight:600;color:var(--color-text-primary)}
+.d-bank-card-amount{font-family:var(--font-mono);font-size:16px;font-weight:700;color:#A02020}
+.d-bank-card-meta{font-size:11px;color:var(--color-text-tertiary);display:flex;gap:10px}
+
+/* GL search in drawer */
+.d-search-wrap{display:flex;align-items:center;gap:7px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:8px 11px;margin-bottom:var(--space-3);transition:border-color var(--transition-fast)}
+.d-search-wrap:focus-within{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.d-search-wrap svg{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.d-search-wrap input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.d-search-wrap input::placeholder{color:var(--color-text-tertiary)}
+
+/* GL candidates */
+.gl-candidate{border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:10px 12px;margin-bottom:var(--space-2);cursor:pointer;transition:all var(--transition-fast)}
+.gl-candidate:hover{border-color:var(--color-action);background:#EBF0FD}
+.gl-candidate.selected{border-color:var(--color-action);background:#EBF0FD;box-shadow:0 0 0 3px rgba(26,70,200,.1)}
+.glc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.glc-ref{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--color-action)}
+.glc-amount{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--color-text-primary)}
+.glc-desc{font-size:12px;color:var(--color-text-secondary);margin-bottom:3px}
+.glc-meta{display:flex;gap:8px;font-size:11px;color:var(--color-text-tertiary)}
+.glc-similarity{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:var(--radius-full)}
+.glc-sim-high{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.glc-sim-med{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+
+/* Drawer footer */
+.d-foot{padding:var(--space-4) var(--space-5);border-top:1px solid var(--color-border-default);display:flex;gap:var(--space-2);flex-shrink:0}
+.d-btn-confirm{flex:1;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:9px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base)}
+.d-btn-confirm:hover{background:var(--color-action-hover)}
+.d-btn-newje{font-family:var(--font-sans);font-size:12px;font-weight:500;padding:9px 14px;background:var(--color-surface-raised);color:var(--color-text-secondary);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;transition:all var(--transition-fast);white-space:nowrap;display:flex;align-items:center;gap:5px}
+.d-btn-newje:hover{border-color:#c8c2ba;background:var(--color-surface-sunken)}
+.d-btn-newje svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* Info rows */
+.info-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--color-surface-sunken);gap:var(--space-3)}
+.info-row:last-child{border-bottom:none}
+.info-row label{font-size:11px;color:var(--color-text-tertiary);flex-shrink:0}
+.info-row span{font-size:12px;font-weight:500;color:var(--color-text-primary);text-align:right;font-family:var(--font-mono)}
+
+/* ── EMPTY STATE ── */
+.empty-state{padding:48px 24px;text-align:center;color:var(--color-text-tertiary)}
+.empty-title{font-size:14px;font-weight:600;color:var(--color-text-secondary);margin-bottom:4px}
+.empty-sub{font-size:12px}
+
+/* ── UTILITY ── */
+.tag-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-full);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.tag-je{background:#EBF0FD;color:var(--color-action)}
+.tag-pay{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+.tag-bill{background:var(--warning-surface);color:var(--warning-text)}
+.divider-or{display:flex;align-items:center;gap:8px;margin:var(--space-3) 0;font-size:11px;color:var(--color-text-tertiary)}
+.divider-or::before,.divider-or::after{content:'';flex:1;height:1px;background:var(--color-border-default)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sb">
+  <div class="sb-top">
+    <div class="sb-logomark">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <span class="sb-brand">TradeOS</span>
+  </div>
+  <div class="sb-section">Overview</div>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard
+  </a>
+  <div class="sb-section">Keuangan</div>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>General Ledger
+  </a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Journal Entry
+  </a>
+  <a class="sb-item active" href="#">
+    <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><path d="M6 15h2M10 15h2"/></svg>Rekonsiliasi
+  </a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Bills
+  </a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Invoices
+  </a>
+  <div class="sb-section">Operasional</div>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Vendors
+  </a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Customers
+  </a>
+  <div class="sb-footer">
+    <div class="sb-footer-item">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Settings
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-search-wrap">
+      <div class="tb-search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Cari transaksi, ref, nominal…" autocomplete="off">
+        <span class="tb-kbd">⌘K</span>
+      </div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-notif">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="notif-dot"></div>
+      </div>
+      <div class="tb-org">
+        <div class="tb-av">PT</div>
+        <span class="tb-org-name">PT Sejahtera Makmur</span>
+        <svg class="tb-caret" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT ROW -->
+  <div class="content-row">
+    <div class="content-main">
+      <div class="scroll-area" id="scrollArea">
+
+        <!-- PAGE HEADER -->
+        <div class="page-head">
+          <div>
+            <div class="page-title">Rekonsiliasi Bank</div>
+            <div class="page-sub">PT Sejahtera Makmur · BCA — 3921-0483-XX · Periode: Maret 2025</div>
+          </div>
+          <div class="head-right">
+            <button class="btn-ghost" onclick="openHistoryDrawer()">
+              <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+              Riwayat
+            </button>
+            <button class="btn-ghost">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export
+            </button>
+            <button class="btn-primary">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Selesaikan Rekonsiliasi
+            </button>
+          </div>
+        </div>
+
+        <!-- AI REKON ENGINE -->
+        <div class="rekon-engine" id="rekonEngine">
+          <div class="re-head" onclick="toggleRekonEngine()">
+            <div class="re-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10"/><circle cx="19" cy="5" r="3"/><path d="M9 12l2 2 4-4"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="re-title">Rekonsiliasi Engine ✦</div>
+              <div class="re-sub">AI sedang aktif mencocokkan transaksi secara real-time</div>
+            </div>
+            <div class="re-prog-wrap">
+              <div class="re-prog-track">
+                <div class="re-prog-fill" style="width:93%"></div>
+              </div>
+              <span class="re-pct">93%</span>
+              <span class="re-period">cocok</span>
+            </div>
+            <svg class="re-chevron open" id="reChevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+
+          <div class="re-body" id="reBody">
+            <!-- AI Insight Row -->
+            <div class="re-ai-row">
+              <div class="re-ai-badge">
+                <div class="re-ai-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10"/><circle cx="19" cy="5" r="3"/></svg></div>
+                <span class="re-ai-label">AI</span>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div class="re-ai-text"><strong>87 dari 94 transaksi</strong> dicocokkan otomatis. Terdapat <strong>5 transaksi medium-confidence</strong> yang perlu konfirmasi dan <strong>2 transaksi bank</strong> tanpa pasangan di sistem.</div>
+                <div class="re-chips">
+                  <span class="re-chip re-chip-ok">
+                    <svg viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    72 High-confidence
+                  </span>
+                  <span class="re-chip re-chip-warn">
+                    <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    15 Medium-confidence
+                  </span>
+                  <span class="re-chip re-chip-err">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    7 Perlu Perhatian
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stat Cards -->
+            <div class="re-stats">
+              <div class="re-stat">
+                <div class="re-stat-label">Total Transaksi Bank</div>
+                <div class="re-stat-val">94</div>
+                <div class="re-stat-sub">Maret 2025 · BCA</div>
+              </div>
+              <div class="re-stat">
+                <div class="re-stat-label">Sudah Cocok</div>
+                <div class="re-stat-val green">87</div>
+                <div class="re-stat-sub">92.5% match rate</div>
+              </div>
+              <div class="re-stat">
+                <div class="re-stat-label">Perlu Review</div>
+                <div class="re-stat-val orange">5</div>
+                <div class="re-stat-sub">Konfirmasi diperlukan</div>
+              </div>
+              <div class="re-stat">
+                <div class="re-stat-label">Tidak Ada Pasangan</div>
+                <div class="re-stat-val red">2</div>
+                <div class="re-stat-sub">Buat JE baru</div>
+              </div>
+            </div>
+
+            <!-- Bulk Action Row -->
+            <div class="re-action-row">
+              <div class="re-action-left">
+                <div class="re-action-text">
+                  <strong>72 transaksi high-confidence</strong> siap diapprove sekaligus
+                </div>
+                <button class="re-approve-all" onclick="approveAllHigh()">
+                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  Approve Semua High-Confidence
+                </button>
+              </div>
+              <div class="re-action-hint">atau review satu per satu di bawah</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PERIOD + BANK SELECTOR -->
+        <div class="period-bar">
+          <span class="period-label">Periode</span>
+          <select class="period-select">
+            <option>Maret 2025</option>
+            <option>Februari 2025</option>
+            <option>Januari 2025</option>
+          </select>
+          <div class="period-bank-label">
+            <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            Rekening: <span class="period-bank-name">BCA 3921-0483-XX</span>
+          </div>
+          <button class="period-upload-btn">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload Statement Baru
+          </button>
+        </div>
+
+        <!-- FILTER BAR -->
+        <div class="filter-bar">
+          <div class="f-search">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Cari deskripsi, ref, nominal…">
+          </div>
+          <div class="fsep"></div>
+          <div class="chip-grp" id="tabChips">
+            <span class="chip warn-on" onclick="switchTab('review',this)">Perlu Review <span class="chip-cnt">5</span></span>
+            <span class="chip" onclick="switchTab('unmatched',this)">Tidak Ada Pasangan <span class="chip-cnt">2</span></span>
+            <span class="chip" onclick="switchTab('matched',this)">Sudah Cocok <span class="chip-cnt">87</span></span>
+            <span class="chip" onclick="switchTab('all',this)">Semua <span class="chip-cnt">94</span></span>
+          </div>
+          <div class="f-right">
+            <button class="f-filter-btn">
+              <svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+              Filter
+            </button>
+          </div>
+        </div>
+
+        <!-- TABLE: PERLU REVIEW (default view) -->
+        <div class="table-wrap" id="tableReview">
+
+          <!-- Dual column header -->
+          <div class="tbl-col-header">
+            <div class="tbl-col-header-cell">Transaksi Bank Statement</div>
+            <div class="tbl-col-header-cell center">Match</div>
+            <div class="tbl-col-header-cell">Entri di Sistem (GL / JE)</div>
+            <div class="tbl-col-header-cell right">Aksi</div>
+          </div>
+
+          <!-- ─── SECTION: MEDIUM CONFIDENCE ─── -->
+          <div class="tbl-section-row">
+            <div class="tbl-section-cell" style="grid-column:1/-1;color:var(--warning-text)">
+              ⚠ Medium Confidence — butuh konfirmasi manual
+            </div>
+          </div>
+
+          <!-- Row 1: Medium confidence, expanded -->
+          <div class="match-row warn-row" id="row1" onclick="toggleExpand('exp1','row1')">
+            <div class="bank-cell">
+              <div class="bc-top">
+                <span class="bc-date">03 Mar</span>
+                <span class="bc-desc">TRANSFER PT MAJU BERSAMA</span>
+              </div>
+              <div class="bc-ref">REF/BCA/250303/7748291</div>
+              <div class="bc-amount debit">− Rp 45.750.000</div>
+            </div>
+            <div class="conf-cell">
+              <div class="conf-line"></div>
+              <span class="conf-badge medium">
+                <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                84%
+              </span>
+              <div class="conf-line"></div>
+            </div>
+            <div class="gl-cell">
+              <span class="tag-badge tag-bill" style="align-self:flex-start;margin-bottom:4px">BILL</span>
+              <div class="gl-ref">BILL-2025-0147</div>
+              <div class="gl-desc">PT Maju Bersama — Pembelian Bahan Baku</div>
+              <div class="gl-acct">2-10001 · Hutang Usaha</div>
+              <div class="gl-amount">Rp 45.750.000</div>
+            </div>
+            <div class="action-cell">
+              <button class="act-approve" title="Approve" onclick="approveRow(event,'row1','exp1')">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+              <button class="act-reject" title="Tolak" onclick="rejectRow(event,'row1')">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="expand-row open" id="exp1">
+            <div class="expand-inner">
+              <div class="expand-ai-label">
+                <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10"/><circle cx="19" cy="5" r="3"/></svg>
+                Alasan AI
+              </div>
+              <div class="expand-reason">
+                Nominal <code>Rp 45.750.000</code> exact match. Nama vendor <em>"PT MAJU BERSAMA"</em> cocok dengan <em>"PT Maju Bersama"</em> di sistem (fuzzy match <strong>97%</strong>). Namun tanggal bank <code>03 Mar</code> berbeda 2 hari dari tanggal jatuh tempo bill <code>01 Mar</code> — masih dalam toleransi ±3 hari.
+              </div>
+              <div class="expand-match-grid">
+                <div class="expand-cell">
+                  <div class="expand-cell-label">Nominal</div>
+                  <div class="expand-cell-val">Rp 45.750.000</div>
+                  <span class="expand-cell-badge ok">Exact Match</span>
+                </div>
+                <div class="expand-cell">
+                  <div class="expand-cell-label">Nama Vendor</div>
+                  <div class="expand-cell-val">97%</div>
+                  <span class="expand-cell-badge ok">Fuzzy Match</span>
+                </div>
+                <div class="expand-cell">
+                  <div class="expand-cell-label">Selisih Tanggal</div>
+                  <div class="expand-cell-val">+2 hari</div>
+                  <span class="expand-cell-badge close">Dalam toleransi</span>
+                </div>
+              </div>
+              <div class="expand-actions">
+                <button class="expand-btn expand-btn-approve" onclick="approveRow(event,'row1','exp1')">
+                  ✓ Approve — cocokkan ke BILL-2025-0147
+                </button>
+                <button class="expand-btn expand-btn-manual" onclick="openManualMatch('TRANSFER PT MAJU BERSAMA','45.750.000')">
+                  Pilih Entri Lain
+                </button>
+                <button class="expand-btn expand-btn-ghost">
+                  Abaikan
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2: Medium confidence -->
+          <div class="match-row warn-row" id="row2" onclick="toggleExpand('exp2','row2')">
+            <div class="bank-cell">
+              <div class="bc-top">
+                <span class="bc-date">07 Mar</span>
+                <span class="bc-desc">DEBIT BANK CHARGE Q1</span>
+              </div>
+              <div class="bc-ref">REF/BCA/250307/ADM-Q1</div>
+              <div class="bc-amount debit">− Rp 750.000</div>
+            </div>
+            <div class="conf-cell">
+              <div class="conf-line"></div>
+              <span class="conf-badge medium">
+                <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                76%
+              </span>
+              <div class="conf-line"></div>
+            </div>
+            <div class="gl-cell">
+              <span class="tag-badge tag-je" style="align-self:flex-start;margin-bottom:4px">JE</span>
+              <div class="gl-ref">JE-2025-0312</div>
+              <div class="gl-desc">Biaya Administrasi Bank Maret</div>
+              <div class="gl-acct">6-20010 · Biaya Adm Bank</div>
+              <div class="gl-amount">Rp 750.000</div>
+            </div>
+            <div class="action-cell">
+              <button class="act-approve" title="Approve" onclick="approveRow(event,'row2','exp2')">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+              <button class="act-reject" title="Tolak" onclick="rejectRow(event,'row2')">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="expand-row" id="exp2">
+            <div class="expand-inner">
+              <div class="expand-ai-label">
+                <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10"/><circle cx="19" cy="5" r="3"/></svg>
+                Alasan AI
+              </div>
+              <div class="expand-reason">
+                Nominal <code>Rp 750.000</code> exact match. Namun deskripsi bank <em>"DEBIT BANK CHARGE Q1"</em> hanya cocok sebagian dengan <em>"Biaya Administrasi Bank Maret"</em> (fuzzy match <strong>68%</strong>). AI mendeteksi pola biaya bank periodik dengan frekuensi konsisten.
+              </div>
+              <div class="expand-match-grid">
+                <div class="expand-cell">
+                  <div class="expand-cell-label">Nominal</div>
+                  <div class="expand-cell-val">Rp 750.000</div>
+                  <span class="expand-cell-badge ok">Exact Match</span>
+                </div>
+                <div class="expand-cell">
+                  <div class="expand-cell-label">Deskripsi</div>
+                  <div class="expand-cell-val">68%</div>
+                  <span class="expand-cell-badge close">Partial Match</span>
+                </div>
+                <div class="expand-cell">
+                  <div class="expand-cell-label">Pola Periodik</div>
+                  <div class="expand-cell-val">3x cocok</div>
+                  <span class="expand-cell-badge ok">Terdeteksi</span>
+                </div>
+              </div>
+              <div class="expand-actions">
+                <button class="expand-btn expand-btn-approve" onclick="approveRow(event,'row2','exp2')">
+                  ✓ Approve — cocokkan ke JE-2025-0312
+                </button>
+                <button class="expand-btn expand-btn-manual" onclick="openManualMatch('DEBIT BANK CHARGE Q1','750.000')">
+                  Pilih Entri Lain
+                </button>
+                <button class="expand-btn expand-btn-ghost">Abaikan</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3 -->
+          <div class="match-row warn-row" id="row3" onclick="toggleExpand('exp3','row3')">
+            <div class="bank-cell">
+              <div class="bc-top">
+                <span class="bc-date">12 Mar</span>
+                <span class="bc-desc">INKASO PIUTANG CV TEKNIK</span>
+              </div>
+              <div class="bc-ref">REF/BCA/250312/INK-0831</div>
+              <div class="bc-amount credit">+ Rp 128.500.000</div>
+            </div>
+            <div class="conf-cell">
+              <div class="conf-line"></div>
+              <span class="conf-badge medium">
+                <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                79%
+              </span>
+              <div class="conf-line"></div>
+            </div>
+            <div class="gl-cell">
+              <span class="tag-badge" style="background:#E8F5EE;color:#166638;align-self:flex-start;margin-bottom:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:9999px">INV</span>
+              <div class="gl-ref">INV-2025-0089</div>
+              <div class="gl-desc">CV Teknik Jaya — Penjualan Produk B</div>
+              <div class="gl-acct">1-20001 · Piutang Usaha</div>
+              <div class="gl-amount">Rp 128.500.000</div>
+            </div>
+            <div class="action-cell">
+              <button class="act-approve" title="Approve" onclick="approveRow(event,'row3','exp3')">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+              <button class="act-reject" title="Tolak" onclick="rejectRow(event,'row3')">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="expand-row" id="exp3">
+            <div class="expand-inner">
+              <div class="expand-ai-label"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10"/><circle cx="19" cy="5" r="3"/></svg>Alasan AI</div>
+              <div class="expand-reason">Nominal <code>Rp 128.500.000</code> exact match. <em>"CV TEKNIK"</em> → <em>"CV Teknik Jaya"</em> partial match 82%. Deskripsi "INKASO PIUTANG" teridentifikasi sebagai pembayaran piutang dari customer.</div>
+              <div class="expand-match-grid">
+                <div class="expand-cell"><div class="expand-cell-label">Nominal</div><div class="expand-cell-val">Rp 128,5jt</div><span class="expand-cell-badge ok">Exact</span></div>
+                <div class="expand-cell"><div class="expand-cell-label">Nama Customer</div><div class="expand-cell-val">82%</div><span class="expand-cell-badge ok">Partial</span></div>
+                <div class="expand-cell"><div class="expand-cell-label">Tipe Transaksi</div><div class="expand-cell-val">Piutang</div><span class="expand-cell-badge ok">Terdeteksi</span></div>
+              </div>
+              <div class="expand-actions">
+                <button class="expand-btn expand-btn-approve" onclick="approveRow(event,'row3','exp3')">✓ Approve</button>
+                <button class="expand-btn expand-btn-manual" onclick="openManualMatch('INKASO PIUTANG CV TEKNIK','128.500.000')">Pilih Entri Lain</button>
+                <button class="expand-btn expand-btn-ghost">Abaikan</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── SECTION: TIDAK ADA PASANGAN ─── -->
+          <div class="tbl-section-row">
+            <div class="tbl-section-cell" style="grid-column:1/-1;color:var(--danger-text)">
+              ✕ Tidak Ada Pasangan — tidak ditemukan entri di sistem
+            </div>
+          </div>
+
+          <!-- Row 4: Unmatched -->
+          <div class="match-row unmatched-row" id="row4" onclick="toggleExpand('exp4','row4')">
+            <div class="bank-cell">
+              <div class="bc-top">
+                <span class="bc-date">18 Mar</span>
+                <span class="bc-desc">TRANSFER KELUAR 18031</span>
+              </div>
+              <div class="bc-ref">REF/BCA/250318/TRF-9201</div>
+              <div class="bc-amount debit">− Rp 12.300.000</div>
+            </div>
+            <div class="conf-cell">
+              <div class="conf-line"></div>
+              <span class="conf-badge none">Tidak cocok</span>
+              <div class="conf-line"></div>
+            </div>
+            <div class="gl-cell">
+              <div class="gl-placeholder">Tidak ada entri ditemukan</div>
+              <button class="gl-add-btn" onclick="openManualMatch(event,'TRANSFER KELUAR 18031','12.300.000')">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Cocokkan Manual / Buat JE
+              </button>
+            </div>
+            <div class="action-cell">
+              <button class="act-reject" title="Abaikan" onclick="rejectRow(event,'row4')">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="expand-row" id="exp4">
+            <div class="expand-inner">
+              <div class="expand-ai-label" style="color:var(--danger-text)">
+                <svg viewBox="0 0 24 24" stroke="var(--danger-text)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Tidak Ada Padanan
+              </div>
+              <div class="expand-reason" style="color:var(--danger-text)">
+                AI tidak menemukan entri yang cocok dengan transfer <code>Rp 12.300.000</code> pada 18 Mar. Kemungkinan: (1) transaksi belum dijurnal, (2) nominal dicatat berbeda, atau (3) transaksi luar sistem.
+              </div>
+              <div class="expand-actions">
+                <button class="expand-btn expand-btn-manual" onclick="openManualMatch(null,'TRANSFER KELUAR 18031','12.300.000')">
+                  Cari &amp; Cocokkan Manual
+                </button>
+                <button class="expand-btn expand-btn-approve" style="background:var(--color-brand);">
+                  + Buat Journal Entry Baru
+                </button>
+                <button class="expand-btn expand-btn-ghost">Abaikan</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 5: Unmatched - income -->
+          <div class="match-row unmatched-row" id="row5" onclick="toggleExpand('exp5','row5')">
+            <div class="bank-cell">
+              <div class="bc-top">
+                <span class="bc-date">25 Mar</span>
+                <span class="bc-desc">CREDIT MISC INCOMING</span>
+              </div>
+              <div class="bc-ref">REF/BCA/250325/MIS-4417</div>
+              <div class="bc-amount credit">+ Rp 5.000.000</div>
+            </div>
+            <div class="conf-cell">
+              <div class="conf-line"></div>
+              <span class="conf-badge none">Tidak cocok</span>
+              <div class="conf-line"></div>
+            </div>
+            <div class="gl-cell">
+              <div class="gl-placeholder">Tidak ada entri ditemukan</div>
+              <button class="gl-add-btn" onclick="openManualMatch(null,'CREDIT MISC INCOMING','5.000.000')">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Cocokkan Manual / Buat JE
+              </button>
+            </div>
+            <div class="action-cell">
+              <button class="act-reject" title="Abaikan" onclick="rejectRow(event,'row5')">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="expand-row" id="exp5">
+            <div class="expand-inner">
+              <div class="expand-ai-label" style="color:var(--danger-text)">
+                <svg viewBox="0 0 24 24" stroke="var(--danger-text)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Tidak Ada Padanan
+              </div>
+              <div class="expand-reason" style="color:var(--danger-text)">
+                Credit <code>Rp 5.000.000</code> dengan deskripsi umum "CREDIT MISC INCOMING". Kemungkinan pembayaran dari pihak tidak dikenal atau refund. Perlu konfirmasi dari tim operasional.
+              </div>
+              <div class="expand-actions">
+                <button class="expand-btn expand-btn-manual" onclick="openManualMatch(null,'CREDIT MISC INCOMING','5.000.000')">
+                  Cari &amp; Cocokkan Manual
+                </button>
+                <button class="expand-btn expand-btn-approve" style="background:var(--color-brand);">
+                  + Buat Journal Entry Baru
+                </button>
+                <button class="expand-btn expand-btn-ghost">Abaikan</button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /tableReview -->
+
+        <!-- TABLE: SUDAH COCOK (hidden by default) -->
+        <div class="table-wrap" id="tableMatched" style="display:none">
+          <div class="tbl-col-header">
+            <div class="tbl-col-header-cell">Transaksi Bank Statement</div>
+            <div class="tbl-col-header-cell center">Match</div>
+            <div class="tbl-col-header-cell">Entri di Sistem (GL / JE)</div>
+            <div class="tbl-col-header-cell right">Status</div>
+          </div>
+
+          <!-- Sample matched rows -->
+          <div class="match-row matched-row">
+            <div class="bank-cell">
+              <div class="bc-top"><span class="bc-date">01 Mar</span><span class="bc-desc">TRANSFER PT SUMBER JAYA</span></div>
+              <div class="bc-ref">REF/BCA/250301/4419823</div>
+              <div class="bc-amount debit">− Rp 88.000.000</div>
+            </div>
+            <div class="conf-cell">
+              <div class="conf-line"></div>
+              <span class="conf-badge high"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>99%</span>
+              <div class="conf-line"></div>
+            </div>
+            <div class="gl-cell">
+              <span class="tag-badge tag-bill" style="align-self:flex-start;margin-bottom:4px">BILL</span>
+              <div class="gl-ref">BILL-2025-0141</div>
+              <div class="gl-desc">PT Sumber Jaya — Bahan Baku Produksi</div>
+              <div class="gl-acct">2-10001 · Hutang Usaha</div>
+              <div class="gl-amount">Rp 88.000.000</div>
+            </div>
+            <div class="action-cell">
+              <div class="act-matched"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            </div>
+          </div>
+          <div class="match-row matched-row">
+            <div class="bank-cell">
+              <div class="bc-top"><span class="bc-date">02 Mar</span><span class="bc-desc">PENERIMAAN PELUNASAN INV</span></div>
+              <div class="bc-ref">REF/BCA/250302/7723011</div>
+              <div class="bc-amount credit">+ Rp 215.000.000</div>
+            </div>
+            <div class="conf-cell">
+              <div class="conf-line"></div>
+              <span class="conf-badge high"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>98%</span>
+              <div class="conf-line"></div>
+            </div>
+            <div class="gl-cell">
+              <span class="tag-badge" style="background:#E8F5EE;color:#166638;align-self:flex-start;margin-bottom:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:9999px">INV</span>
+              <div class="gl-ref">INV-2025-0082</div>
+              <div class="gl-desc">PT Global Utama — Pelunasan Inv Feb</div>
+              <div class="gl-acct">1-20001 · Piutang Usaha</div>
+              <div class="gl-amount">Rp 215.000.000</div>
+            </div>
+            <div class="action-cell">
+              <div class="act-matched"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            </div>
+          </div>
+          <div style="padding:10px 14px;font-size:11px;color:var(--color-text-tertiary);text-align:center;border-top:1px solid var(--color-surface-sunken)">
+            Menampilkan 2 dari 87 transaksi yang sudah cocok · <span style="color:var(--color-action);cursor:pointer">Lihat semua →</span>
+          </div>
+        </div>
+
+        <!-- TABLE: TIDAK ADA PASANGAN (hidden) -->
+        <div class="table-wrap" id="tableUnmatched" style="display:none">
+          <div class="tbl-col-header">
+            <div class="tbl-col-header-cell">Transaksi Bank Statement</div>
+            <div class="tbl-col-header-cell center">Status</div>
+            <div class="tbl-col-header-cell">Aksi yang Diperlukan</div>
+            <div class="tbl-col-header-cell right"></div>
+          </div>
+          <div class="match-row unmatched-row">
+            <div class="bank-cell">
+              <div class="bc-top"><span class="bc-date">18 Mar</span><span class="bc-desc">TRANSFER KELUAR 18031</span></div>
+              <div class="bc-ref">REF/BCA/250318/TRF-9201</div>
+              <div class="bc-amount debit">− Rp 12.300.000</div>
+            </div>
+            <div class="conf-cell"><span class="conf-badge none" style="font-size:9px">Tanpa Pasangan</span></div>
+            <div class="gl-cell">
+              <div class="gl-placeholder">Belum ada entri. Buat JE baru atau cocokkan secara manual.</div>
+              <button class="gl-add-btn" onclick="openManualMatch(null,'TRANSFER KELUAR 18031','12.300.000')">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Cocokkan / Buat JE
+              </button>
+            </div>
+            <div class="action-cell">
+              <button class="act-reject" title="Abaikan"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+          </div>
+          <div class="match-row unmatched-row">
+            <div class="bank-cell">
+              <div class="bc-top"><span class="bc-date">25 Mar</span><span class="bc-desc">CREDIT MISC INCOMING</span></div>
+              <div class="bc-ref">REF/BCA/250325/MIS-4417</div>
+              <div class="bc-amount credit">+ Rp 5.000.000</div>
+            </div>
+            <div class="conf-cell"><span class="conf-badge none" style="font-size:9px">Tanpa Pasangan</span></div>
+            <div class="gl-cell">
+              <div class="gl-placeholder">Belum ada entri. Perlu konfirmasi dari tim operasional.</div>
+              <button class="gl-add-btn" onclick="openManualMatch(null,'CREDIT MISC INCOMING','5.000.000')">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Cocokkan / Buat JE
+              </button>
+            </div>
+            <div class="action-cell">
+              <button class="act-reject" title="Abaikan"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /scroll-area -->
+
+      <!-- STATUS BAR -->
+      <div class="status-bar">
+        <div class="sb-stat">
+          <span class="sb-stat-label">Saldo Bank</span>
+          <span class="sb-stat-val">Rp 1.284.750.000</span>
+        </div>
+        <div class="sb-sep"></div>
+        <div class="sb-stat">
+          <span class="sb-stat-label">Saldo Buku</span>
+          <span class="sb-stat-val">Rp 1.267.450.000</span>
+        </div>
+        <div class="sb-sep"></div>
+        <div class="sb-stat">
+          <span class="sb-stat-label">Perlu Review</span>
+          <span class="sb-stat-val orange" id="reviewCount">5 transaksi</span>
+        </div>
+        <div class="sb-sep"></div>
+        <div class="sb-stat">
+          <span class="sb-stat-label">Tanpa Pasangan</span>
+          <span class="sb-stat-val red">2 transaksi</span>
+        </div>
+        <div class="sb-right">
+          <span class="sb-diff-label">Selisih Saldo</span>
+          <span class="sb-diff-val" id="diffVal">Rp 17.300.000</span>
+        </div>
+      </div>
+
+    </div><!-- /content-main -->
+  </div><!-- /content-row -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- MANUAL MATCH DRAWER -->
+<div class="drawer" id="matchDrawer">
+  <div class="drawer-head">
+    <div>
+      <div class="d-title">Cocokkan Manual</div>
+      <div class="d-sub" id="drawerSub">Pilih entri GL yang cocok atau buat jurnal baru</div>
+    </div>
+    <div class="d-close" onclick="closeDrawer()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+  </div>
+  <div class="d-body">
+
+    <!-- Bank statement preview -->
+    <div class="dsec">
+      <div class="dlbl">Transaksi Bank</div>
+      <div class="d-bank-card">
+        <div class="d-bank-card-row">
+          <span class="d-bank-card-desc" id="drawerBankDesc">TRANSFER KELUAR 18031</span>
+          <span class="d-bank-card-amount" id="drawerBankAmount">− Rp 12.300.000</span>
+        </div>
+        <div class="d-bank-card-meta">
+          <span>18 Mar 2025</span>
+          <span>BCA 3921-0483-XX</span>
+          <span>REF/BCA/250318/TRF-9201</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search GL entries -->
+    <div class="dsec">
+      <div class="dlbl">Cari di GL / Journal Entry</div>
+      <div class="d-search-wrap">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="glSearchInput" placeholder="Nama vendor, nominal, ref…" oninput="filterGLCandidates(this.value)">
+      </div>
+
+      <!-- AI suggestions -->
+      <div style="font-size:11px;font-weight:700;color:var(--color-action);display:flex;align-items:center;gap:5px;margin-bottom:10px">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a10 10 0 1 0 10 10"/><circle cx="19" cy="5" r="3"/></svg>
+        Saran AI — kandidat terbaik
+      </div>
+
+      <div id="glCandidates">
+        <div class="gl-candidate selected" onclick="selectCandidate(this)">
+          <div class="glc-top">
+            <span class="glc-ref">JE-2025-0298</span>
+            <span class="glc-amount">Rp 12.300.000</span>
+          </div>
+          <div class="glc-desc">Pembayaran Operasional Maret — Misc</div>
+          <div class="glc-meta">
+            <span>17 Mar 2025</span>
+            <span>6-30005 · Biaya Operasional</span>
+            <span class="glc-similarity glc-sim-high">Skor 91%</span>
+          </div>
+        </div>
+
+        <div class="gl-candidate" onclick="selectCandidate(this)">
+          <div class="glc-top">
+            <span class="glc-ref">BILL-2025-0163</span>
+            <span class="glc-amount">Rp 12.300.000</span>
+          </div>
+          <div class="glc-desc">CV Logistik Nusantara — Jasa Kirim</div>
+          <div class="glc-meta">
+            <span>16 Mar 2025</span>
+            <span>5-10002 · Biaya Logistik</span>
+            <span class="glc-similarity glc-sim-med">Skor 74%</span>
+          </div>
+        </div>
+
+        <div class="gl-candidate" onclick="selectCandidate(this)">
+          <div class="glc-top">
+            <span class="glc-ref">JE-2025-0301</span>
+            <span class="glc-amount">Rp 12.000.000</span>
+          </div>
+          <div class="glc-desc">Kas Kecil — Pengeluaran Operasional</div>
+          <div class="glc-meta">
+            <span>18 Mar 2025</span>
+            <span>1-10003 · Kas &amp; Bank</span>
+            <span class="glc-similarity glc-sim-med">Skor 68%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider-or">atau</div>
+
+      <!-- Create new JE option -->
+      <div style="background:var(--color-surface-sunken);border:1px dashed var(--color-border-default);border-radius:var(--radius-md);padding:12px 14px;text-align:center">
+        <div style="font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:4px">Tidak ada yang cocok?</div>
+        <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:10px">TradeOS AI akan menyarankan akun dan deskripsi otomatis.</div>
+        <button class="d-btn-newje" style="margin:0 auto;display:inline-flex">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Buat Journal Entry Baru
+        </button>
+      </div>
+    </div>
+
+  </div>
+  <div class="d-foot">
+    <button class="d-btn-confirm" onclick="confirmMatch()">
+      ✓ Konfirmasi Match
+    </button>
+    <button class="d-btn-newje" onclick="closeDrawer()">
+      Batal
+    </button>
+  </div>
+</div>
+
+<script>
+// ── Toggle Rekon Engine ──
+function toggleRekonEngine(){
+  const body = document.getElementById('reBody');
+  const chevron = document.getElementById('reChevron');
+  body.classList.toggle('collapsed');
+  chevron.classList.toggle('open');
+}
+
+// ── Toggle expand row ──
+function toggleExpand(expId, rowId){
+  const exp = document.getElementById(expId);
+  const row = document.getElementById(rowId);
+  const isOpen = exp.classList.contains('open');
+  // Close all others
+  document.querySelectorAll('.expand-row.open').forEach(el => el.classList.remove('open'));
+  document.querySelectorAll('.match-row.active-row').forEach(el => el.classList.remove('active-row'));
+  if(!isOpen){
+    exp.classList.add('open');
+    row.classList.add('active-row');
+  }
+}
+
+// ── Approve row ──
+function approveRow(e, rowId, expId){
+  if(e) e.stopPropagation();
+  const row = document.getElementById(rowId);
+  const exp = expId ? document.getElementById(expId) : null;
+  row.style.opacity = '0';
+  row.style.transition = 'opacity 0.3s ease, max-height 0.4s ease';
+  if(exp){ exp.style.opacity='0'; exp.style.transition='opacity 0.3s ease'; }
+  setTimeout(()=>{
+    row.style.display='none';
+    if(exp) exp.style.display='none';
+    updateCounts(-1, 0);
+  }, 300);
+}
+
+// ── Reject row ──
+function rejectRow(e, rowId){
+  if(e) e.stopPropagation();
+  const row = document.getElementById(rowId);
+  row.style.background='var(--danger-surface)';
+  setTimeout(()=>{
+    row.style.opacity='0';
+    row.style.transition='opacity 0.3s ease';
+    setTimeout(()=>{ row.style.display='none'; }, 300);
+  }, 200);
+}
+
+// ── Update status bar counts ──
+function updateCounts(reviewDelta, unmatchedDelta){
+  const reviewEl = document.getElementById('reviewCount');
+  // Simple demo: just show toast
+  showToast('Transaksi berhasil dicocokkan ✓');
+}
+
+// ── Approve all high confidence ──
+function approveAllHigh(){
+  showToast('72 transaksi high-confidence diapprove ✓');
+  const btn = document.querySelector('.re-approve-all');
+  btn.textContent = '✓ Semua High-Confidence Diapprove';
+  btn.style.background = 'var(--success-text)';
+  btn.disabled = true;
+}
+
+// ── Tab switching ──
+function switchTab(tab, el){
+  const chips = document.querySelectorAll('#tabChips .chip');
+  chips.forEach(c => c.classList.remove('on','warn-on','err-on'));
+
+  const tableReview = document.getElementById('tableReview');
+  const tableMatched = document.getElementById('tableMatched');
+  const tableUnmatched = document.getElementById('tableUnmatched');
+
+  tableReview.style.display='none';
+  tableMatched.style.display='none';
+  tableUnmatched.style.display='none';
+
+  if(tab==='review'){ el.classList.add('warn-on'); tableReview.style.display='block'; }
+  else if(tab==='unmatched'){ el.classList.add('err-on'); tableUnmatched.style.display='block'; }
+  else if(tab==='matched'){ el.classList.add('on'); tableMatched.style.display='block'; }
+  else if(tab==='all'){
+    el.classList.add('on');
+    tableReview.style.display='block';
+    tableMatched.style.display='block';
+    tableUnmatched.style.display='block';
+  }
+}
+
+// ── Drawer ──
+function openManualMatch(e, desc, amount){
+  if(e && e.stopPropagation) e.stopPropagation();
+  document.getElementById('drawerBankDesc').textContent = desc || 'Transaksi';
+  document.getElementById('drawerBankAmount').textContent = 'Rp ' + (amount||'—');
+  document.getElementById('matchDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+
+function closeDrawer(){
+  document.getElementById('matchDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+
+function openHistoryDrawer(){
+  showToast('Riwayat rekonsiliasi akan segera tersedia');
+}
+
+function confirmMatch(){
+  closeDrawer();
+  showToast('Match dikonfirmasi — entri GL diperbarui ✓');
+}
+
+function selectCandidate(el){
+  document.querySelectorAll('.gl-candidate').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function filterGLCandidates(val){
+  // Demo: just highlight
+}
+
+// ── Toast ──
+function showToast(msg){
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = `position:fixed;bottom:72px;left:50%;transform:translateX(-50%);background:#080706;color:#fff;font-size:12px;font-weight:600;padding:10px 18px;border-radius:var(--radius-full);z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.2);font-family:'Manrope',sans-serif;white-space:nowrap`;
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity 0.4s'; setTimeout(()=>t.remove(),400); }, 2500);
+}
+</script>
+</body>
+</html>

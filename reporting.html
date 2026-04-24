@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Laporan Keuangan — TradeOS</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Manrope:wght@300;400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-brand:#B83D08;--color-brand-hover:#A03206;
+  --color-action:#1A46C8;--color-action-hover:#1338A8;
+  --color-text-primary:#080706;--color-text-secondary:#2E2B27;--color-text-tertiary:#8C857C;
+  --color-surface-base:#FBF8F5;--color-surface-raised:#FFFFFF;--color-surface-sunken:#F4F0EB;--color-surface-deep:#080706;
+  --color-border-default:#E2DDD7;
+  --success-text:#166638;--success-border:#A8D9BC;--success-surface:#E8F5EE;
+  --warning-text:#7A4D00;--warning-border:#E8C870;--warning-surface:#FDF3E0;
+  --danger-text:#A02020;--danger-border:#EAB8B8;--danger-surface:#FBF0F0;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;--radius-full:9999px;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;
+  --transition-fast:0.1s ease;--transition-base:0.15s ease;--transition-slow:0.2s ease;
+  --font-display:'Playfair Display',serif;--font-sans:'Manrope',sans-serif;--font-mono:'Inconsolata',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-surface-base);color:var(--color-text-primary);-webkit-font-smoothing:antialiased;font-size:13px;height:100vh;overflow:hidden}
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sb{width:196px;flex-shrink:0;background:var(--color-surface-raised);border-right:1px solid var(--color-border-default);display:flex;flex-direction:column;overflow-y:auto}
+.sb-top{padding:0 16px;height:52px;display:flex;align-items:center;border-bottom:1px solid var(--color-border-default);gap:8px;flex-shrink:0}
+.sb-logomark{width:26px;height:26px;background:var(--color-brand);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logomark svg{width:12px;height:12px;fill:none;stroke:#fff;stroke-width:1.8}
+.sb-brand{font-size:14px;font-weight:700;letter-spacing:-.02em}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-border-default);padding:16px 16px 6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 12px;margin:1px 6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:400;color:var(--color-text-tertiary);text-decoration:none;transition:background var(--transition-fast),color var(--transition-fast)}
+.sb-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.sb-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+.sb-item.active{background:var(--color-surface-sunken);color:var(--color-text-primary);font-weight:600;border-left:2px solid var(--color-brand);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-left:0;padding-left:14px}
+.sb-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--color-surface-sunken)}
+.sb-footer-item{display:flex;align-items:center;gap:8px;padding:6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--color-text-tertiary)}
+.sb-footer-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.content-row{display:flex;flex:1;min-height:0;overflow:hidden}
+.content-main{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column}
+
+/* ── TOPBAR ── */
+.topbar{height:52px;flex-shrink:0;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 20px;gap:12px}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-notif{width:30px;height:30px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.tb-notif svg{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--color-brand);border-radius:50%;border:1.5px solid #fff}
+.tb-org{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);cursor:pointer}
+.tb-org-name{font-size:12px;font-weight:500;color:var(--color-text-secondary)}
+.tb-av{width:24px;height:24px;border-radius:var(--radius-sm);background:var(--color-action);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tb-caret{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2}
+
+/* ── SCROLL AREA ── */
+.scroll-area{flex:1;overflow-y:auto;padding:var(--space-6) var(--space-6) 60px;min-height:0}
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:var(--space-5)}
+.page-title{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.page-sub{font-size:12px;color:var(--color-text-tertiary);margin-top:2px}
+.head-right{display:flex;gap:8px;align-items:center}
+
+/* ── BUTTONS ── */
+.btn-primary{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:8px 16px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base)}
+.btn-primary:hover{background:var(--color-action-hover)}
+.btn-primary svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2}
+.btn-ghost{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 13px;cursor:pointer;transition:all var(--transition-fast)}
+.btn-ghost svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+.btn-ghost:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.btn-ghost.active-btn{background:var(--color-action);color:#fff;border-color:var(--color-action)}
+.btn-ghost.active-btn svg{stroke:#fff}
+.btn-ghost.active-btn:hover{background:var(--color-action-hover)}
+
+/* ── REPORT CONTROL BAR ── */
+.report-control-bar{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);margin-bottom:var(--space-4);display:flex;align-items:center;gap:var(--space-3)}
+.report-tabs{display:flex;background:var(--color-surface-sunken);border-radius:var(--radius-sm);padding:3px;gap:2px;flex-shrink:0}
+.report-tab{font-family:var(--font-sans);font-size:12px;font-weight:500;padding:5px 14px;border-radius:4px;cursor:pointer;color:var(--color-text-tertiary);border:none;background:transparent;transition:all var(--transition-base);white-space:nowrap}
+.report-tab:hover{color:var(--color-text-secondary)}
+.report-tab.on{background:var(--color-surface-raised);color:var(--color-text-primary);font-weight:600;box-shadow:0 1px 4px rgba(8,7,6,.08)}
+.ctrl-sep{width:1px;height:22px;background:var(--color-border-default);flex-shrink:0}
+.period-btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:600;color:var(--color-text-primary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:6px 11px;cursor:pointer;transition:all var(--transition-fast);white-space:nowrap}
+.period-btn:hover{border-color:#c8c2ba}
+.period-btn svg{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.compare-toggle{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:var(--color-text-tertiary);cursor:pointer;padding:5px 10px;border-radius:var(--radius-sm);border:1px solid var(--color-border-default);background:var(--color-surface-raised);transition:all var(--transition-fast)}
+.compare-toggle:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.compare-toggle.on{background:#EBF0FD;border-color:#C8D8FA;color:var(--color-action)}
+.compare-toggle .tog-sw{width:26px;height:14px;border-radius:var(--radius-full);background:var(--color-border-default);position:relative;transition:background var(--transition-base);flex-shrink:0}
+.compare-toggle.on .tog-sw{background:var(--color-action)}
+.compare-toggle .tog-thumb{width:10px;height:10px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left var(--transition-base)}
+.compare-toggle.on .tog-thumb{left:14px}
+.ctrl-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.exp-wrap{position:relative}
+.exp-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);box-shadow:0 4px 20px rgba(8,7,6,.1);padding:var(--space-2);min-width:180px;display:none;z-index:50}
+.exp-menu.open{display:block}
+.exp-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-tertiary);padding:6px 10px 3px}
+.exp-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:500;color:var(--color-text-secondary);transition:background var(--transition-fast)}
+.exp-item:hover{background:var(--color-surface-sunken)}
+.exp-item svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+.exp-divider{height:1px;background:var(--color-border-default);margin:4px 0}
+.exp-do-btn{width:calc(100% - 16px);margin:5px 8px 6px;font-family:var(--font-sans);font-size:12px;font-weight:600;padding:7px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer}
+.exp-do-btn:hover{background:var(--color-action-hover)}
+
+/* ── AI NARRATIVE ── */
+.ai-narrative{background:linear-gradient(135deg,#EBF0FD 0%,#EDE9FE 100%);border:1px solid #C8D8FA;border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);margin-bottom:var(--space-4);display:flex;gap:12px;align-items:flex-start}
+.ain-icon{width:32px;height:32px;border-radius:var(--radius-sm);background:linear-gradient(135deg,#1A46C8,#7C3AED);display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:aiPulse 3s ease-in-out infinite}
+@keyframes aiPulse{0%,100%{box-shadow:0 0 0 0 rgba(26,70,200,.25)}50%{box-shadow:0 0 0 6px rgba(26,70,200,.0)}}
+.ain-icon svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:1.5}
+.ain-body{flex:1;min-width:0}
+.ain-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-action);margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.ain-label-dot{width:5px;height:5px;border-radius:50%;background:var(--color-action);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.ain-text{font-size:12px;color:var(--color-text-secondary);line-height:1.55;margin-bottom:8px}
+.ain-text strong{font-weight:700;color:var(--color-text-primary)}
+.ain-text .ain-warn{color:var(--warning-text);font-weight:600}
+.ain-chips{display:flex;flex-wrap:wrap;gap:5px}
+.ain-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:3px 9px;border-radius:var(--radius-full);cursor:pointer;white-space:nowrap;transition:all var(--transition-fast)}
+.ain-chip svg{width:9px;height:9px;flex-shrink:0}
+.ain-chip-ok{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.ain-chip-ok svg{stroke:var(--success-text);fill:none}
+.ain-chip-warn{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.ain-chip-warn svg{fill:var(--warning-text)}
+.ain-chip-info{background:#EBF0FD;color:var(--color-action);border:1px solid #C8D8FA}
+.ain-chip-info svg{stroke:var(--color-action);fill:none}
+.ain-ask{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--color-action);background:rgba(255,255,255,.7);border:1px solid rgba(26,70,200,.2);border-radius:var(--radius-full);padding:4px 12px;cursor:pointer;transition:all var(--transition-fast);flex-shrink:0;margin-top:2px}
+.ain-ask:hover{background:rgba(255,255,255,.95);box-shadow:0 0 0 3px rgba(26,70,200,.1)}
+.ain-ask svg{width:11px;height:11px;stroke:var(--color-action);fill:none;stroke-width:2}
+
+/* ── REPORT TABLE ── */
+.report-table-wrap{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:60px}
+table.report-tbl{width:100%;border-collapse:collapse;table-layout:fixed}
+table.report-tbl colgroup .col-name{width:42%}
+table.report-tbl colgroup .col-cur{width:18%}
+table.report-tbl colgroup .col-prev{width:17%}
+table.report-tbl colgroup .col-var{width:14%}
+table.report-tbl colgroup .col-pct{width:9%}
+
+/* Table head */
+.report-tbl thead tr{background:var(--color-surface-deep)}
+.report-tbl thead th{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.45);padding:10px 14px;text-align:left;white-space:nowrap;user-select:none}
+.report-tbl thead th.r{text-align:right}
+.report-tbl thead th.compare-col{transition:opacity var(--transition-base)}
+
+/* Section row */
+.tr-section td{background:var(--color-surface-sunken);border-top:1px solid var(--color-border-default);border-bottom:1px solid var(--color-border-default);padding:8px 14px;cursor:pointer;user-select:none;transition:background var(--transition-fast)}
+.tr-section td:hover{background:#EDEBE6}
+.tr-section .sec-name{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-secondary)}
+.tr-section .sec-chevron{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;transition:transform var(--transition-base);flex-shrink:0}
+.tr-section.collapsed .sec-chevron{transform:rotate(-90deg)}
+
+/* Account row */
+.tr-account td{padding:9px 14px;border-bottom:1px solid var(--color-surface-sunken);transition:background var(--transition-fast);cursor:pointer}
+.tr-account:hover td{background:#FAFAF9}
+.tr-account .acct-inner{display:flex;align-items:center;gap:6px;padding-left:16px}
+.tr-account .acct-code{font-family:var(--font-mono);font-size:10px;color:var(--color-text-tertiary)}
+.tr-account .acct-name{font-size:12px;color:var(--color-text-secondary)}
+.tr-account .acct-drill{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;opacity:0;transition:opacity var(--transition-fast);flex-shrink:0}
+.tr-account:hover .acct-drill{opacity:1}
+.amount-cell{font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--color-text-primary);text-align:right;padding:9px 14px;white-space:nowrap}
+.amount-cell.muted{color:var(--color-text-tertiary)}
+
+/* Variance cells */
+.var-cell{text-align:right;padding:9px 14px;white-space:nowrap;font-family:var(--font-mono);font-size:12px}
+.var-pos{color:var(--success-text);font-weight:600}
+.var-neg{color:var(--danger-text);font-weight:600}
+.var-pos-inv{color:var(--danger-text);font-weight:600}
+.var-neg-inv{color:var(--success-text);font-weight:600}
+.var-neutral{color:var(--color-text-tertiary)}
+.pct-chip{display:inline-flex;align-items:center;padding:1px 7px;border-radius:var(--radius-full);font-size:10px;font-weight:700;white-space:nowrap}
+.pct-pos{background:var(--success-surface);color:var(--success-text)}
+.pct-neg{background:var(--danger-surface);color:var(--danger-text)}
+.pct-pos-inv{background:var(--danger-surface);color:var(--danger-text)}
+.pct-neg-inv{background:var(--success-surface);color:var(--success-text)}
+.pct-neutral{background:var(--color-surface-sunken);color:var(--color-text-tertiary)}
+
+/* Subtotal row */
+.tr-subtotal td{padding:9px 14px;border-top:1px solid var(--color-border-default);border-bottom:1px solid var(--color-border-default);background:var(--color-surface-sunken)}
+.tr-subtotal .sub-name{font-size:12px;font-weight:700;color:var(--color-text-primary);padding-left:16px}
+.tr-subtotal .amount-cell,.tr-subtotal .var-cell{background:var(--color-surface-sunken)}
+
+/* Computed total row (Laba Kotor, EBIT, Laba Sblm Pajak) */
+.tr-computed td{padding:11px 14px;border-top:2px solid var(--color-border-default);border-bottom:1px solid var(--color-border-default);background:var(--color-surface-raised)}
+.tr-computed .comp-inner{display:flex;align-items:center;gap:8px}
+.tr-computed .comp-name{font-size:13px;font-weight:700;color:var(--color-text-primary)}
+.tr-computed .comp-meta{font-size:10px;font-weight:600;padding:2px 7px;border-radius:var(--radius-full);background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+.tr-computed .comp-meta.gm-ok{background:var(--success-surface);color:var(--success-text);border-color:var(--success-border)}
+.tr-computed .comp-meta.gm-warn{background:var(--warning-surface);color:var(--warning-text);border-color:var(--warning-border)}
+.tr-computed .amount-cell{font-size:13px;font-weight:700}
+
+/* Grand total row */
+.tr-grandtotal td{padding:13px 14px;background:var(--color-surface-deep);border-top:2px solid rgba(255,255,255,.1)}
+.tr-grandtotal .gt-name{font-size:14px;font-weight:700;color:#fff}
+.tr-grandtotal .amount-cell{font-size:14px;font-weight:700;color:#fff}
+.tr-grandtotal .amount-cell.gt-pos{color:#86D4A4}
+.tr-grandtotal .amount-cell.gt-neg{color:#F59A9A}
+.tr-grandtotal .var-cell{color:rgba(255,255,255,.6)}
+.tr-grandtotal .pct-chip{background:rgba(255,255,255,.12);color:rgba(255,255,255,.9)}
+.tr-grandtotal .pct-chip.pct-pos{background:rgba(134,212,164,.2);color:#86D4A4}
+.tr-grandtotal .pct-chip.pct-neg{background:rgba(245,154,154,.2);color:#F59A9A}
+
+/* Balance check row */
+.balance-check-row td{padding:12px 14px;background:var(--success-surface);border-top:2px solid var(--success-border)}
+.bc-inner{display:flex;align-items:center;gap:8px}
+.bc-icon{width:18px;height:18px;border-radius:50%;background:var(--success-text);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bc-icon svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:2.5}
+.bc-text{font-size:12px;font-weight:600;color:var(--success-text)}
+
+/* Compare col visibility */
+.compare-col{transition:opacity var(--transition-base),max-width var(--transition-base)}
+body.hide-compare .compare-col{display:none}
+
+/* ── STICKY STATUS BAR ── */
+.sticky-bar{position:fixed;bottom:0;left:196px;right:0;background:var(--color-surface-deep);border-top:1px solid rgba(255,255,255,.08);padding:9px 20px;display:flex;align-items:center;gap:var(--space-5);z-index:30}
+.sticky-bar.ai-open{right:340px}
+.sb-stat{display:flex;align-items:center;gap:6px}
+.sb-stat-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.sb-stat-val{font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(255,255,255,.85)}
+.sb-stat-val.pos{color:#86D4A4}
+.sb-stat-val.neg{color:#F59A9A}
+.sb-stat-val.ok{color:#86D4A4}
+.sb-stat-val.info{color:#93B4F8}
+.sb-sep{width:1px;height:14px;background:rgba(255,255,255,.12)}
+.sb-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.sb-ai-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:rgba(255,255,255,.75);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius-full);padding:4px 12px;cursor:pointer;transition:all var(--transition-fast)}
+.sb-ai-btn:hover{background:rgba(255,255,255,.14);color:#fff}
+.sb-ai-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.5}
+
+/* ── DRAWER ── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(8,7,6,.35);z-index:40;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:400px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow);box-shadow:-4px 0 24px rgba(8,7,6,.1)}
+.drawer.open{transform:translateX(0)}
+.dw-head{padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--color-border-default);display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-3);flex-shrink:0}
+.dw-title{font-size:14px;font-weight:700;color:var(--color-text-primary)}
+.dw-code{font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.dw-period{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-full);font-size:10px;font-weight:600;background:#EBF0FD;color:var(--color-action);border:1px solid #C8D8FA;margin-top:5px}
+.dw-close{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-tertiary);transition:background var(--transition-fast);flex-shrink:0}
+.dw-close:hover{background:var(--color-surface-sunken);color:var(--color-text-primary)}
+.dw-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.dw-body{flex:1;overflow-y:auto;padding:var(--space-4) var(--space-5)}
+.dw-section{margin-bottom:var(--space-5)}
+.dw-section-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:var(--space-3)}
+.dw-info-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--color-surface-sunken)}
+.dw-info-row:last-child{border:none}
+.dw-info-label{font-size:11px;color:var(--color-text-tertiary)}
+.dw-info-val{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.dw-info-val.mono{font-family:var(--font-mono)}
+.dw-je-list{display:flex;flex-direction:column;gap:1px;overflow:hidden;border:1px solid var(--color-border-default);border-radius:var(--radius-md)}
+.dw-je-head{display:grid;grid-template-columns:80px 1fr 110px;gap:0;background:var(--color-surface-deep);padding:7px 12px}
+.dw-je-head span{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.dw-je-head span:last-child{text-align:right}
+.dw-je-row{display:grid;grid-template-columns:80px 1fr 110px;background:var(--color-surface-raised);padding:8px 12px;border-top:1px solid var(--color-surface-sunken);cursor:pointer;transition:background var(--transition-fast)}
+.dw-je-row:hover{background:var(--color-surface-base)}
+.dw-je-ref{font-family:var(--font-mono);font-size:11px;color:var(--color-action)}
+.dw-je-desc{font-size:11px;color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dw-je-date{font-size:10px;color:var(--color-text-tertiary);margin-top:2px}
+.dw-je-amt{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--color-text-primary);text-align:right}
+.dw-je-foot{display:grid;grid-template-columns:80px 1fr 110px;background:var(--color-surface-sunken);padding:8px 12px;border-top:1px solid var(--color-border-default)}
+.dw-je-foot-total{font-size:11px;font-weight:700;color:var(--color-text-secondary)}
+.dw-je-foot-amt{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--color-text-primary);text-align:right}
+.dw-ai-insight{background:linear-gradient(135deg,#EBF0FD,#EDE9FE);border:1px solid #C8D8FA;border-radius:var(--radius-md);padding:12px 14px}
+.dw-ai-insight .ai-label{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--color-action);margin-bottom:5px;display:flex;align-items:center;gap:4px}
+.dw-ai-insight .ai-text{font-size:11px;color:var(--color-text-secondary);line-height:1.5}
+.dw-ai-insight .ai-text strong{font-weight:600;color:var(--color-text-primary)}
+
+/* ── AI PANEL ── */
+.ai-panel{width:0;flex-shrink:0;height:100vh;transition:width 0.2s ease;overflow:hidden}
+.ai-panel.open{width:340px}
+.ai-panel-inner{width:340px;height:100vh;display:flex;flex-direction:column;background:var(--color-surface-raised);border-left:2px solid var(--color-action)}
+.ai-head{padding:14px 16px;border-bottom:1px solid rgba(26,70,200,.15);display:flex;align-items:center;gap:10px;flex-shrink:0;background:linear-gradient(135deg,#EBF0FD,#F0ECFF)}
+.ai-head-icon{width:28px;height:28px;border-radius:var(--radius-sm);background:linear-gradient(135deg,#1A46C8,#7C3AED);display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:aiPulse 3s ease-in-out infinite}
+.ai-head-icon svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:1.5}
+.ai-head-text{flex:1;min-width:0}
+.ai-head-title{font-size:13px;font-weight:700;color:var(--color-text-primary)}
+.ai-head-sub{font-size:10px;color:var(--color-action);font-weight:600;letter-spacing:.04em}
+.ai-head-close{width:24px;height:24px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-tertiary);transition:background var(--transition-fast);flex-shrink:0}
+.ai-head-close:hover{background:rgba(26,70,200,.12);color:var(--color-action)}
+.ai-head-close svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.ai-msgs{flex:1;min-height:0;overflow-y:auto;padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-3)}
+.ai-msg{display:flex;flex-direction:column;gap:3px}
+.ai-msg.user{align-items:flex-end}
+.ai-msg.user .ai-bubble{background:var(--color-action);color:#fff;border-radius:var(--radius-md) var(--radius-md) 4px var(--radius-md)}
+.ai-msg.ai .ai-bubble{background:var(--color-surface-sunken);color:var(--color-text-primary);border-radius:4px var(--radius-md) var(--radius-md) var(--radius-md)}
+.ai-bubble{padding:9px 12px;font-size:12px;line-height:1.5;max-width:90%;border:1px solid var(--color-border-default)}
+.ai-msg.user .ai-bubble{border-color:var(--color-action-hover)}
+.ai-msg-time{font-size:10px;color:var(--color-text-tertiary);padding:0 4px}
+.ai-chips{display:flex;flex-wrap:wrap;gap:5px;padding:0 var(--space-4) var(--space-2)}
+.ai-sc{font-size:11px;font-weight:500;padding:4px 10px;border-radius:var(--radius-full);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-secondary);cursor:pointer;transition:all var(--transition-fast);white-space:nowrap}
+.ai-sc:hover{border-color:var(--color-action);color:var(--color-action);background:#EBF0FD}
+.ai-chat-box{padding:var(--space-3) var(--space-4) var(--space-4);border-top:1px solid var(--color-border-default);flex-shrink:0}
+.ai-chat-box-inner{display:flex;gap:8px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:8px 10px;transition:border-color var(--transition-fast),box-shadow var(--transition-fast)}
+.ai-chat-box-inner:focus-within{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.1);background:var(--color-surface-raised)}
+.ai-chat-textarea{flex:1;border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;resize:none;min-height:20px;max-height:120px;line-height:1.5}
+.ai-chat-textarea::placeholder{color:var(--color-text-tertiary)}
+.ai-chat-send{width:28px;height:28px;border-radius:var(--radius-sm);background:var(--color-action);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background var(--transition-fast);align-self:flex-end}
+.ai-chat-send:hover{background:var(--color-action-hover)}
+.ai-chat-send svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2}
+.ai-thinking{display:flex;gap:3px;align-items:center;padding:10px 12px;background:var(--color-surface-sunken);border-radius:4px var(--radius-md) var(--radius-md) var(--radius-md);border:1px solid var(--color-border-default);width:fit-content}
+.ai-thinking span{width:5px;height:5px;border-radius:50%;background:var(--color-text-tertiary);animation:thinking .9s ease-in-out infinite}
+.ai-thinking span:nth-child(2){animation-delay:.15s}
+.ai-thinking span:nth-child(3){animation-delay:.3s}
+@keyframes thinking{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+
+/* neraca section divider */
+.tr-neraca-divider td{background:var(--color-surface-deep);padding:8px 14px}
+.tr-neraca-divider .div-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.tr-neraca-total td{padding:12px 14px;background:var(--color-surface-deep);border-top:1px solid rgba(255,255,255,.12)}
+.tr-neraca-total .nt-name{font-size:13px;font-weight:700;color:#fff}
+.tr-neraca-total .amount-cell{font-size:13px;font-weight:700;color:#fff}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sb">
+  <div class="sb-top">
+    <div class="sb-logomark"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <span class="sb-brand">TradeOS</span>
+  </div>
+  <div class="sb-section">Overview</div>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard
+  </a>
+  <div class="sb-section">Keuangan</div>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Journal Entry
+  </a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Buku Besar
+  </a>
+  <a class="sb-item active" href="#">
+    <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>Laporan
+  </a>
+  <div class="sb-section">Transaksi</div>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Invoices
+  </a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>Bills
+  </a>
+  <div class="sb-section">Operasional</div>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Vendors
+  </a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Customers
+  </a>
+  <div class="sb-footer">
+    <div class="sb-footer-item">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Pengaturan
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="font-size:12px;color:var(--color-text-tertiary)">TradeOS</div>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-border-default)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      <div style="font-size:12px;color:var(--color-text-primary);font-weight:600">Laporan Keuangan</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-notif">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="notif-dot"></div>
+      </div>
+      <div class="tb-org">
+        <div class="tb-av">PT</div>
+        <span class="tb-org-name">PT Sejahtera Makmur</span>
+        <svg class="tb-caret" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-row">
+    <div class="content-main">
+      <div class="scroll-area" id="scrollArea">
+
+        <!-- PAGE HEADER -->
+        <div class="page-head">
+          <div>
+            <div class="page-title">Laporan Keuangan</div>
+            <div class="page-sub">PT Sejahtera Makmur · Periode: <strong style="color:var(--color-text-secondary)">Januari 2025</strong> · Terakhir diperbarui 18 Jan 2025, 14:32</div>
+          </div>
+          <div class="head-right">
+            <button class="btn-ghost" onclick="window.print()">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              Cetak
+            </button>
+            <button class="btn-primary" onclick="openAI()">
+              <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#fff"/></svg>
+              Tanya AI
+            </button>
+          </div>
+        </div>
+
+        <!-- REPORT CONTROL BAR -->
+        <div class="report-control-bar">
+          <div class="report-tabs">
+            <button class="report-tab on" id="tabPL" onclick="switchReport('pl')">Laba Rugi</button>
+            <button class="report-tab" id="tabBS" onclick="switchReport('bs')">Neraca</button>
+          </div>
+          <div class="ctrl-sep"></div>
+          <div class="exp-wrap" style="position:relative">
+            <button class="period-btn" onclick="togglePeriodMenu(event)">
+              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span id="periodLabel">Januari 2025</span>
+              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="exp-menu" id="periodMenu" style="min-width:160px">
+              <div class="exp-label">Bulan</div>
+              <div class="exp-item" onclick="setPeriod('Januari 2025')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Januari 2025</div>
+              <div class="exp-item" onclick="setPeriod('Desember 2024')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Desember 2024</div>
+              <div class="exp-item" onclick="setPeriod('November 2024')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>November 2024</div>
+              <div class="exp-divider"></div>
+              <div class="exp-label">Kuartal</div>
+              <div class="exp-item" onclick="setPeriod('Q1 2025 (Jan–Mar)')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Q1 2025</div>
+              <div class="exp-item" onclick="setPeriod('Q4 2024 (Okt–Des)')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Q4 2024</div>
+              <div class="exp-divider"></div>
+              <div class="exp-label">Tahunan</div>
+              <div class="exp-item" onclick="setPeriod('FY 2024 (Jan–Des)')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>FY 2024</div>
+            </div>
+          </div>
+          <button class="compare-toggle on" id="compareToggle" onclick="toggleCompare()">
+            <span class="tog-sw"><span class="tog-thumb"></span></span>
+            <span id="compareLabel">vs Des 2024</span>
+          </button>
+          <div class="ctrl-sep"></div>
+          <div style="font-size:11px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:5px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+            Basis Akrual
+          </div>
+          <div class="ctrl-right">
+            <div class="exp-wrap">
+              <button class="btn-ghost" onclick="toggleExpMenu(event)">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export
+              </button>
+              <div class="exp-menu" id="expMenu">
+                <div class="exp-label">Format</div>
+                <div class="exp-item" onclick="closeMenus()">
+                  <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  Excel (.xlsx)
+                </div>
+                <div class="exp-item" onclick="closeMenus()">
+                  <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  PDF
+                </div>
+                <div class="exp-item" onclick="closeMenus()">
+                  <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                  CSV
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI NARRATIVE -->
+        <div class="ai-narrative" id="aiNarrative"></div>
+
+        <!-- REPORT TABLE -->
+        <div class="report-table-wrap">
+          <table class="report-tbl" id="reportTable">
+            <colgroup>
+              <col class="col-name">
+              <col class="col-cur">
+              <col class="col-prev compare-col">
+              <col class="col-var compare-col">
+              <col class="col-pct compare-col">
+            </colgroup>
+            <thead id="reportThead"></thead>
+            <tbody id="reportTbody"></tbody>
+          </table>
+        </div>
+
+      </div><!-- /scroll-area -->
+    </div><!-- /content-main -->
+
+    <!-- AI PANEL -->
+    <div class="ai-panel" id="aiPanel">
+      <div class="ai-panel-inner">
+        <div class="ai-head">
+          <div class="ai-head-icon">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div class="ai-head-text">
+            <div class="ai-head-title">Asisten AI TradeOS</div>
+            <div class="ai-head-sub" id="aiPanelSub">● AKTIF · Laporan Keuangan</div>
+          </div>
+          <div class="ai-head-close" onclick="closeAI()">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </div>
+        </div>
+        <div class="ai-msgs" id="aiMsgs">
+          <div class="ai-msg ai">
+            <div class="ai-bubble">Halo! Aku siap menjawab pertanyaan tentang laporan keuangan <strong>Januari 2025</strong>. Mau tanya apa?</div>
+            <div class="ai-msg-time">Klay AI · Baru saja</div>
+          </div>
+        </div>
+        <div class="ai-chips" id="aiChips">
+          <span class="ai-sc" onclick="sendSuggestion(this)">Kenapa gross margin turun?</span>
+          <span class="ai-sc" onclick="sendSuggestion(this)">Analisis tren beban usaha</span>
+          <span class="ai-sc" onclick="sendSuggestion(this)">Perbandingan dengan bulan lalu</span>
+          <span class="ai-sc" onclick="sendSuggestion(this)">Rekomendasi untuk CFO</span>
+        </div>
+        <div class="ai-chat-box">
+          <div class="ai-chat-box-inner">
+            <textarea class="ai-chat-textarea" id="aiInput" placeholder="Tanya tentang laporan ini…" rows="1" onkeydown="aiKeyDown(event)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+            <button class="ai-chat-send" onclick="sendAI()">
+              <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content-row -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- STICKY STATUS BAR -->
+<div class="sticky-bar" id="stickyBar">
+  <div class="sb-stat">
+    <span class="sb-stat-label">Periode</span>
+    <span class="sb-stat-val" id="statPeriod">Jan 2025</span>
+  </div>
+  <div class="sb-sep"></div>
+  <div class="sb-stat" id="statMain">
+    <span class="sb-stat-label">Laba Bersih</span>
+    <span class="sb-stat-val pos" id="statMainVal">Rp 14.287.500</span>
+  </div>
+  <div class="sb-sep"></div>
+  <div class="sb-stat" id="statSecond">
+    <span class="sb-stat-label">Gross Margin</span>
+    <span class="sb-stat-val info" id="statSecondVal">47,2%</span>
+  </div>
+  <div class="sb-sep"></div>
+  <div class="sb-stat">
+    <span class="sb-stat-label">vs Bln Lalu</span>
+    <span class="sb-stat-val pos">↑ +19,1%</span>
+  </div>
+  <div class="sb-right">
+    <button class="sb-ai-btn" onclick="openAI()">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor"/></svg>
+      Tanya AI
+    </button>
+  </div>
+</div>
+
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- DETAIL DRAWER -->
+<div class="drawer" id="drawer">
+  <div class="dw-head">
+    <div>
+      <div class="dw-title" id="dwTitle">—</div>
+      <div class="dw-code" id="dwCode">—</div>
+      <div class="dw-period" id="dwPeriod">Januari 2025</div>
+    </div>
+    <div class="dw-close" onclick="closeDrawer()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+  </div>
+  <div class="dw-body" id="dwBody"></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════ */
+const FMT = n => {
+  if(n === 0) return '—';
+  const abs = Math.abs(n);
+  const s = abs.toLocaleString('id-ID');
+  return n < 0 ? `(${s})` : s;
+};
+const FMT_FULL = n => {
+  const abs = Math.abs(n);
+  const s = abs.toLocaleString('id-ID');
+  return (n < 0 ? '-' : '') + 'Rp\u00A0' + s;
+};
+const PCT = (cur, prv) => {
+  if(!prv || prv === 0) return null;
+  return ((cur - prv) / Math.abs(prv) * 100);
+};
+
+const PL_SECTIONS = [
+  {
+    id:'pendapatan', label:'PENDAPATAN USAHA', type:'income',
+    accounts:[
+      { code:'4-1010', name:'Penjualan Produk — Divisi A', cur:285000000, prv:252000000,
+        entries:[
+          {ref:'JE-2025-0008',date:'15 Jan 2025',memo:'Penjualan produk ke PT Maju Bersama',amt:150000000},
+          {ref:'JE-2025-0011',date:'22 Jan 2025',memo:'Penjualan produk ke CV Berkah Abadi',amt:95000000},
+          {ref:'JE-2025-0014',date:'29 Jan 2025',memo:'Penjualan produk ke PT Andalan Nusantara',amt:40000000},
+        ]
+      },
+      { code:'4-1020', name:'Penjualan Produk — Divisi B', cur:124750000, prv:112500000,
+        entries:[
+          {ref:'JE-2025-0005',date:'25 Jan 2025',memo:'Penjualan produk Divisi B ke distributor',amt:8750000},
+          {ref:'JE-2025-0009',date:'18 Jan 2025',memo:'Penjualan produk Divisi B ke PT Surya Terang',amt:116000000},
+        ]
+      },
+      { code:'4-1030', name:'Pendapatan Jasa', cur:48500000, prv:43000000,
+        entries:[
+          {ref:'JE-2025-0010',date:'20 Jan 2025',memo:'Jasa instalasi & konfigurasi sistem',amt:28500000},
+          {ref:'JE-2025-0013',date:'28 Jan 2025',memo:'Jasa konsultasi teknis lapangan',amt:20000000},
+        ]
+      },
+    ],
+    subtotalLabel:'Total Pendapatan', subtotalCur:458250000, subtotalPrv:407500000,
+  },
+  {
+    id:'hpp', label:'HARGA POKOK PENJUALAN', type:'expense',
+    accounts:[
+      { code:'6-1000', name:'Biaya Pokok Penjualan', cur:187500000, prv:162000000,
+        entries:[
+          {ref:'JE-2025-0002',date:'15 Jan 2025',memo:'Pembelian komponen elektronik — BILL001',amt:75000000},
+          {ref:'JE-2025-0007',date:'12 Jan 2025',memo:'Pembelian bahan baku produk Divisi A',amt:68000000},
+          {ref:'JE-2025-0012',date:'24 Jan 2025',memo:'HPP penjualan batch Januari 2025',amt:44500000},
+        ]
+      },
+      { code:'6-1010', name:'Biaya Bahan Baku Langsung', cur:54250000, prv:47000000,
+        entries:[
+          {ref:'JE-2025-0015',date:'01 Jan 2025',memo:'Bahan baku produksi Divisi B (jagung premium)',amt:54250000},
+        ]
+      },
+    ],
+    subtotalLabel:'Total HPP', subtotalCur:241750000, subtotalPrv:209000000,
+  },
+  { id:'laba_kotor', type:'computed', label:'LABA KOTOR', cur:216500000, prv:198500000, meta:'GM 47,2%', metaPrev:'was 48,7%', metaClass:'gm-warn' },
+  {
+    id:'beban_usaha', label:'BEBAN USAHA', type:'expense',
+    accounts:[
+      { code:'5-1010', name:'Beban Gaji & Tunjangan', cur:85000000, prv:82000000,
+        entries:[{ref:'JE-2025-0001',date:'31 Jan 2025',memo:'Penggajian karyawan & tunjangan Januari 2025',amt:85000000}],
+        aiInsight:'Naik Rp 3jt (+3,7%) dari bulan lalu. Sesuai dengan kenaikan gaji tahunan yang sudah dianggarkan.'
+      },
+      { code:'5-1020', name:'Beban Sewa Kantor', cur:18000000, prv:18000000,
+        entries:[{ref:'JE-2025-0016',date:'01 Jan 2025',memo:'Sewa kantor Jl. Sudirman — kontrak tahunan',amt:18000000}]
+      },
+      { code:'5-1000', name:'Beban Operasional', cur:32500000, prv:28000000,
+        entries:[
+          {ref:'JE-2025-0004',date:'08 Jan 2025',memo:'Biaya jasa logistik — BILL003',amt:12500000},
+          {ref:'JE-2025-0017',date:'15 Jan 2025',memo:'Biaya operasional rutin kantor',amt:20000000},
+        ]
+      },
+      { code:'5-1030', name:'Beban Pemasaran & Promosi', cur:24500000, prv:19500000,
+        entries:[
+          {ref:'JE-2025-0018',date:'10 Jan 2025',memo:'Iklan digital media sosial Q1 2025',amt:14500000},
+          {ref:'JE-2025-0019',date:'20 Jan 2025',memo:'Acara promosi & launching produk baru',amt:10000000},
+        ],
+        aiInsight:'Naik signifikan +25,6% vs bulan lalu. Ada campaign besar untuk launching produk Divisi A. Perlu dipantau apakah konversi sebanding.'
+      },
+      { code:'5-1040', name:'Beban Penyusutan', cur:11200000, prv:11200000,
+        entries:[{ref:'JE-2025-0020',date:'31 Jan 2025',memo:'Penyusutan aset tetap — periode Januari 2025',amt:11200000}]
+      },
+      { code:'5-1050', name:'Beban Listrik & Utilitas', cur:7800000, prv:7200000,
+        entries:[{ref:'JE-2025-0021',date:'25 Jan 2025',memo:'Tagihan listrik, air & utilitas kantor',amt:7800000}]
+      },
+      { code:'5-1060', name:'Beban Logistik & Pengiriman', cur:13750000, prv:11500000,
+        entries:[{ref:'JE-2025-0004',date:'08 Jan 2025',memo:'Logistik & pengiriman ke pelanggan — BILL003',amt:13750000}]
+      },
+      { code:'5-1070', name:'Beban Komunikasi & Internet', cur:3200000, prv:3100000,
+        entries:[{ref:'JE-2025-0022',date:'05 Jan 2025',memo:'Tagihan telekomunikasi & internet kantor',amt:3200000}]
+      },
+    ],
+    subtotalLabel:'Total Beban Usaha', subtotalCur:195950000, subtotalPrv:180500000,
+  },
+  { id:'laba_usaha', type:'computed', label:'LABA USAHA (EBIT)', cur:20550000, prv:18000000 },
+  {
+    id:'lain', label:'PENDAPATAN / BEBAN LAIN-LAIN', type:'other',
+    accounts:[
+      { code:'8-1010', name:'Pendapatan Bunga Bank', cur:1450000, prv:1350000 },
+      { code:'8-2010', name:'Beban Bunga Pinjaman', cur:-3200000, prv:-3200000 },
+      { code:'8-2020', name:'Laba / Rugi Selisih Kurs', cur:250000, prv:-150000 },
+    ],
+    subtotalLabel:'Total Lain-lain', subtotalCur:-1500000, subtotalPrv:-2000000,
+  },
+  { id:'laba_pajak', type:'computed', label:'LABA SEBELUM PAJAK', cur:19050000, prv:16000000 },
+  {
+    id:'pajak', label:'PAJAK PENGHASILAN', type:'tax',
+    accounts:[
+      { code:'7-1010', name:'Pajak Penghasilan Badan (25%)', cur:4762500, prv:4000000 },
+    ],
+    subtotalLabel:'Total Pajak', subtotalCur:4762500, subtotalPrv:4000000,
+  },
+  { id:'laba_bersih', type:'grand_total', label:'LABA BERSIH', cur:14287500, prv:12000000 },
+];
+
+const BS_SECTIONS = [
+  { divider:'ASET' },
+  {
+    id:'aset_lancar', label:'ASET LANCAR', type:'bs_asset',
+    accounts:[
+      { code:'1-1100', name:'Kas & Bank', cur:285450000, entries:[{ref:'JE-2025-0001',date:'31 Jan 2025',memo:'Penerimaan kas dari pelanggan — INV001',amt:33000000},{ref:'JE-2025-0006',date:'10 Feb 2025',memo:'Pembayaran utang ke supplier — BILL001',amt:-82500000}] },
+      { code:'1-1200', name:'Piutang Usaha', cur:148625000, entries:[{ref:'JE-2025-0005',date:'25 Jan 2025',memo:'Piutang penjualan Divisi B',amt:9625000},{ref:'JE-2025-0008',date:'15 Jan 2025',memo:'Piutang penjualan Divisi A ke PT Maju Bersama',amt:165000000}] },
+      { code:'1-1300', name:'Persediaan', cur:95000000 },
+      { code:'1-1400', name:'Biaya Dibayar Dimuka', cur:18000000 },
+      { code:'1-1500', name:'PPN Masukan', cur:10670000 },
+    ],
+    subtotalLabel:'Total Aset Lancar', subtotalCur:557745000,
+  },
+  {
+    id:'aset_tetap', label:'ASET TETAP', type:'bs_asset',
+    accounts:[
+      { code:'1-2100', name:'Peralatan Kantor', cur:95200000, entries:[{ref:'JE-2025-0003',date:'20 Jan 2025',memo:'Pembelian meja & kursi kantor — BILL002',amt:19200000}] },
+      { code:'1-2200', name:'Kendaraan', cur:180000000 },
+      { code:'1-2300', name:'Bangunan & Renovasi', cur:250000000 },
+      { code:'1-2900', name:'Akumulasi Penyusutan', cur:-98400000 },
+    ],
+    subtotalLabel:'Total Aset Tetap', subtotalCur:426800000,
+  },
+  { id:'total_aset', type:'bs_total', label:'TOTAL ASET', cur:984545000 },
+  { divider:'LIABILITAS & EKUITAS' },
+  {
+    id:'liab_lancar', label:'LIABILITAS LANCAR', type:'bs_liab',
+    accounts:[
+      { code:'2-1100', name:'Utang Usaha', cur:117370000, entries:[{ref:'JE-2025-0002',date:'15 Jan 2025',memo:'Utang komponen elektronik — V001',amt:82500000},{ref:'JE-2025-0003',date:'20 Jan 2025',memo:'Utang peralatan kantor — V002',amt:21120000},{ref:'JE-2025-0004',date:'08 Jan 2025',memo:'Utang biaya logistik — V003',amt:13750000}] },
+      { code:'2-1200', name:'Utang Pajak', cur:24762500 },
+      { code:'2-1300', name:'Biaya Masih Harus Dibayar', cur:35000000 },
+    ],
+    subtotalLabel:'Total Liabilitas Lancar', subtotalCur:177132500,
+  },
+  {
+    id:'liab_panjang', label:'LIABILITAS JANGKA PANJANG', type:'bs_liab',
+    accounts:[
+      { code:'2-2100', name:'Pinjaman Bank Jangka Panjang', cur:180000000 },
+    ],
+    subtotalLabel:'Total Liabilitas Jangka Panjang', subtotalCur:180000000,
+  },
+  { id:'total_liab', type:'bs_subtotal_major', label:'TOTAL LIABILITAS', cur:357132500 },
+  {
+    id:'ekuitas', label:'EKUITAS', type:'bs_equity',
+    accounts:[
+      { code:'3-1100', name:'Modal Disetor', cur:500000000 },
+      { code:'3-1200', name:'Saldo Laba Ditahan', cur:113125000 },
+      { code:'3-1300', name:'Laba Bersih Periode Ini', cur:14287500 },
+    ],
+    subtotalLabel:'Total Ekuitas', subtotalCur:627412500,
+  },
+  { id:'total_liab_eq', type:'bs_grand_total', label:'TOTAL LIABILITAS & EKUITAS', cur:984545000 },
+  { id:'balance_check', type:'balance_check', aset:984545000, liabEq:984545000 },
+];
+
+/* ═══════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════ */
+let currentReport = 'pl';
+let compareOn = true;
+let collapsedSections = new Set();
+
+/* ═══════════════════════════════════════════════
+   RENDER HELPERS
+═══════════════════════════════════════════════ */
+function varClass(diff, type) {
+  if(diff === 0) return 'var-neutral';
+  if(type === 'expense' || type === 'tax') return diff > 0 ? 'var-pos-inv' : 'var-neg-inv';
+  return diff > 0 ? 'var-pos' : 'var-neg';
+}
+function pctClass(pct, type) {
+  if(pct === null || pct === 0) return 'pct-neutral';
+  if(type === 'expense' || type === 'tax') return pct > 0 ? 'pct-pos-inv' : 'pct-neg-inv';
+  return pct > 0 ? 'pct-pos' : 'pct-neg';
+}
+function renderPctChip(pct, type) {
+  if(pct === null) return '<span class="pct-chip pct-neutral">—</span>';
+  const cls = pctClass(pct, type);
+  const sign = pct > 0 ? '+' : '';
+  return `<span class="pct-chip ${cls}">${sign}${pct.toFixed(1)}%</span>`;
+}
+function varSign(diff) {
+  if(diff === 0) return '—';
+  return diff > 0 ? `+${FMT(diff)}` : FMT(diff);
+}
+
+/* ═══════════════════════════════════════════════
+   RENDER P&L
+═══════════════════════════════════════════════ */
+function renderPL() {
+  document.getElementById('reportThead').innerHTML = `
+    <tr>
+      <th>Nama Akun</th>
+      <th class="r">Jan 2025</th>
+      <th class="r compare-col">Des 2024</th>
+      <th class="r compare-col">Selisih</th>
+      <th class="r compare-col">%</th>
+    </tr>`;
+
+  let html = '';
+  for(const sec of PL_SECTIONS) {
+    if(sec.type === 'grand_total') {
+      const diff = sec.cur - sec.prv;
+      const pct = PCT(sec.cur, sec.prv);
+      const amtClass = sec.cur >= 0 ? 'gt-pos' : 'gt-neg';
+      html += `<tr class="tr-grandtotal">
+        <td><span class="gt-name">${sec.label}</span></td>
+        <td class="amount-cell ${amtClass}">${FMT(sec.cur)}</td>
+        <td class="amount-cell compare-col" style="color:rgba(255,255,255,.5)">${FMT(sec.prv)}</td>
+        <td class="var-cell compare-col" style="color:rgba(255,255,255,.6)">${varSign(diff)}</td>
+        <td class="var-cell compare-col">${renderPctChip(pct, 'income')}</td>
+      </tr>`;
+      continue;
+    }
+    if(sec.type === 'computed') {
+      const diff = sec.cur - sec.prv;
+      const pct = PCT(sec.cur, sec.prv);
+      const metaHtml = sec.meta ? `<span class="comp-meta ${sec.metaClass||''}">${sec.meta}</span>` : '';
+      const metaPrevHtml = sec.metaPrev ? `<span class="comp-meta" style="margin-left:4px">${sec.metaPrev}</span>` : '';
+      html += `<tr class="tr-computed">
+        <td><div class="comp-inner"><span class="comp-name">${sec.label}</span>${metaHtml}${metaPrevHtml}</div></td>
+        <td class="amount-cell">${FMT(sec.cur)}</td>
+        <td class="amount-cell compare-col muted">${FMT(sec.prv)}</td>
+        <td class="var-cell compare-col ${varClass(diff,'income')}">${varSign(diff)}</td>
+        <td class="var-cell compare-col">${renderPctChip(pct,'income')}</td>
+      </tr>`;
+      continue;
+    }
+    // Section with accounts
+    const collapsed = collapsedSections.has(sec.id);
+    const chevronRot = collapsed ? ' collapsed' : '';
+    html += `<tr class="tr-section${chevronRot}" onclick="toggleSection('${sec.id}')">
+      <td colspan="5">
+        <div class="sec-name">
+          <svg class="sec-chevron" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+          ${sec.label}
+        </div>
+      </td>
+    </tr>`;
+    if(!collapsed) {
+      for(const acct of sec.accounts) {
+        const diff = acct.cur - acct.prv;
+        const pct = PCT(acct.cur, acct.prv);
+        const hasEntries = acct.entries && acct.entries.length;
+        html += `<tr class="tr-account" onclick="openDrawer(${JSON.stringify(acct).replace(/"/g,'&quot;')}, '${sec.type}')">
+          <td>
+            <div class="acct-inner">
+              <span class="acct-code">${acct.code}</span>
+              <span class="acct-name">${acct.name}</span>
+              ${hasEntries ? '<svg class="acct-drill" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>' : ''}
+            </div>
+          </td>
+          <td class="amount-cell">${FMT(acct.cur)}</td>
+          <td class="amount-cell compare-col muted">${FMT(acct.prv)}</td>
+          <td class="var-cell compare-col ${varClass(diff, sec.type)}">${varSign(diff)}</td>
+          <td class="var-cell compare-col">${renderPctChip(pct, sec.type)}</td>
+        </tr>`;
+      }
+      // Subtotal
+      if(sec.subtotalLabel) {
+        const diff = sec.subtotalCur - sec.subtotalPrv;
+        const pct = PCT(sec.subtotalCur, sec.subtotalPrv);
+        html += `<tr class="tr-subtotal">
+          <td><span class="sub-name">${sec.subtotalLabel}</span></td>
+          <td class="amount-cell">${FMT(sec.subtotalCur)}</td>
+          <td class="amount-cell compare-col muted">${FMT(sec.subtotalPrv)}</td>
+          <td class="var-cell compare-col ${varClass(diff, sec.type)}">${varSign(diff)}</td>
+          <td class="var-cell compare-col">${renderPctChip(pct, sec.type)}</td>
+        </tr>`;
+      }
+    }
+  }
+  document.getElementById('reportTbody').innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════
+   RENDER NERACA
+═══════════════════════════════════════════════ */
+function renderBS() {
+  document.getElementById('reportThead').innerHTML = `
+    <tr>
+      <th>Nama Akun</th>
+      <th class="r">31 Jan 2025</th>
+      <th class="r compare-col">31 Des 2024</th>
+      <th class="r compare-col">Selisih</th>
+      <th class="r compare-col">%</th>
+    </tr>`;
+
+  // BS prev values (rough estimates for comparison)
+  const bsPrev = {
+    '1-1100':268000000,'1-1200':115750000,'1-1300':102000000,'1-1400':18000000,'1-1500':9200000,
+    '1-2100':76000000,'1-2200':180000000,'1-2300':250000000,'1-2900':-87200000,
+    '2-1100':135870000,'2-1200':20000000,'2-1300':32500000,
+    '2-2100':180000000,
+    '3-1100':500000000,'3-1200':101125000,'3-1300':12000000,
+  };
+
+  let html = '';
+  for(const sec of BS_SECTIONS) {
+    if(sec.divider) {
+      html += `<tr class="tr-neraca-divider"><td colspan="5"><span class="div-label">${sec.divider}</span></td></tr>`;
+      continue;
+    }
+    if(sec.type === 'bs_total' || sec.type === 'bs_subtotal_major') {
+      const diff = sec.cur - (sec.id === 'total_aset' ? 933000000 : 330370000);
+      html += `<tr class="tr-neraca-total">
+        <td><span class="nt-name">${sec.label}</span></td>
+        <td class="amount-cell">${FMT(sec.cur)}</td>
+        <td class="amount-cell compare-col" style="color:rgba(255,255,255,.5)">${sec.id === 'total_aset' ? FMT(933000000) : FMT(330370000)}</td>
+        <td class="var-cell compare-col" style="color:rgba(255,255,255,.55)">+${FMT(Math.abs(diff))}</td>
+        <td class="var-cell compare-col"><span class="pct-chip pct-pos" style="background:rgba(134,212,164,.2);color:#86D4A4">+${((diff/Math.abs(sec.id === 'total_aset' ? 933000000 : 330370000))*100).toFixed(1)}%</span></td>
+      </tr>`;
+      continue;
+    }
+    if(sec.type === 'bs_grand_total') {
+      html += `<tr class="tr-grandtotal">
+        <td><span class="gt-name">${sec.label}</span></td>
+        <td class="amount-cell gt-pos">${FMT(sec.cur)}</td>
+        <td class="amount-cell compare-col" style="color:rgba(255,255,255,.5)">${FMT(945370000)}</td>
+        <td class="var-cell compare-col" style="color:rgba(255,255,255,.55)">+${FMT(sec.cur - 945370000)}</td>
+        <td class="var-cell compare-col"><span class="pct-chip pct-pos">+${(((sec.cur-945370000)/945370000)*100).toFixed(1)}%</span></td>
+      </tr>`;
+      continue;
+    }
+    if(sec.type === 'balance_check') {
+      html += `<tr class="balance-check-row">
+        <td colspan="5">
+          <div class="bc-inner">
+            <div class="bc-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span class="bc-text">Neraca balance — Total Aset (<strong>Rp 984.545.000</strong>) = Total Liabilitas + Ekuitas (<strong>Rp 984.545.000</strong>)</span>
+          </div>
+        </td>
+      </tr>`;
+      continue;
+    }
+    // Regular BS section
+    const collapsed = collapsedSections.has(sec.id);
+    html += `<tr class="tr-section${collapsed?' collapsed':''}" onclick="toggleSection('${sec.id}')">
+      <td colspan="5">
+        <div class="sec-name">
+          <svg class="sec-chevron" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+          ${sec.label}
+        </div>
+      </td>
+    </tr>`;
+    if(!collapsed) {
+      for(const acct of sec.accounts) {
+        const prev = bsPrev[acct.code] || 0;
+        const diff = acct.cur - prev;
+        const pct = PCT(acct.cur, prev);
+        html += `<tr class="tr-account" onclick="openDrawer(${JSON.stringify({...acct,prv:prev}).replace(/"/g,'&quot;')}, 'bs')">
+          <td><div class="acct-inner">
+            <span class="acct-code">${acct.code}</span>
+            <span class="acct-name">${acct.name}</span>
+            ${acct.entries ? '<svg class="acct-drill" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>' : ''}
+          </div></td>
+          <td class="amount-cell">${FMT(acct.cur)}</td>
+          <td class="amount-cell compare-col muted">${FMT(prev)}</td>
+          <td class="var-cell compare-col ${varClass(diff,'bs_asset')}">${varSign(diff)}</td>
+          <td class="var-cell compare-col">${renderPctChip(pct,'bs_asset')}</td>
+        </tr>`;
+      }
+      if(sec.subtotalLabel) {
+        const prevSub = Object.values(sec.accounts).reduce((s,a) => s + (bsPrev[a.code]||0), 0);
+        const diff = sec.subtotalCur - prevSub;
+        const pct = PCT(sec.subtotalCur, prevSub);
+        html += `<tr class="tr-subtotal">
+          <td><span class="sub-name">${sec.subtotalLabel}</span></td>
+          <td class="amount-cell">${FMT(sec.subtotalCur)}</td>
+          <td class="amount-cell compare-col muted">${FMT(prevSub)}</td>
+          <td class="var-cell compare-col ${varClass(diff,'bs_asset')}">${varSign(diff)}</td>
+          <td class="var-cell compare-col">${renderPctChip(pct,'bs_asset')}</td>
+        </tr>`;
+      }
+    }
+  }
+  document.getElementById('reportTbody').innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════
+   AI NARRATIVE
+═══════════════════════════════════════════════ */
+const PL_NARRATIVE = `<strong>Revenue Rp 458jt</strong>, naik <strong>+12,5%</strong> vs Desember 2024 — didorong kenaikan Divisi A (+Rp 33jt) dan Divisi B (+Rp 12,25jt). Namun <span class="ain-warn">HPP tumbuh lebih cepat (+15,7%)</span> sehingga gross margin terkompresi dari 48,7% menjadi 47,2%. Beban pemasaran melonjak +25,6% untuk campaign launching produk baru — perlu dipantau konversi-nya. <strong>Laba bersih Rp 14,3jt</strong>, naik +19,1%.`;
+const BS_NARRATIVE = `Posisi keuangan <strong>31 Januari 2025</strong> menunjukkan total aset <strong>Rp 984,5jt</strong>, naik Rp 51,5jt dari akhir Desember. Kas & Bank meningkat Rp 17,5jt berkat penerimaan piutang. <span class="ain-warn">Piutang usaha naik +28,4% menjadi Rp 148,6jt</span> — ada 3 invoice belum jatuh tempo yang perlu dimonitor. <strong>Neraca balance ✓</strong> — Total Aset = Total Liabilitas + Ekuitas.`;
+
+const PL_CHIPS = [
+  {cls:'ain-chip-warn',icon:'⚠',text:'GM terkompresi ke 47,2%'},
+  {cls:'ain-chip-ok',icon:'✓',text:'Laba bersih +19,1%'},
+  {cls:'ain-chip-warn',icon:'⚠',text:'Beban marketing +25,6%'},
+  {cls:'ain-chip-info',icon:'→',text:'Revenue +12,5%'},
+];
+const BS_CHIPS = [
+  {cls:'ain-chip-ok',icon:'✓',text:'Neraca balance'},
+  {cls:'ain-chip-ok',icon:'✓',text:'Kas meningkat'},
+  {cls:'ain-chip-warn',icon:'⚠',text:'Piutang naik +28,4%'},
+  {cls:'ain-chip-info',icon:'→',text:'Aset bersih +5,5%'},
+];
+
+function renderNarrative() {
+  const isPL = currentReport === 'pl';
+  const chips = (isPL ? PL_CHIPS : BS_CHIPS).map(c =>
+    `<span class="ain-chip ${c.cls}" onclick="openAIWith('${isPL ? c.text : c.text}')">${c.text}</span>`
+  ).join('');
+  document.getElementById('aiNarrative').innerHTML = `
+    <div class="ain-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#fff"/></svg></div>
+    <div class="ain-body">
+      <div class="ain-label"><span class="ain-label-dot"></span>Klay AI · Analisis Laporan ${isPL ? 'Laba Rugi' : 'Neraca'}</div>
+      <div class="ain-text">${isPL ? PL_NARRATIVE : BS_NARRATIVE}</div>
+      <div class="ain-chips">${chips}</div>
+    </div>
+    <button class="ain-ask" onclick="openAI()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="currentColor"/></svg>Tanya AI</button>
+  `;
+}
+
+/* ═══════════════════════════════════════════════
+   STICKY STATUS BAR
+═══════════════════════════════════════════════ */
+function updateStatusBar() {
+  if(currentReport === 'pl') {
+    document.getElementById('statMain').innerHTML = '<span class="sb-stat-label">Laba Bersih</span><span class="sb-stat-val pos" id="statMainVal">Rp 14.287.500</span>';
+    document.getElementById('statSecond').innerHTML = '<span class="sb-stat-label">Gross Margin</span><span class="sb-stat-val info">47,2%</span>';
+    document.getElementById('stickyBar').innerHTML = `
+      <div class="sb-stat"><span class="sb-stat-label">Periode</span><span class="sb-stat-val">Jan 2025</span></div>
+      <div class="sb-sep"></div>
+      <div class="sb-stat"><span class="sb-stat-label">Laba Bersih</span><span class="sb-stat-val pos">Rp 14.287.500</span></div>
+      <div class="sb-sep"></div>
+      <div class="sb-stat"><span class="sb-stat-label">Gross Margin</span><span class="sb-stat-val info">47,2%</span></div>
+      <div class="sb-sep"></div>
+      <div class="sb-stat"><span class="sb-stat-label">vs Bln Lalu</span><span class="sb-stat-val pos">↑ +19,1%</span></div>
+      <div class="sb-sep"></div>
+      <div class="sb-stat"><span class="sb-stat-label">Revenue</span><span class="sb-stat-val">Rp 458.250.000</span></div>
+      <div class="sb-right"><button class="sb-ai-btn" onclick="openAI()"><svg width="11" height="11" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor" stroke="none"/></svg>Tanya AI</button></div>
+    `;
+  } else {
+    document.getElementById('stickyBar').innerHTML = `
+      <div class="sb-stat"><span class="sb-stat-label">Periode</span><span class="sb-stat-val">31 Jan 2025</span></div>
+      <div class="sb-sep"></div>
+      <div class="sb-stat"><span class="sb-stat-label">Total Aset</span><span class="sb-stat-val">Rp 984.545.000</span></div>
+      <div class="sb-sep"></div>
+      <div class="sb-stat"><span class="sb-stat-label">Total Liabilitas</span><span class="sb-stat-val">Rp 357.132.500</span></div>
+      <div class="sb-sep"></div>
+      <div class="sb-stat"><span class="sb-stat-label">Total Ekuitas</span><span class="sb-stat-val info">Rp 627.412.500</span></div>
+      <div class="sb-sep"></div>
+      <div class="sb-stat"><span class="sb-stat-label">Neraca</span><span class="sb-stat-val ok">Balance ✓</span></div>
+      <div class="sb-right"><button class="sb-ai-btn" onclick="openAI()"><svg width="11" height="11" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor" stroke="none"/></svg>Tanya AI</button></div>
+    `;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   INTERACTIONS
+═══════════════════════════════════════════════ */
+function switchReport(type) {
+  currentReport = type;
+  document.getElementById('tabPL').classList.toggle('on', type==='pl');
+  document.getElementById('tabBS').classList.toggle('on', type==='bs');
+  collapsedSections.clear();
+  if(type==='pl') renderPL(); else renderBS();
+  renderNarrative();
+  updateStatusBar();
+  document.getElementById('aiPanelSub').textContent = `● AKTIF · Laporan ${type==='pl'?'Laba Rugi':'Neraca'}`;
+  document.getElementById('aiChips').innerHTML = type==='pl' ?
+    `<span class="ai-sc" onclick="sendSuggestion(this)">Kenapa gross margin turun?</span>
+     <span class="ai-sc" onclick="sendSuggestion(this)">Analisis tren beban usaha</span>
+     <span class="ai-sc" onclick="sendSuggestion(this)">Perbandingan dengan bulan lalu</span>
+     <span class="ai-sc" onclick="sendSuggestion(this)">Rekomendasi untuk CFO</span>` :
+    `<span class="ai-sc" onclick="sendSuggestion(this)">Analisis posisi kas</span>
+     <span class="ai-sc" onclick="sendSuggestion(this)">Piutang yang perlu dimonitor</span>
+     <span class="ai-sc" onclick="sendSuggestion(this)">Rasio likuiditas</span>
+     <span class="ai-sc" onclick="sendSuggestion(this)">Struktur modal perusahaan</span>`;
+}
+
+function toggleSection(id) {
+  if(collapsedSections.has(id)) collapsedSections.delete(id);
+  else collapsedSections.add(id);
+  if(currentReport==='pl') renderPL(); else renderBS();
+}
+
+function toggleCompare() {
+  compareOn = !compareOn;
+  const btn = document.getElementById('compareToggle');
+  btn.classList.toggle('on', compareOn);
+  document.getElementById('compareLabel').textContent = compareOn ? 'vs Des 2024' : 'Bandingkan';
+  document.body.classList.toggle('hide-compare', !compareOn);
+}
+
+function togglePeriodMenu(e) {
+  e.stopPropagation();
+  document.getElementById('periodMenu').classList.toggle('open');
+}
+function toggleExpMenu(e) {
+  e.stopPropagation();
+  document.getElementById('expMenu').classList.toggle('open');
+}
+function setPeriod(p) {
+  document.getElementById('periodLabel').textContent = p;
+  document.querySelector('.page-sub strong').textContent = p;
+  closeMenus();
+}
+function closeMenus() {
+  document.querySelectorAll('.exp-menu').forEach(m=>m.classList.remove('open'));
+  document.getElementById('periodMenu').classList.remove('open');
+}
+
+document.addEventListener('click', closeMenus);
+
+/* ═══════════════════════════════════════════════
+   DRAWER
+═══════════════════════════════════════════════ */
+function openDrawer(acct, sectionType) {
+  if(typeof acct === 'string') acct = JSON.parse(acct.replace(/&quot;/g,'"'));
+  document.getElementById('dwTitle').textContent = acct.name;
+  document.getElementById('dwCode').textContent = `Akun ${acct.code}`;
+  document.getElementById('dwPeriod').textContent = currentReport === 'pl' ? 'Januari 2025' : '31 Januari 2025';
+
+  let html = '';
+
+  // Summary
+  html += `<div class="dw-section">
+    <div class="dw-section-label">Ringkasan</div>
+    <div class="dw-info-row"><span class="dw-info-label">Saldo periode ini</span><span class="dw-info-val mono">${FMT_FULL(acct.cur)}</span></div>`;
+  if(acct.prv !== undefined) {
+    const diff = acct.cur - acct.prv;
+    const pct = PCT(acct.cur, acct.prv);
+    html += `<div class="dw-info-row"><span class="dw-info-label">Periode lalu</span><span class="dw-info-val mono">${FMT_FULL(acct.prv)}</span></div>
+    <div class="dw-info-row"><span class="dw-info-label">Selisih</span><span class="dw-info-val mono ${diff>=0?'':'danger'}" style="color:${diff>=0?'var(--success-text)':'var(--danger-text)'}">${FMT_FULL(diff)}</span></div>`;
+    if(pct !== null) html += `<div class="dw-info-row"><span class="dw-info-label">Perubahan</span><span class="dw-info-val" style="color:${pct>=0?'var(--success-text)':'var(--danger-text)'}">${pct>=0?'+':''}${pct.toFixed(1)}%</span></div>`;
+  }
+  html += `</div>`;
+
+  // Journal entries
+  if(acct.entries && acct.entries.length) {
+    const total = acct.entries.reduce((s,e)=>s+e.amt,0);
+    html += `<div class="dw-section">
+      <div class="dw-section-label">Journal Entry — Januari 2025 (${acct.entries.length} transaksi)</div>
+      <div class="dw-je-list">
+        <div class="dw-je-head"><span>Ref</span><span>Keterangan</span><span>Jumlah</span></div>`;
+    for(const e of acct.entries) {
+      html += `<div class="dw-je-row">
+        <div><div class="dw-je-ref">${e.ref}</div></div>
+        <div><div class="dw-je-desc">${e.memo}</div><div class="dw-je-date">${e.date}</div></div>
+        <div><div class="dw-je-amt">${FMT(Math.abs(e.amt))}</div></div>
+      </div>`;
+    }
+    html += `<div class="dw-je-foot">
+      <div></div>
+      <div class="dw-je-foot-total">Total kontribusi</div>
+      <div class="dw-je-foot-amt">${FMT(Math.abs(total))}</div>
+    </div></div></div>`;
+  } else {
+    html += `<div class="dw-section">
+      <div class="dw-section-label">Journal Entry</div>
+      <div style="padding:20px;text-align:center;color:var(--color-text-tertiary);font-size:12px">Tidak ada entri individual yang terkait</div>
+    </div>`;
+  }
+
+  // AI insight for this account
+  if(acct.aiInsight) {
+    html += `<div class="dw-section">
+      <div class="dw-ai-insight">
+        <div class="ai-label"><svg width="11" height="11" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor" stroke="none" style="color:var(--color-action)"/></svg>AI Insight</div>
+        <div class="ai-text">${acct.aiInsight}</div>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('dwBody').innerHTML = html;
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+
+/* ═══════════════════════════════════════════════
+   AI PANEL
+═══════════════════════════════════════════════ */
+function openAI() {
+  document.getElementById('aiPanel').classList.add('open');
+  document.getElementById('stickyBar').classList.add('ai-open');
+}
+function openAIWith(query) {
+  openAI();
+  document.getElementById('aiInput').value = query;
+  sendAI();
+}
+function closeAI() {
+  document.getElementById('aiPanel').classList.remove('open');
+  document.getElementById('stickyBar').classList.remove('ai-open');
+}
+function sendSuggestion(el) {
+  document.getElementById('aiInput').value = el.textContent;
+  sendAI();
+}
+function aiKeyDown(e) {
+  if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendAI(); }
+}
+
+const PL_CONTEXT = `Data Laporan Laba Rugi PT Sejahtera Makmur:
+Periode: Januari 2025 vs Desember 2024
+
+PENDAPATAN:
+- Penjualan Divisi A: Rp 285.000.000 (Des: 252.000.000, +13,1%)
+- Penjualan Divisi B: Rp 124.750.000 (Des: 112.500.000, +10,9%)  
+- Pendapatan Jasa: Rp 48.500.000 (Des: 43.000.000, +12,8%)
+Total Pendapatan: Rp 458.250.000 (Des: 407.500.000, +12,5%)
+
+HPP:
+- Biaya Pokok Penjualan: Rp 187.500.000 (+15,7%)
+- Biaya Bahan Baku: Rp 54.250.000 (+15,4%)
+Total HPP: Rp 241.750.000 (+15,7%)
+
+LABA KOTOR: Rp 216.500.000 — Gross Margin 47,2% (turun dari 48,7%)
+
+BEBAN USAHA:
+- Beban Gaji: Rp 85.000.000 (+3,7%)
+- Beban Sewa: Rp 18.000.000 (0%)
+- Beban Operasional: Rp 32.500.000 (+16,1%)
+- Beban Pemasaran: Rp 24.500.000 (+25,6%) ← naik signifikan
+- Beban Penyusutan: Rp 11.200.000 (0%)
+- Beban Listrik: Rp 7.800.000 (+8,3%)
+- Beban Logistik: Rp 13.750.000 (+19,6%)
+- Beban Komunikasi: Rp 3.200.000 (+3,2%)
+Total Beban Usaha: Rp 195.950.000 (+8,6%)
+
+LABA USAHA (EBIT): Rp 20.550.000 (+14,2%)
+Lain-lain: -Rp 1.500.000
+LABA SEBELUM PAJAK: Rp 19.050.000 (+19,1%)
+Pajak (25%): Rp 4.762.500
+LABA BERSIH: Rp 14.287.500 (+19,1% vs Desember)`;
+
+const BS_CONTEXT = `Data Neraca PT Sejahtera Makmur per 31 Januari 2025:
+ASET LANCAR: Kas Rp 285,4jt | Piutang Rp 148,6jt | Persediaan Rp 95jt | Total Lancar Rp 557,7jt
+ASET TETAP: Rp 426,8jt (setelah penyusutan)
+TOTAL ASET: Rp 984,5jt
+
+LIABILITAS LANCAR: Utang Usaha Rp 117,4jt | Utang Pajak Rp 24,8jt | Total Lancar Rp 177,1jt
+LIABILITAS JANGKA PANJANG: Pinjaman Bank Rp 180jt
+TOTAL LIABILITAS: Rp 357,1jt
+
+EKUITAS: Modal Rp 500jt | Laba Ditahan Rp 113,1jt | Laba Periode Ini Rp 14,3jt
+TOTAL EKUITAS: Rp 627,4jt
+
+NERACA BALANCE: ✓ Aset = Liabilitas + Ekuitas = Rp 984.545.000`;
+
+async function sendAI() {
+  const input = document.getElementById('aiInput');
+  const msg = input.value.trim();
+  if(!msg) return;
+  input.value = '';
+  input.style.height = 'auto';
+
+  const msgs = document.getElementById('aiMsgs');
+  const time = new Date().toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'});
+  msgs.innerHTML += `<div class="ai-msg user"><div class="ai-bubble">${msg}</div><div class="ai-msg-time">${time}</div></div>`;
+
+  const thinking = document.createElement('div');
+  thinking.className = 'ai-msg ai';
+  thinking.innerHTML = '<div class="ai-thinking"><span></span><span></span><span></span></div>';
+  msgs.appendChild(thinking);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  const ctx = currentReport === 'pl' ? PL_CONTEXT : BS_CONTEXT;
+  const systemPrompt = `Kamu adalah asisten keuangan untuk TradeOS ERP. Kamu sedang menganalisis laporan keuangan PT Sejahtera Makmur.
+
+${ctx}
+
+Jawab pertanyaan user dalam Bahasa Indonesia. Berikan insight yang spesifik, actionable, dan relevan untuk finance team. Gunakan angka konkret dari data di atas. Format jawaban: ringkas (3-5 kalimat), langsung ke poin, gunakan bullet point jika perlu.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:systemPrompt,
+        messages:[{role:'user',content:msg}]
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Maaf, tidak bisa memproses permintaan ini.';
+    thinking.innerHTML = `<div class="ai-bubble">${reply.replace(/\n/g,'<br>')}</div><div class="ai-msg-time">Klay AI · ${time}</div>`;
+  } catch(e) {
+    thinking.innerHTML = `<div class="ai-bubble">Maaf, terjadi kesalahan. Silakan coba lagi.</div><div class="ai-msg-time">Klay AI · ${time}</div>`;
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+renderPL();
+renderNarrative();
+updateStatusBar();
+</script>
+</body>
+</html>

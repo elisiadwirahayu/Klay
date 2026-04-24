@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Pengguna & Hak Akses — Klay</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Manrope:wght@300;400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-brand:#B83D08;--color-brand-hover:#A03206;
+  --color-action:#1A46C8;--color-action-hover:#1338A8;
+  --color-text-primary:#080706;--color-text-secondary:#2E2B27;--color-text-tertiary:#8C857C;
+  --color-surface-base:#FBF8F5;--color-surface-raised:#FFFFFF;--color-surface-sunken:#F4F0EB;--color-surface-deep:#080706;
+  --color-border-default:#E2DDD7;
+  --success-text:#166638;--success-border:#A8D9BC;--success-surface:#E8F5EE;
+  --warning-text:#7A4D00;--warning-border:#E8C870;--warning-surface:#FDF3E0;
+  --danger-text:#A02020;--danger-border:#EAB8B8;--danger-surface:#FBF0F0;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;--radius-full:9999px;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;
+  --transition-fast:0.1s ease;--transition-base:0.15s ease;--transition-slow:0.2s ease;
+  --font-display:'Playfair Display',serif;--font-sans:'Manrope',sans-serif;--font-mono:'Inconsolata',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-surface-base);color:var(--color-text-primary);-webkit-font-smoothing:antialiased;font-size:13px;height:100vh;overflow:hidden}
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sb{width:196px;flex-shrink:0;background:var(--color-surface-raised);border-right:1px solid var(--color-border-default);display:flex;flex-direction:column;overflow-y:auto}
+.sb-top{padding:0 16px;height:52px;display:flex;align-items:center;border-bottom:1px solid var(--color-border-default);gap:8px;flex-shrink:0}
+.sb-logomark{width:26px;height:26px;background:var(--color-brand);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logomark svg{width:12px;height:12px;fill:none;stroke:#fff;stroke-width:1.5}
+.sb-brand{font-size:14px;font-weight:700;letter-spacing:-.02em;color:var(--color-text-primary)}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-border-default);padding:16px 16px 6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 12px;margin:1px 6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:400;color:var(--color-text-tertiary);text-decoration:none;transition:background var(--transition-fast),color var(--transition-fast)}
+.sb-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.sb-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+.sb-item.active{background:var(--color-surface-sunken);color:var(--color-text-primary);font-weight:600;border-left:2px solid var(--color-brand);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-left:0;padding-left:14px}
+.sb-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--color-surface-sunken)}
+.sb-footer-user{display:flex;align-items:center;gap:8px;padding:6px;border-radius:var(--radius-sm);cursor:pointer}
+.sb-footer-user:hover{background:var(--color-surface-base)}
+.sb-av-sm{width:24px;height:24px;border-radius:var(--radius-sm);background:var(--color-brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-footer-name{font-size:12px;font-weight:600;color:var(--color-text-secondary);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-footer-role{font-size:10px;color:var(--color-text-tertiary)}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* ── TOPBAR ── */
+.topbar{height:52px;flex-shrink:0;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 20px;gap:12px}
+.tb-breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-text-tertiary)}
+.tb-breadcrumb span{color:var(--color-text-primary);font-weight:600}
+.tb-breadcrumb svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-notif{width:30px;height:30px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.tb-notif svg{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--color-brand);border-radius:50%;border:1.5px solid var(--color-surface-raised)}
+.tb-org{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);cursor:pointer}
+.tb-org-name{font-size:12px;font-weight:500;color:var(--color-text-secondary)}
+.tb-av{width:24px;height:24px;border-radius:var(--radius-sm);background:var(--color-action);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── SCROLL AREA ── */
+.scroll-area{flex:1;overflow-y:auto;padding:var(--space-6) var(--space-6) 0;min-height:0}
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:var(--space-5)}
+.page-title{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.page-sub{font-size:12px;color:var(--color-text-tertiary);margin-top:3px}
+
+/* ── BUTTONS ── */
+.btn-primary{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:8px 16px;background:var(--color-action);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background var(--transition-base)}
+.btn-primary:hover{background:var(--color-action-hover)}
+.btn-primary svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
+.btn-ghost{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 13px;cursor:pointer;transition:all var(--transition-fast)}
+.btn-ghost svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+.btn-ghost:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.btn-danger{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:600;padding:7px 14px;background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border);border-radius:var(--radius-md);cursor:pointer;transition:all var(--transition-fast)}
+.btn-danger:hover{background:#f5e0e0}
+
+/* ── TABS ── */
+.page-tabs{display:flex;border-bottom:1px solid var(--color-border-default);margin-bottom:var(--space-5);gap:0}
+.ptab{padding:10px 0;margin-right:var(--space-6);font-size:13px;font-weight:500;color:var(--color-text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--transition-fast);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.ptab:hover{color:var(--color-text-secondary)}
+.ptab.on{color:var(--color-action);border-bottom-color:var(--color-action);font-weight:600}
+.ptab-badge{font-size:10px;font-weight:700;padding:1px 6px;border-radius:var(--radius-full);background:var(--color-surface-sunken);color:var(--color-text-tertiary)}
+.ptab.on .ptab-badge{background:#EBF0FD;color:var(--color-action)}
+.tab-pane{display:none}
+.tab-pane.on{display:block}
+
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-4)}
+.search-wrap{position:relative;flex:1;max-width:320px}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:13px;height:13px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;pointer-events:none}
+.search-input{width:100%;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:8px 12px 8px 32px;outline:none;transition:all var(--transition-fast)}
+.search-input:focus{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.search-input::placeholder{color:var(--color-text-tertiary)}
+.filter-select{font-family:var(--font-sans);font-size:12px;color:var(--color-text-secondary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 10px;outline:none;cursor:pointer;transition:border-color var(--transition-fast)}
+.filter-select:focus{border-color:var(--color-action)}
+.filter-count{margin-left:auto;font-size:12px;color:var(--color-text-tertiary);font-family:var(--font-mono)}
+
+/* ── TABLE ── */
+.tbl-wrap{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:var(--space-6)}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--color-surface-deep)}
+thead th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.5);padding:10px 14px;text-align:left;white-space:nowrap}
+thead th.r{text-align:right}
+tbody tr{border-bottom:1px solid var(--color-border-default);cursor:pointer;transition:background var(--transition-fast)}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#FAFAF9}
+td{padding:12px 14px;vertical-align:middle}
+.td-user{display:flex;align-items:center;gap:10px}
+.av{width:32px;height:32px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;letter-spacing:.02em}
+.av-admin{background:var(--color-brand)}
+.av-fm{background:var(--color-action)}
+.av-ap{background:#6D28D9}
+.av-ar{background:#0E7490}
+.av-pur{background:#166638}
+.av-wh{background:#7A4D00}
+.av-mon{background:#8C857C}
+.av-pending{background:var(--color-border-default)}
+.user-name{font-size:13px;font-weight:600;color:var(--color-text-primary)}
+.user-email{font-size:11px;color:var(--color-text-tertiary);margin-top:1px;font-family:var(--font-mono)}
+.roles-cell{display:flex;flex-wrap:wrap;gap:4px}
+
+/* ── ROLE BADGES ── */
+.rbadge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--radius-full);font-size:10px;font-weight:700;letter-spacing:.02em;white-space:nowrap}
+.rb-admin{background:#FBF0F0;color:#B83D08;border:1px solid #EAB8B8}
+.rb-fm{background:#EBF0FD;color:#1A46C8;border:1px solid #C8D8FA}
+.rb-ap{background:#EDE9FE;color:#6D28D9;border:1px solid #C4B5FD}
+.rb-ar{background:#ECFEFF;color:#0E7490;border:1px solid #99F6E4}
+.rb-pur{background:#E8F5EE;color:#166638;border:1px solid #A8D9BC}
+.rb-wh{background:#FDF3E0;color:#7A4D00;border:1px solid #E8C870}
+.rb-mon{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+
+/* ── STATUS BADGES ── */
+.status-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:var(--radius-full);font-size:10px;font-weight:700;letter-spacing:.03em}
+.status-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.sb-active{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.sb-active .status-dot{background:var(--success-text)}
+.sb-inactive{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+.sb-inactive .status-dot{background:var(--color-text-tertiary)}
+.sb-pending{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.sb-pending .status-dot{background:var(--warning-text)}
+
+.td-last{font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary)}
+
+/* row action menu */
+.row-action-wrap{position:relative}
+.row-action-btn{width:28px;height:28px;border-radius:var(--radius-sm);border:1px solid transparent;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--transition-fast);color:var(--color-text-tertiary)}
+.row-action-btn:hover,.row-action-btn.open{background:var(--color-surface-sunken);border-color:var(--color-border-default);color:var(--color-text-secondary)}
+.row-action-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+.row-menu{position:absolute;right:0;top:calc(100% + 4px);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);box-shadow:0 8px 24px rgba(8,7,6,.1),0 2px 6px rgba(8,7,6,.06);z-index:20;min-width:168px;overflow:hidden;display:none}
+.row-menu.open{display:block}
+.rm-item{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:12px;font-weight:500;color:var(--color-text-secondary);cursor:pointer;transition:background var(--transition-fast)}
+.rm-item svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.rm-item:hover{background:var(--color-surface-sunken)}
+.rm-item.danger{color:var(--danger-text)}
+.rm-item.danger svg{stroke:var(--danger-text)}
+.rm-item.danger:hover{background:var(--danger-surface)}
+.rm-div{height:1px;background:var(--color-border-default);margin:3px 0}
+
+/* ── SoD WARNING INLINE (in table row) ── */
+.sod-flag{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:var(--radius-full);font-size:9px;font-weight:700;background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border);cursor:help;margin-left:4px}
+.sod-flag svg{width:9px;height:9px;fill:var(--warning-text);flex-shrink:0}
+
+/* ── DRAWER ── */
+.overlay{position:fixed;inset:0;background:rgba(8,7,6,.35);z-index:40;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:420px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--transition-slow);box-shadow:-4px 0 32px rgba(8,7,6,.12)}
+.drawer.open{transform:translateX(0)}
+.dh{padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--color-border-default);display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-3);flex-shrink:0}
+.dh-left{display:flex;align-items:center;gap:var(--space-3)}
+.dh-av{width:40px;height:40px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+.dh-name{font-size:15px;font-weight:700;color:var(--color-text-primary);letter-spacing:-.01em}
+.dh-email{font-size:11px;color:var(--color-text-tertiary);margin-top:2px;font-family:var(--font-mono)}
+.d-close{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-tertiary);transition:background var(--transition-fast);flex-shrink:0;border:none;background:transparent}
+.d-close:hover{background:var(--color-surface-sunken);color:var(--color-text-primary)}
+.d-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* Drawer tabs */
+.d-tabs{display:flex;padding:0 var(--space-5);border-bottom:1px solid var(--color-border-default);flex-shrink:0}
+.d-tab{padding:10px 0;margin-right:var(--space-5);font-size:12px;font-weight:500;color:var(--color-text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--transition-fast);white-space:nowrap}
+.d-tab:hover{color:var(--color-text-secondary)}
+.d-tab.on{color:var(--color-action);border-bottom-color:var(--color-action);font-weight:600}
+.d-body{flex:1;overflow-y:auto;padding:var(--space-4) var(--space-5)}
+.d-pane{display:none}
+.d-pane.on{display:block}
+
+.dsec{margin-bottom:var(--space-5)}
+.dlbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:var(--space-3)}
+.info-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--color-surface-sunken)}
+.info-row:last-child{border-bottom:none}
+.info-row label{font-size:11px;color:var(--color-text-tertiary)}
+.info-row span{font-size:12px;font-weight:500;color:var(--color-text-primary);text-align:right}
+
+/* Role editor in drawer */
+.role-picker{display:flex;flex-direction:column;gap:var(--space-2)}
+.role-option{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;transition:all var(--transition-fast);position:relative}
+.role-option:hover{border-color:#c8c2ba;background:var(--color-surface-sunken)}
+.role-option.selected{border-color:var(--color-action);background:#EBF0FD}
+.role-option input[type=checkbox]{display:none}
+.role-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all var(--transition-fast)}
+.role-option.selected .role-check{background:var(--color-action);border-color:var(--color-action)}
+.role-check svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:2.5;display:none}
+.role-option.selected .role-check svg{display:block}
+.role-icon{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.role-opt-info{flex:1;min-width:0}
+.role-opt-name{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.role-opt-desc{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+
+/* SoD alert */
+.sod-alert{border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);display:flex;gap:10px;margin-top:var(--space-3)}
+.sod-hard{background:var(--danger-surface);border:1px solid var(--danger-border)}
+.sod-soft{background:var(--warning-surface);border:1px solid var(--warning-border)}
+.sod-alert-icon{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.sod-hard .sod-alert-icon{background:#F5D0D0}
+.sod-soft .sod-alert-icon{background:#FCE7B8}
+.sod-alert-icon svg{width:14px;height:14px;fill:none;stroke-width:2}
+.sod-hard .sod-alert-icon svg{stroke:var(--danger-text)}
+.sod-soft .sod-alert-icon svg{stroke:var(--warning-text)}
+.sod-alert-body{flex:1;min-width:0}
+.sod-alert-title{font-size:12px;font-weight:700;margin-bottom:3px}
+.sod-hard .sod-alert-title{color:var(--danger-text)}
+.sod-soft .sod-alert-title{color:var(--warning-text)}
+.sod-alert-desc{font-size:11px;line-height:1.5}
+.sod-hard .sod-alert-desc{color:#C03030}
+.sod-soft .sod-alert-desc{color:var(--warning-text)}
+.justify-label{font-size:11px;font-weight:600;color:var(--warning-text);margin-top:var(--space-3);margin-bottom:var(--space-2)}
+.justify-input{font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:var(--color-surface-raised);border:1.5px solid var(--warning-border);border-radius:var(--radius-sm);padding:8px 10px;width:100%;outline:none;resize:vertical;min-height:64px;line-height:1.5;transition:border-color var(--transition-fast)}
+.justify-input:focus{border-color:var(--warning-text);box-shadow:0 0 0 3px rgba(122,77,0,.08)}
+.justify-input::placeholder{color:var(--color-text-tertiary)}
+
+/* Drawer footer */
+.d-foot{padding:var(--space-4) var(--space-5);border-top:1px solid var(--color-border-default);display:flex;gap:var(--space-2);flex-shrink:0}
+.d-foot .btn-primary{flex:1;justify-content:center}
+.d-foot .btn-ghost{flex:0 0 auto}
+
+/* Audit timeline in drawer */
+.audit-list{display:flex;flex-direction:column}
+.audit-item{display:flex;gap:10px;padding:10px 0;position:relative}
+.audit-item:not(:last-child)::after{content:'';position:absolute;left:11px;top:32px;bottom:-10px;width:1px;background:var(--color-border-default)}
+.audit-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.audit-dot.role-change{background:#EBF0FD;border:1.5px solid #C8D8FA}
+.audit-dot.role-change svg{width:10px;height:10px;stroke:var(--color-action);fill:none;stroke-width:2}
+.audit-dot.invite{background:var(--warning-surface);border:1.5px solid var(--warning-border)}
+.audit-dot.invite svg{width:10px;height:10px;stroke:var(--warning-text);fill:none;stroke-width:2}
+.audit-dot.active{background:var(--success-surface);border:1.5px solid var(--success-border)}
+.audit-dot.active svg{width:10px;height:10px;stroke:var(--success-text);fill:none;stroke-width:2.5}
+.audit-content{flex:1}
+.audit-action{font-size:12px;font-weight:600;color:var(--color-text-primary)}
+.audit-meta{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+
+/* ── INVITE DRAWER ── */
+.inv-step-bar{display:flex;align-items:center;gap:0;margin-bottom:var(--space-5)}
+.inv-step{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--color-text-tertiary)}
+.inv-step.on{color:var(--color-action)}
+.inv-step.done{color:var(--success-text)}
+.inv-step-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:var(--color-border-default);color:var(--color-text-tertiary);flex-shrink:0;transition:all var(--transition-base)}
+.inv-step.on .inv-step-num{background:var(--color-action);color:#fff}
+.inv-step.done .inv-step-num{background:var(--success-text);color:#fff}
+.inv-step-check{width:20px;height:20px;border-radius:50%;background:var(--success-text);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.inv-step-check svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:2.5}
+.inv-step-connector{flex:1;height:1px;background:var(--color-border-default);margin:0 8px}
+.inv-step-connector.done{background:var(--success-border)}
+
+.inv-field{margin-bottom:var(--space-4)}
+.inv-field label{display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);margin-bottom:6px;letter-spacing:.02em}
+.inv-input{font-family:var(--font-sans);font-size:13px;color:var(--color-text-primary);background:var(--color-surface-sunken);border:1.5px solid var(--color-border-default);border-radius:var(--radius-md);padding:10px 12px;width:100%;outline:none;transition:all var(--transition-fast)}
+.inv-input:focus{border-color:var(--color-action);background:var(--color-surface-raised);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.inv-input::placeholder{color:var(--color-text-tertiary)}
+.inv-input.error{border-color:var(--danger-border);background:var(--danger-surface)}
+.inv-hint{font-size:11px;color:var(--color-text-tertiary);margin-top:4px}
+.inv-hint.err{color:var(--danger-text)}
+
+/* Access preview */
+.access-preview{background:var(--color-surface-sunken);border-radius:var(--radius-md);padding:var(--space-4);margin-top:var(--space-4)}
+.ap-title{font-size:11px;font-weight:700;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:var(--space-3)}
+.ap-grid{display:flex;flex-direction:column;gap:5px}
+.ap-row{display:flex;align-items:center;justify-content:space-between}
+.ap-mod{font-size:11px;color:var(--color-text-secondary)}
+.ap-lvl{font-size:10px;font-weight:700;padding:2px 7px;border-radius:var(--radius-full)}
+.ap-none{background:var(--color-border-default);color:var(--color-text-tertiary)}
+.ap-view{background:var(--color-surface-sunken);border:1px solid var(--color-border-default);color:var(--color-text-secondary)}
+.ap-transact{background:#EBF0FD;color:var(--color-action);border:1px solid #C8D8FA}
+.ap-approve{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.ap-post{background:#EDE9FE;color:#6D28D9;border:1px solid #C4B5FD}
+.ap-full{background:var(--color-surface-deep);color:rgba(255,255,255,.85)}
+
+/* ── ROLE MATRIX TAB ── */
+.matrix-wrap{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:var(--space-6)}
+.matrix-legend{display:flex;flex-wrap:wrap;gap:var(--space-3);padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--color-border-default)}
+.ml-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--color-text-secondary)}
+.ml-chip{font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--radius-full)}
+.matrix-tbl{width:100%;border-collapse:collapse}
+.matrix-tbl thead tr{background:var(--color-surface-deep)}
+.matrix-tbl thead th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.5);padding:10px 14px;text-align:center;white-space:nowrap}
+.matrix-tbl thead th.mod-col{text-align:left}
+.matrix-tbl tbody tr{border-bottom:1px solid var(--color-border-default)}
+.matrix-tbl tbody tr:last-child{border-bottom:none}
+.matrix-tbl tbody tr:hover{background:#FAFAF9}
+.matrix-tbl td{padding:10px 14px;text-align:center;vertical-align:middle}
+.matrix-tbl td.mod-name{text-align:left;font-size:12px;font-weight:600;color:var(--color-text-secondary);white-space:nowrap}
+.matrix-tbl td.mod-name span{display:block;font-size:10px;font-weight:400;color:var(--color-text-tertiary);margin-top:1px}
+.perm-chip{display:inline-flex;padding:2px 8px;border-radius:var(--radius-full);font-size:10px;font-weight:700;white-space:nowrap}
+.pc-none{color:var(--color-border-default);font-size:10px}
+.pc-view{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+.pc-transact{background:#EBF0FD;color:var(--color-action);border:1px solid #C8D8FA}
+.pc-approve{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.pc-post{background:#EDE9FE;color:#6D28D9;border:1px solid #C4B5FD}
+.pc-full{background:var(--color-surface-deep);color:rgba(255,255,255,.85)}
+.pc-ia{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+
+/* Role header in matrix */
+.role-th{display:flex;flex-direction:column;align-items:center;gap:3px}
+.role-th-av{width:24px;height:24px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;margin:0 auto}
+
+/* ── TRADEOS ACCESS TAB ── */
+.ia-table-wrap{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:var(--space-4)}
+.ia-header-note{background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:var(--space-4);margin-bottom:var(--space-4);display:flex;gap:10px}
+.ia-note-icon{width:28px;height:28px;border-radius:var(--radius-sm);background:#EBF0FD;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ia-note-icon svg{width:13px;height:13px;stroke:var(--color-action);fill:none;stroke-width:1.5}
+.ia-note-text{flex:1;font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.ia-note-text strong{font-weight:600;color:var(--color-text-primary)}
+
+.access-level{display:inline-flex;padding:2px 8px;border-radius:var(--radius-full);font-size:10px;font-weight:700}
+.al-full{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.al-restricted{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+
+/* ── DEACTIVATE CONFIRM MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(8,7,6,.4);z-index:60;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--color-surface-raised);border-radius:var(--radius-xl);padding:var(--space-6);width:400px;box-shadow:0 24px 64px rgba(8,7,6,.2);transform:translateY(8px);transition:transform var(--transition-slow)}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-icon{width:44px;height:44px;border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;margin-bottom:var(--space-4)}
+.modal-icon.warn{background:var(--warning-surface);border:1px solid var(--warning-border)}
+.modal-icon.danger{background:var(--danger-surface);border:1px solid var(--danger-border)}
+.modal-icon svg{width:20px;height:20px;fill:none;stroke-width:1.8}
+.modal-icon.warn svg{stroke:var(--warning-text)}
+.modal-icon.danger svg{stroke:var(--danger-text)}
+.modal-title{font-size:16px;font-weight:700;color:var(--color-text-primary);margin-bottom:var(--space-2)}
+.modal-desc{font-size:13px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:var(--space-5)}
+.modal-desc strong{font-weight:600;color:var(--color-text-primary)}
+.modal-actions{display:flex;gap:var(--space-2);justify-content:flex-end}
+
+/* ── SUCCESS TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--color-surface-deep);color:#fff;padding:12px 16px;border-radius:var(--radius-md);display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;z-index:99;box-shadow:0 8px 24px rgba(8,7,6,.2);transform:translateY(8px);opacity:0;transition:all var(--transition-base);pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-icon{width:20px;height:20px;border-radius:50%;background:var(--success-surface);border:1.5px solid var(--success-border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.toast-icon svg{width:10px;height:10px;stroke:var(--success-text);fill:none;stroke-width:2.5}
+
+/* ── EMPTY STATE ── */
+.empty-state{padding:48px 24px;text-align:center;color:var(--color-text-tertiary)}
+.empty-state svg{width:32px;height:32px;stroke:var(--color-border-default);fill:none;stroke-width:1;margin:0 auto 12px}
+.empty-title{font-size:14px;font-weight:600;color:var(--color-text-secondary);margin-bottom:4px}
+.empty-sub{font-size:12px}
+
+/* Status bar */
+.status-bar{background:var(--color-surface-deep);border-top:1px solid rgba(255,255,255,.08);padding:9px 14px;display:flex;align-items:center;gap:var(--space-5);flex-shrink:0}
+.sb-stat{display:flex;align-items:center;gap:6px}
+.sb-stat-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.sb-stat-val{font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(255,255,255,.85)}
+.sb-sep{width:1px;height:14px;background:rgba(255,255,255,.12)}
+
+/* Invite step pane */
+.inv-step-pane{display:none}
+.inv-step-pane.on{display:block}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sb">
+  <div class="sb-top">
+    <div class="sb-logomark"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-width="1.5"/></svg></div>
+    <span class="sb-brand">Klay</span>
+  </div>
+  <div class="sb-section">Overview</div>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+  <div class="sb-section">Keuangan</div>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>General Ledger</a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Journal Entry</a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Bills</a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Invoices</a>
+  <div class="sb-section">Operasional</div>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Vendors</a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Customers</a>
+  <div class="sb-section">Pengaturan</div>
+  <a class="sb-item active" href="#">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Pengguna & Akses</a>
+  <a class="sb-item" href="#">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Pengaturan</a>
+  <div class="sb-footer">
+    <div class="sb-footer-user">
+      <div class="sb-av-sm">RP</div>
+      <div>
+        <div class="sb-footer-name">Reza Purnama</div>
+        <div class="sb-footer-role">Admin</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-breadcrumb">
+      Pengaturan
+      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      <span>Pengguna & Hak Akses</span>
+    </div>
+    <div class="tb-right">
+      <div class="tb-notif">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="notif-dot"></div>
+      </div>
+      <div class="tb-org">
+        <div class="tb-av">PT</div>
+        <span class="tb-org-name">PT Sejahtera Makmur</span>
+        <svg style="width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCROLL AREA -->
+  <div class="scroll-area">
+
+    <!-- PAGE HEADER -->
+    <div class="page-head">
+      <div>
+        <div class="page-title">Pengguna & Hak Akses</div>
+        <div class="page-sub">PT Sejahtera Makmur · Kelola anggota tim, peran, dan izin akses</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn-primary" onclick="openInvite()">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Undang Pengguna
+        </button>
+      </div>
+    </div>
+
+    <!-- PAGE TABS -->
+    <div class="page-tabs">
+      <div class="ptab on" onclick="switchTab('members')">
+        Anggota Tim
+        <span class="ptab-badge" id="memberCount">8</span>
+      </div>
+      <div class="ptab" onclick="switchTab('matrix')">Matriks Peran</div>
+      <div class="ptab" onclick="switchTab('ia')">Akses TradeOS <span class="ptab-badge">2</span></div>
+    </div>
+
+    <!-- TAB: ANGGOTA TIM -->
+    <div class="tab-pane on" id="tab-members">
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-input" type="text" placeholder="Cari nama atau email…" id="memberSearch" oninput="filterMembers()">
+        </div>
+        <select class="filter-select" id="roleFilter" onchange="filterMembers()">
+          <option value="">Semua Peran</option>
+          <option value="admin">Admin</option>
+          <option value="fm">Manajer Keuangan</option>
+          <option value="ap">Staff AP</option>
+          <option value="ar">Staff AR</option>
+          <option value="pur">Staff Pengadaan</option>
+          <option value="wh">Staff Gudang</option>
+          <option value="mon">Pemantau</option>
+        </select>
+        <select class="filter-select" id="statusFilter" onchange="filterMembers()">
+          <option value="">Semua Status</option>
+          <option value="active">Aktif</option>
+          <option value="inactive">Tidak Aktif</option>
+          <option value="pending">Menunggu</option>
+        </select>
+        <span class="filter-count" id="filterCount">8 pengguna</span>
+      </div>
+
+      <div class="tbl-wrap">
+        <table id="memberTable">
+          <thead>
+            <tr>
+              <th>Pengguna</th>
+              <th>Peran</th>
+              <th>Status</th>
+              <th>Terakhir Aktif</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="memberTbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: MATRIKS PERAN -->
+    <div class="tab-pane" id="tab-matrix">
+      <div style="margin-bottom:var(--space-4)">
+        <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.6">Matriks ini menunjukkan level akses untuk setiap peran di tiap modul. Peran bersifat <strong>aditif</strong> — jika seseorang memegang dua peran, mereka mendapatkan akses gabungan dari keduanya.</div>
+      </div>
+      <div class="matrix-wrap">
+        <div class="matrix-legend">
+          <div class="ml-item"><span class="ml-chip pc-none" style="border:1px solid var(--color-border-default)">—</span> Tidak ada akses</div>
+          <div class="ml-item"><span class="ml-chip pc-view">View</span> Hanya lihat</div>
+          <div class="ml-item"><span class="ml-chip pc-transact">Transact</span> Buat & edit transaksi</div>
+          <div class="ml-item"><span class="ml-chip pc-approve">Approve</span> Setujui dokumen</div>
+          <div class="ml-item"><span class="ml-chip pc-post">Post</span> Posting ke GL</div>
+          <div class="ml-item"><span class="ml-chip pc-full">Full</span> Akses penuh</div>
+        </div>
+        <table class="matrix-tbl">
+          <thead>
+            <tr>
+              <th class="mod-col" style="text-align:left;min-width:160px">Modul</th>
+              <th>
+                <div class="role-th"><div class="role-th-av" style="background:#B83D08">AD</div><span>Admin</span></div>
+              </th>
+              <th>
+                <div class="role-th"><div class="role-th-av" style="background:#1A46C8">FM</div><span>Mgr Keuangan</span></div>
+              </th>
+              <th>
+                <div class="role-th"><div class="role-th-av" style="background:#6D28D9">AP</div><span>Staff AP</span></div>
+              </th>
+              <th>
+                <div class="role-th"><div class="role-th-av" style="background:#0E7490">AR</div><span>Staff AR</span></div>
+              </th>
+              <th>
+                <div class="role-th"><div class="role-th-av" style="background:#166638">PU</div><span>Pengadaan</span></div>
+              </th>
+              <th>
+                <div class="role-th"><div class="role-th-av" style="background:#7A4D00">WH</div><span>Gudang</span></div>
+              </th>
+              <th>
+                <div class="role-th"><div class="role-th-av" style="background:#8C857C">PM</div><span>Pemantau</span></div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mod-name">General Ledger<span>Jurnal, Trial Balance</span></td>
+              <td><span class="perm-chip pc-full">Full</span></td>
+              <td><span class="perm-chip pc-post">Post</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-view">View</span></td>
+            </tr>
+            <tr>
+              <td class="mod-name">Accounts Payable<span>Invoice vendor, pembayaran</span></td>
+              <td><span class="perm-chip pc-full">Full</span></td>
+              <td><span class="perm-chip pc-approve">Approve</span></td>
+              <td><span class="perm-chip pc-transact">Transact</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-view">View</span></td>
+            </tr>
+            <tr>
+              <td class="mod-name">Accounts Receivable<span>Invoice customer, penagihan</span></td>
+              <td><span class="perm-chip pc-full">Full</span></td>
+              <td><span class="perm-chip pc-approve">Approve</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-transact">Transact</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-view">View</span></td>
+            </tr>
+            <tr>
+              <td class="mod-name">Purchasing<span>PO, Purchase Request</span></td>
+              <td><span class="perm-chip pc-full">Full</span></td>
+              <td><span class="perm-chip pc-approve">Approve</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-transact">Transact</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-view">View</span></td>
+            </tr>
+            <tr>
+              <td class="mod-name">Inventory<span>GRN, Stock Opname</span></td>
+              <td><span class="perm-chip pc-full">Full</span></td>
+              <td><span class="perm-chip pc-view">View</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-view">View</span></td>
+              <td><span class="perm-chip pc-transact">Transact</span></td>
+              <td><span class="perm-chip pc-view">View</span></td>
+            </tr>
+            <tr>
+              <td class="mod-name">Reports<span>P&amp;L, Neraca, Arus Kas</span></td>
+              <td><span class="perm-chip pc-full">Full</span></td>
+              <td><span class="perm-chip pc-full">Full</span></td>
+              <td><span class="perm-chip pc-view">View</span></td>
+              <td><span class="perm-chip pc-view">View</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-view">View</span></td>
+            </tr>
+            <tr>
+              <td class="mod-name">Settings<span>CoA, Dimensi, Pengguna</span></td>
+              <td><span class="perm-chip pc-full">Full</span></td>
+              <td><span class="perm-chip pc-view">View</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+            </tr>
+            <tr>
+              <td class="mod-name">Migration<span>CMS migrasi data</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+              <td><span class="perm-chip pc-none">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:var(--space-4);display:flex;gap:10px;margin-bottom:var(--space-6)">
+        <svg style="width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0;margin-top:2px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.6"><strong style="color:var(--color-text-primary)">SoD (Segregasi Tugas):</strong> Seseorang tidak dapat menjadi submitter sekaligus approver dokumen yang sama. Kombinasi Staff AP + Manajer Keuangan adalah <strong style="color:var(--danger-text)">hard block</strong> dan tidak dapat ditetapkan. Kombinasi Admin + Manajer Keuangan menghasilkan <strong style="color:var(--warning-text)">soft warning</strong> yang memerlukan justifikasi tertulis.</div>
+      </div>
+    </div>
+
+    <!-- TAB: AKSES TRADEOS -->
+    <div class="tab-pane" id="tab-ia">
+      <div class="ia-header-note">
+        <div class="ia-note-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div class="ia-note-text">
+          <strong>Transparansi Akses Tim TradeOS.</strong> Kamu bisa melihat siapa dari tim TradeOS yang saat ini memiliki akses ke sistem kamu, level akses, dan hingga kapan. Setiap tindakan yang mereka lakukan tercatat di audit trail. Kamu tidak dapat mencabut akses selama migrasi aktif — hanya team lead TradeOS yang dapat melakukannya.
+        </div>
+      </div>
+      <div class="ia-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Staf TradeOS</th>
+              <th>Level Akses</th>
+              <th>Berlaku Dari</th>
+              <th>Berlaku Hingga</th>
+              <th>Tujuan</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="td-user">
+                  <div class="av av-fm">AF</div>
+                  <div>
+                    <div class="user-name">Ahmad Fauzi</div>
+                    <div class="user-email">ahmad.fauzi@tradeos.id</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="access-level al-full">FULL</span></td>
+              <td class="td-last">15 Apr 2026</td>
+              <td class="td-last">30 Apr 2026</td>
+              <td style="font-size:12px;color:var(--color-text-secondary)">Migrasi data dari Accurate</td>
+              <td><span class="status-badge sb-active"><span class="status-dot"></span>Aktif</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="td-user">
+                  <div class="av" style="background:#6D28D9;font-size:11px">NS</div>
+                  <div>
+                    <div class="user-name">Nadia Sari</div>
+                    <div class="user-email">nadia.sari@tradeos.id</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="access-level al-restricted">RESTRICTED</span></td>
+              <td class="td-last">01 Mar 2026</td>
+              <td class="td-last">01 Jun 2026</td>
+              <td style="font-size:12px;color:var(--color-text-secondary)">Support pasca go-live</td>
+              <td><span class="status-badge sb-active"><span class="status-dot"></span>Aktif</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:12px;color:var(--color-text-tertiary);padding-bottom:var(--space-6)">Riwayat akses tersimpan di <strong style="color:var(--color-text-secondary)">Pengaturan → Audit Log</strong> dan dapat diexpor sewaktu-waktu.</div>
+    </div>
+
+  </div><!-- end scroll-area -->
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div class="sb-stat"><span class="sb-stat-label">Total Pengguna</span><span class="sb-stat-val">8</span></div>
+    <div class="sb-sep"></div>
+    <div class="sb-stat"><span class="sb-stat-label">Aktif</span><span class="sb-stat-val" style="color:#86D4A4">6</span></div>
+    <div class="sb-sep"></div>
+    <div class="sb-stat"><span class="sb-stat-label">Menunggu</span><span class="sb-stat-val" style="color:#F9CC6A">1</span></div>
+    <div class="sb-sep"></div>
+    <div class="sb-stat"><span class="sb-stat-label">Tidak Aktif</span><span class="sb-stat-val" style="color:rgba(255,255,255,.4)">1</span></div>
+  </div>
+
+</div><!-- end main -->
+</div><!-- end shell -->
+
+<!-- ══════════════════════════════════
+     EDIT USER DRAWER
+══════════════════════════════════ -->
+<div class="overlay" id="editOverlay" onclick="closeEdit()"></div>
+<div class="drawer" id="editDrawer">
+  <div class="dh">
+    <div class="dh-left">
+      <div class="dh-av" id="editDhAv" style="background:#1A46C8">SD</div>
+      <div>
+        <div class="dh-name" id="editDhName">Sari Dewi</div>
+        <div class="dh-email" id="editDhEmail">sari.dewi@ptsjm.com</div>
+      </div>
+    </div>
+    <button class="d-close" onclick="closeEdit()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="d-tabs">
+    <div class="d-tab on" onclick="switchDTab(this,'d-info')">Profil</div>
+    <div class="d-tab" onclick="switchDTab(this,'d-roles')">Peran & Akses</div>
+    <div class="d-tab" onclick="switchDTab(this,'d-audit')">Riwayat</div>
+  </div>
+  <div class="d-body">
+
+    <!-- Profil pane -->
+    <div class="d-pane on" id="d-info">
+      <div class="dsec">
+        <div class="dlbl">Informasi Pengguna</div>
+        <div class="info-row"><label>Nama Lengkap</label><span id="ei-name">Sari Dewi</span></div>
+        <div class="info-row"><label>Email</label><span id="ei-email">sari.dewi@ptsjm.com</span></div>
+        <div class="info-row"><label>Status</label><span id="ei-status"><span class="status-badge sb-active"><span class="status-dot"></span>Aktif</span></span></div>
+        <div class="info-row"><label>Bergabung</label><span id="ei-joined">12 Feb 2026</span></div>
+        <div class="info-row"><label>Terakhir Aktif</label><span id="ei-last">2 jam lalu</span></div>
+      </div>
+      <div class="dsec">
+        <div class="dlbl">Peran Saat Ini</div>
+        <div id="ei-roles" style="display:flex;flex-wrap:wrap;gap:5px"></div>
+      </div>
+    </div>
+
+    <!-- Roles pane -->
+    <div class="d-pane" id="d-roles">
+      <div class="dsec">
+        <div class="dlbl">Pilih Peran</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:var(--space-3);line-height:1.5">Peran bersifat aditif. Sistem akan mendeteksi konflik SoD secara otomatis saat kamu memilih kombinasi peran.</div>
+        <div class="role-picker" id="rolePicker"></div>
+        <div id="sodAlert" style="display:none"></div>
+        <div id="justifySection" style="display:none">
+          <div class="justify-label">Justifikasi Bisnis (wajib diisi)</div>
+          <textarea class="justify-input" id="justifyText" placeholder="Jelaskan alasan bisnis untuk kombinasi peran ini. Alasan ini akan dicatat secara permanen di audit log."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audit pane -->
+    <div class="d-pane" id="d-audit">
+      <div class="dsec">
+        <div class="dlbl">Riwayat Perubahan Akses</div>
+        <div class="audit-list" id="auditList"></div>
+      </div>
+    </div>
+  </div>
+  <div class="d-foot" id="editFoot">
+    <button class="btn-ghost" onclick="closeEdit()">Batal</button>
+    <button class="btn-primary" id="saveRolesBtn" style="flex:1;justify-content:center" onclick="saveRoles()">
+      <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      Simpan Perubahan
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     INVITE DRAWER
+══════════════════════════════════ -->
+<div class="overlay" id="invOverlay" onclick="closeInvite()"></div>
+<div class="drawer" id="invDrawer">
+  <div class="dh" style="align-items:center">
+    <div>
+      <div class="dh-name" style="font-size:15px">Undang Pengguna Baru</div>
+      <div class="dh-email" style="font-family:var(--font-sans);font-size:12px;color:var(--color-text-tertiary)">Pengguna akan menerima email undangan</div>
+    </div>
+    <button class="d-close" onclick="closeInvite()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="d-body">
+    <!-- Step indicator -->
+    <div class="inv-step-bar" id="invStepBar">
+      <div class="inv-step on" id="istep1"><div class="inv-step-num">1</div>Info</div>
+      <div class="inv-step-connector" id="iconn1"></div>
+      <div class="inv-step" id="istep2"><div class="inv-step-num">2</div>Peran</div>
+      <div class="inv-step-connector" id="iconn2"></div>
+      <div class="inv-step" id="istep3"><div class="inv-step-num">3</div>Konfirmasi</div>
+    </div>
+
+    <!-- Step 1: Info -->
+    <div class="inv-step-pane on" id="inv-pane1">
+      <div class="inv-field">
+        <label>Email Kerja</label>
+        <input class="inv-input" type="email" id="invEmail" placeholder="nama@perusahaan.com" oninput="validateInvEmail()">
+        <div class="inv-hint" id="invEmailHint">Email undangan akan dikirimkan ke alamat ini</div>
+      </div>
+      <div class="inv-field">
+        <label>Nama Lengkap</label>
+        <input class="inv-input" type="text" id="invName" placeholder="Nama pengguna">
+      </div>
+    </div>
+
+    <!-- Step 2: Role -->
+    <div class="inv-step-pane" id="inv-pane2">
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:var(--space-4);line-height:1.5">Pilih satu atau lebih peran untuk pengguna ini. Lihat <strong style="color:var(--color-action);cursor:pointer" onclick="switchTab('matrix')">Matriks Peran</strong> untuk referensi akses per peran.</div>
+      <div class="role-picker" id="invRolePicker"></div>
+      <div id="invSodAlert" style="display:none;margin-top:var(--space-3)"></div>
+      <div id="invAccessPreview" style="display:none">
+        <div class="access-preview" id="invAccessPreviewContent"></div>
+      </div>
+    </div>
+
+    <!-- Step 3: Konfirmasi -->
+    <div class="inv-step-pane" id="inv-pane3">
+      <div style="background:var(--success-surface);border:1px solid var(--success-border);border-radius:var(--radius-md);padding:var(--space-4);margin-bottom:var(--space-4);display:flex;gap:10px">
+        <div style="width:28px;height:28px;border-radius:50%;background:#D1EAD9;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
+          <svg style="width:13px;height:13px;stroke:var(--success-text);fill:none;stroke-width:2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--success-text);margin-bottom:4px">Siap dikirim</div>
+          <div style="font-size:12px;color:#2D6E4A;line-height:1.5">Email undangan akan dikirimkan ke <strong id="confEmail"></strong>. Pengguna perlu mengklik link aktivasi sebelum bisa login.</div>
+        </div>
+      </div>
+      <div class="dsec">
+        <div class="dlbl">Ringkasan</div>
+        <div class="info-row"><label>Nama</label><span id="confName"></span></div>
+        <div class="info-row"><label>Email</label><span id="confEmailRow" style="font-family:var(--font-mono);font-size:11px"></span></div>
+        <div class="info-row"><label>Peran</label><span id="confRoles"></span></div>
+      </div>
+    </div>
+  </div>
+  <div class="d-foot" id="invFoot">
+    <button class="btn-ghost" id="invBackBtn" style="display:none" onclick="invBack()">← Kembali</button>
+    <button class="btn-primary" id="invNextBtn" onclick="invNext()" style="flex:1;justify-content:center">
+      Lanjut →
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     DEACTIVATE MODAL
+══════════════════════════════════ -->
+<div class="modal-overlay" id="deactivateModal">
+  <div class="modal">
+    <div class="modal-icon warn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1" y2="16" x2="12.01" y2="16"/><path d="M12 8v4M12 16h.01"/></svg></div>
+    <div class="modal-title">Nonaktifkan Pengguna?</div>
+    <div class="modal-desc">Pengguna <strong id="deactivateName"></strong> akan kehilangan akses ke semua modul. Data dan riwayat transaksi tetap tersimpan. Kamu bisa mengaktifkan kembali kapan saja.</div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('deactivateModal')">Batal</button>
+      <button class="btn-danger" onclick="confirmDeactivate()">Nonaktifkan</button>
+    </div>
+  </div>
+</div>
+
+<!-- REMOVE MODAL -->
+<div class="modal-overlay" id="removeModal">
+  <div class="modal">
+    <div class="modal-icon danger"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
+    <div class="modal-title">Hapus Pengguna?</div>
+    <div class="modal-desc">Kamu akan menghapus <strong id="removeName"></strong> dari sistem. Tindakan ini tidak dapat dibatalkan. Riwayat audit tetap tersimpan untuk kebutuhan compliance.</div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('removeModal')">Batal</button>
+      <button class="btn-danger" onclick="confirmRemove()">Hapus Permanen</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════
+
+const ROLES_CONFIG = [
+  { id:'admin', label:'Admin', desc:'Akses penuh ke semua modul termasuk pengaturan', avClass:'av-admin', badgeClass:'rb-admin', icon:'AD', bg:'#B83D08' },
+  { id:'fm',    label:'Manajer Keuangan', desc:'Setujui & posting ke GL, lihat semua laporan', avClass:'av-fm', badgeClass:'rb-fm', icon:'FM', bg:'#1A46C8' },
+  { id:'ap',    label:'Staff AP',  desc:'Buat & kelola invoice vendor dan pembayaran', avClass:'av-ap', badgeClass:'rb-ap', icon:'AP', bg:'#6D28D9' },
+  { id:'ar',    label:'Staff AR',  desc:'Buat & kelola invoice customer dan penagihan', avClass:'av-ar', badgeClass:'rb-ar', icon:'AR', bg:'#0E7490' },
+  { id:'pur',   label:'Staff Pengadaan', desc:'Buat Purchase Order dan Purchase Request', avClass:'av-pur', badgeClass:'rb-pur', icon:'PU', bg:'#166638' },
+  { id:'wh',    label:'Staff Gudang', desc:'Kelola GRN, Stock Opname, dan inventori', avClass:'av-wh', badgeClass:'rb-wh', icon:'WH', bg:'#7A4D00' },
+  { id:'mon',   label:'Pemantau', desc:'Lihat semua modul tanpa dapat membuat perubahan', avClass:'av-mon', badgeClass:'rb-mon', icon:'PM', bg:'#8C857C' },
+];
+
+// SoD rules: [roleA, roleB, type, message]
+const SOD_RULES = [
+  ['ap', 'fm', 'hard', 'Staff AP dapat submit invoice, sementara Manajer Keuangan dapat approve. Kombinasi ini melanggar prinsip Segregasi Tugas (SoD) dan tidak dapat ditetapkan.'],
+  ['ar', 'fm', 'hard', 'Staff AR dapat submit invoice customer, sementara Manajer Keuangan dapat approve. Kombinasi ini melanggar prinsip SoD dan tidak dapat ditetapkan.'],
+  ['pur','fm', 'hard', 'Staff Pengadaan dapat submit PO, sementara Manajer Keuangan dapat approve. Kombinasi ini melanggar prinsip SoD dan tidak dapat ditetapkan.'],
+  ['admin','fm','soft', 'Admin memegang akses Settings penuh dan Manajer Keuangan memegang akses approve. Kombinasi ini tidak berbahaya namun tidak umum. Diperlukan justifikasi tertulis.'],
+  ['admin','ap','soft', 'Admin memegang akses penuh termasuk Settings. Menambahkan peran operasional tidak disarankan — pertimbangkan membuat akun terpisah.'],
+];
+
+const ACCESS_MATRIX = {
+  admin: { gl:'full', ap:'full', ar:'full', purchasing:'full', inventory:'full', reports:'full', settings:'full', migration:'—' },
+  fm:    { gl:'post', ap:'approve', ar:'approve', purchasing:'approve', inventory:'view', reports:'full', settings:'view', migration:'—' },
+  ap:    { gl:'—', ap:'transact', ar:'—', purchasing:'—', inventory:'—', reports:'view', settings:'—', migration:'—' },
+  ar:    { gl:'—', ap:'—', ar:'transact', purchasing:'—', inventory:'—', reports:'view', settings:'—', migration:'—' },
+  pur:   { gl:'—', ap:'—', ar:'—', purchasing:'transact', inventory:'view', reports:'—', settings:'—', migration:'—' },
+  wh:    { gl:'—', ap:'—', ar:'—', purchasing:'—', inventory:'transact', reports:'—', settings:'—', migration:'—' },
+  mon:   { gl:'view', ap:'view', ar:'view', purchasing:'view', inventory:'view', reports:'view', settings:'—', migration:'—' },
+};
+
+const MODULE_LABELS = { gl:'General Ledger', ap:'Accounts Payable', ar:'Accounts Receivable', purchasing:'Purchasing', inventory:'Inventory', reports:'Reports', settings:'Settings', migration:'Migration' };
+
+let members = [
+  { id:1, name:'Reza Purnama', email:'reza.purnama@ptsjm.com', roles:['admin'], status:'active', lastActive:'Anda', joined:'01 Jan 2026', isCurrentUser:true,
+    audit:[{type:'active',text:'Bergabung sebagai Admin',meta:'01 Jan 2026 · via undangan email'},{type:'role-change',text:'Peran Admin ditetapkan',meta:'01 Jan 2026 · oleh Sistem'}] },
+  { id:2, name:'Sari Dewi', email:'sari.dewi@ptsjm.com', roles:['fm'], status:'active', lastActive:'2 jam lalu', joined:'12 Feb 2026',
+    audit:[{type:'active',text:'Bergabung sebagai Manajer Keuangan',meta:'12 Feb 2026 · via undangan email'},{type:'role-change',text:'Peran Manajer Keuangan ditetapkan',meta:'12 Feb 2026 · oleh Reza Purnama'}] },
+  { id:3, name:'Budi Santoso', email:'budi.santoso@ptsjm.com', roles:['ap','ar'], status:'active', lastActive:'Kemarin', joined:'15 Feb 2026',
+    audit:[{type:'role-change',text:'Peran Staff AR ditambahkan',meta:'20 Mar 2026 · oleh Reza Purnama · Justifikasi: "Sumber daya terbatas, Budi handle keduanya sementara"'},{type:'active',text:'Bergabung sebagai Staff AP',meta:'15 Feb 2026 · via undangan email'}] },
+  { id:4, name:'Linda Wirawan', email:'linda.w@ptsjm.com', roles:['ar'], status:'active', lastActive:'1 hari lalu', joined:'20 Feb 2026',
+    audit:[{type:'active',text:'Bergabung sebagai Staff AR',meta:'20 Feb 2026 · via undangan email'}] },
+  { id:5, name:'Andi Prasetiyo', email:'andi.p@ptsjm.com', roles:['pur'], status:'active', lastActive:'3 hari lalu', joined:'01 Mar 2026',
+    audit:[{type:'active',text:'Bergabung sebagai Staff Pengadaan',meta:'01 Mar 2026 · via undangan email'}] },
+  { id:6, name:'Hendra Kusuma', email:'hendra.k@ptsjm.com', roles:['wh'], status:'active', lastActive:'5 jam lalu', joined:'01 Mar 2026',
+    audit:[{type:'active',text:'Bergabung sebagai Staff Gudang',meta:'01 Mar 2026 · via undangan email'}] },
+  { id:7, name:'Maya Anggraeni', email:'maya.a@ptsjm.com', roles:['mon'], status:'inactive', lastActive:'22 Mar 2026', joined:'05 Mar 2026',
+    audit:[{type:'role-change',text:'Akses dinonaktifkan',meta:'22 Mar 2026 · oleh Reza Purnama'},{type:'active',text:'Bergabung sebagai Pemantau',meta:'05 Mar 2026 · via undangan email'}] },
+  { id:8, name:'Dita Rahayu', email:'dita.r@ptsjm.com', roles:['ap'], status:'pending', lastActive:'Belum login', joined:'Menunggu',
+    audit:[{type:'invite',text:'Undangan terkirim',meta:'20 Apr 2026 · oleh Reza Purnama'}] },
+];
+
+let currentEditId = null;
+let currentEditRoles = [];
+let inviteStep = 1;
+let inviteSelectedRoles = [];
+let targetDeactivate = null;
+let targetRemove = null;
+
+// ════════════════════════════════════════
+// RENDER MEMBERS TABLE
+// ════════════════════════════════════════
+
+function getRoleConfig(id){ return ROLES_CONFIG.find(r=>r.id===id); }
+
+function renderMembers(list){
+  const tbody = document.getElementById('memberTbody');
+  if(!list || list.length === 0){
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div class="empty-title">Tidak ada pengguna ditemukan</div><div class="empty-sub">Coba ubah filter pencarian</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(m => {
+    const rc = getRoleConfig(m.roles[0]);
+    const initials = m.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const rolesBadges = m.roles.map(r=>{
+      const rr = getRoleConfig(r);
+      return `<span class="rbadge ${rr.badgeClass}">${rr.label}</span>`;
+    }).join('');
+
+    // SoD soft warning check for row
+    let sodFlagHtml = '';
+    const hasSoftSod = SOD_RULES.some(s => s[2]==='soft' && m.roles.includes(s[0]) && m.roles.includes(s[1]));
+    if(hasSoftSod) sodFlagHtml = `<span class="sod-flag" title="Kombinasi peran ini memiliki peringatan SoD yang sudah dijustifikasi"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>SoD</span>`;
+
+    const statusBadge = {
+      active: '<span class="status-badge sb-active"><span class="status-dot"></span>Aktif</span>',
+      inactive: '<span class="status-badge sb-inactive"><span class="status-dot"></span>Tidak Aktif</span>',
+      pending: '<span class="status-badge sb-pending"><span class="status-dot"></span>Menunggu</span>',
+    }[m.status];
+
+    const isCurrentUser = m.isCurrentUser;
+    return `<tr onclick="openEdit(${m.id})" data-id="${m.id}">
+      <td>
+        <div class="td-user">
+          <div class="av ${rc.avClass}">${initials}</div>
+          <div>
+            <div class="user-name">${m.name}${isCurrentUser?'<span style="font-size:10px;font-weight:500;color:var(--color-text-tertiary);margin-left:6px">(Kamu)</span>':''}</div>
+            <div class="user-email">${m.email}</div>
+          </div>
+        </div>
+      </td>
+      <td><div class="roles-cell">${rolesBadges}${sodFlagHtml}</div></td>
+      <td>${statusBadge}</td>
+      <td class="td-last">${m.lastActive}</td>
+      <td onclick="event.stopPropagation()">
+        <div class="row-action-wrap">
+          <button class="row-action-btn" onclick="toggleRowMenu(event,${m.id})">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          </button>
+          <div class="row-menu" id="rm-${m.id}">
+            <div class="rm-item" onclick="openEdit(${m.id});closeAllMenus()">
+              <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit Peran</div>
+            ${m.status === 'active' ? `<div class="rm-item" onclick="triggerDeactivate(${m.id});closeAllMenus()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Nonaktifkan</div>` : ''}
+            ${m.status === 'inactive' ? `<div class="rm-item" onclick="reactivate(${m.id});closeAllMenus()"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Aktifkan Kembali</div>` : ''}
+            <div class="rm-div"></div>
+            ${m.status === 'inactive' ? `<div class="rm-item danger" onclick="triggerRemove(${m.id});closeAllMenus()"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Hapus Pengguna</div>` : '<div class="rm-item danger" style="opacity:.4;cursor:default" title="Nonaktifkan dulu sebelum bisa dihapus"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>Hapus Pengguna</div>'}
+          </div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterMembers(){
+  const q = document.getElementById('memberSearch').value.toLowerCase();
+  const rf = document.getElementById('roleFilter').value;
+  const sf = document.getElementById('statusFilter').value;
+  const filtered = members.filter(m => {
+    const matchQ = !q || m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q);
+    const matchR = !rf || m.roles.includes(rf);
+    const matchS = !sf || m.status === sf;
+    return matchQ && matchR && matchS;
+  });
+  renderMembers(filtered);
+  document.getElementById('filterCount').textContent = `${filtered.length} pengguna`;
+}
+
+// ════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════
+
+function switchTab(id){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('tab-'+id).classList.add('on');
+  const tabMap = {members:0, matrix:1, ia:2};
+  document.querySelectorAll('.ptab')[tabMap[id]].classList.add('on');
+}
+
+function switchDTab(el, paneId){
+  el.parentElement.querySelectorAll('.d-tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.d-pane').forEach(p=>p.classList.remove('on'));
+  document.getElementById(paneId).classList.add('on');
+  document.getElementById('editFoot').style.display = paneId === 'd-roles' ? 'flex' : 'none';
+}
+
+// ════════════════════════════════════════
+// ROW MENU
+// ════════════════════════════════════════
+
+function toggleRowMenu(e, id){
+  e.stopPropagation();
+  closeAllMenus();
+  const menu = document.getElementById('rm-'+id);
+  menu.classList.toggle('open');
+}
+
+function closeAllMenus(){
+  document.querySelectorAll('.row-menu').forEach(m=>m.classList.remove('open'));
+}
+
+document.addEventListener('click', closeAllMenus);
+
+// ════════════════════════════════════════
+// EDIT DRAWER
+// ════════════════════════════════════════
+
+function openEdit(id){
+  const m = members.find(x=>x.id===id);
+  if(!m) return;
+  currentEditId = id;
+  currentEditRoles = [...m.roles];
+
+  const rc = getRoleConfig(m.roles[0]);
+  const initials = m.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+
+  // Header
+  const dhAv = document.getElementById('editDhAv');
+  dhAv.textContent = initials;
+  dhAv.style.background = rc.bg;
+  document.getElementById('editDhName').textContent = m.name;
+  document.getElementById('editDhEmail').textContent = m.email;
+
+  // Profil pane
+  document.getElementById('ei-name').textContent = m.name;
+  document.getElementById('ei-email').textContent = m.email;
+  document.getElementById('ei-joined').textContent = m.joined;
+  document.getElementById('ei-last').textContent = m.lastActive;
+  const statusMap = {
+    active: '<span class="status-badge sb-active"><span class="status-dot"></span>Aktif</span>',
+    inactive: '<span class="status-badge sb-inactive"><span class="status-dot"></span>Tidak Aktif</span>',
+    pending: '<span class="status-badge sb-pending"><span class="status-dot"></span>Menunggu</span>',
+  };
+  document.getElementById('ei-status').innerHTML = statusMap[m.status];
+  const eiRoles = document.getElementById('ei-roles');
+  eiRoles.innerHTML = m.roles.map(r=>{const rr=getRoleConfig(r);return `<span class="rbadge ${rr.badgeClass}">${rr.label}</span>`;}).join('');
+
+  // Roles pane
+  renderRolePicker('rolePicker', currentEditRoles);
+  document.getElementById('sodAlert').style.display = 'none';
+  document.getElementById('justifySection').style.display = 'none';
+
+  // Audit pane
+  const auditList = document.getElementById('auditList');
+  auditList.innerHTML = m.audit.map(a=>`
+    <div class="audit-item">
+      <div class="audit-dot ${a.type}">
+        ${a.type==='active'?'<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>':''}
+        ${a.type==='role-change'?'<svg viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>':''}
+        ${a.type==='invite'?'<svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>':''}
+      </div>
+      <div class="audit-content">
+        <div class="audit-action">${a.text}</div>
+        <div class="audit-meta">${a.meta}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Show profil tab by default
+  document.querySelectorAll('.d-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.d-pane').forEach(p=>p.classList.remove('on'));
+  document.querySelector('#editDrawer .d-tab').classList.add('on');
+  document.getElementById('d-info').classList.add('on');
+  document.getElementById('editFoot').style.display = 'none';
+
+  document.getElementById('editOverlay').classList.add('open');
+  document.getElementById('editDrawer').classList.add('open');
+}
+
+function closeEdit(){
+  document.getElementById('editOverlay').classList.remove('open');
+  document.getElementById('editDrawer').classList.remove('open');
+}
+
+// ════════════════════════════════════════
+// ROLE PICKER
+// ════════════════════════════════════════
+
+function renderRolePicker(containerId, selectedRoles){
+  const c = document.getElementById(containerId);
+  c.innerHTML = ROLES_CONFIG.map(r => {
+    const isSelected = selectedRoles.includes(r.id);
+    return `
+    <div class="role-option ${isSelected?'selected':''}" onclick="toggleRole('${containerId}','${r.id}')">
+      <div class="role-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="role-icon" style="background:${r.bg}20;"><span style="font-size:10px;font-weight:700;color:${r.bg}">${r.icon}</span></div>
+      <div class="role-opt-info">
+        <div class="role-opt-name">${r.label}</div>
+        <div class="role-opt-desc">${r.desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleRole(containerId, roleId){
+  const isInvite = containerId === 'invRolePicker';
+  let roles = isInvite ? inviteSelectedRoles : currentEditRoles;
+
+  const idx = roles.indexOf(roleId);
+  if(idx > -1) roles.splice(idx, 1);
+  else roles.push(roleId);
+
+  renderRolePicker(containerId, roles);
+  checkSoD(roles, isInvite ? 'invSodAlert' : 'sodAlert', isInvite ? null : 'justifySection');
+
+  if(isInvite) updateInviteAccessPreview();
+}
+
+function checkSoD(roles, alertId, justifyId){
+  const alertEl = document.getElementById(alertId);
+  const justEl = justifyId ? document.getElementById(justifyId) : null;
+
+  // Check hard block first
+  let hardRule = SOD_RULES.find(s => s[2]==='hard' && roles.includes(s[0]) && roles.includes(s[1]));
+  let softRule = !hardRule ? SOD_RULES.find(s => s[2]==='soft' && roles.includes(s[0]) && roles.includes(s[1])) : null;
+
+  if(hardRule){
+    alertEl.style.display = 'flex';
+    alertEl.innerHTML = `
+      <div class="sod-alert sod-hard">
+        <div class="sod-alert-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+        <div class="sod-alert-body">
+          <div class="sod-alert-title">Hard Block — Tidak Dapat Disimpan</div>
+          <div class="sod-alert-desc">${hardRule[3]}</div>
+        </div>
+      </div>`;
+    const btn = document.getElementById('saveRolesBtn');
+    if(btn) btn.disabled = true;
+    if(justEl) justEl.style.display = 'none';
+  } else if(softRule){
+    alertEl.style.display = 'flex';
+    alertEl.innerHTML = `
+      <div class="sod-alert sod-soft">
+        <div class="sod-alert-icon"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="sod-alert-body">
+          <div class="sod-alert-title">Peringatan SoD — Justifikasi Diperlukan</div>
+          <div class="sod-alert-desc">${softRule[3]}</div>
+        </div>
+      </div>`;
+    const btn = document.getElementById('saveRolesBtn');
+    if(btn) btn.disabled = false;
+    if(justEl) justEl.style.display = 'block';
+  } else {
+    alertEl.style.display = 'none';
+    if(justEl) justEl.style.display = 'none';
+    const btn = document.getElementById('saveRolesBtn');
+    if(btn) btn.disabled = false;
+  }
+}
+
+function saveRoles(){
+  const m = members.find(x=>x.id===currentEditId);
+  if(!m) return;
+  if(currentEditRoles.length === 0){ showToast('Pilih minimal satu peran'); return; }
+
+  const oldRoles = [...m.roles];
+  m.roles = [...currentEditRoles];
+  m.audit.unshift({type:'role-change', text:'Peran diperbarui: '+currentEditRoles.map(r=>getRoleConfig(r).label).join(', '), meta: 'Baru saja · oleh Reza Purnama'});
+
+  renderMembers(members);
+  closeEdit();
+  showToast(`Peran ${m.name} berhasil diperbarui`);
+}
+
+// ════════════════════════════════════════
+// INVITE FLOW
+// ════════════════════════════════════════
+
+function openInvite(){
+  inviteStep = 1;
+  inviteSelectedRoles = [];
+  document.getElementById('invEmail').value = '';
+  document.getElementById('invName').value = '';
+  document.getElementById('invEmailHint').className = 'inv-hint';
+  document.getElementById('invEmailHint').textContent = 'Email undangan akan dikirimkan ke alamat ini';
+  renderRolePicker('invRolePicker', []);
+  document.getElementById('invSodAlert').style.display = 'none';
+  document.getElementById('invAccessPreview').style.display = 'none';
+  renderInviteStep();
+  document.getElementById('invOverlay').classList.add('open');
+  document.getElementById('invDrawer').classList.add('open');
+}
+
+function closeInvite(){
+  document.getElementById('invOverlay').classList.remove('open');
+  document.getElementById('invDrawer').classList.remove('open');
+}
+
+function renderInviteStep(){
+  for(let i=1;i<=3;i++){
+    document.getElementById('inv-pane'+i).classList.toggle('on', i===inviteStep);
+    const stepEl = document.getElementById('istep'+i);
+    stepEl.classList.remove('on','done');
+    if(i < inviteStep) stepEl.classList.add('done');
+    else if(i === inviteStep) stepEl.classList.add('on');
+    if(i < 3){
+      document.getElementById('iconn'+i).classList.toggle('done', i < inviteStep);
+    }
+  }
+  document.getElementById('invBackBtn').style.display = inviteStep > 1 ? 'inline-flex' : 'none';
+  const nextBtn = document.getElementById('invNextBtn');
+  if(inviteStep === 3) nextBtn.innerHTML = '<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Kirim Undangan';
+  else nextBtn.innerHTML = 'Lanjut →';
+}
+
+function validateInvEmail(){
+  const v = document.getElementById('invEmail').value;
+  const hint = document.getElementById('invEmailHint');
+  if(v && !v.includes('@')){
+    hint.className = 'inv-hint err'; hint.textContent = 'Format email tidak valid';
+  } else {
+    hint.className = 'inv-hint'; hint.textContent = 'Email undangan akan dikirimkan ke alamat ini';
+  }
+}
+
+function invNext(){
+  if(inviteStep === 1){
+    const email = document.getElementById('invEmail').value.trim();
+    const name = document.getElementById('invName').value.trim();
+    if(!email || !name){ showToast('Email dan nama wajib diisi'); return; }
+    if(!email.includes('@')){ showToast('Format email tidak valid'); return; }
+    inviteStep = 2;
+    renderInviteStep();
+  } else if(inviteStep === 2){
+    if(inviteSelectedRoles.length === 0){ showToast('Pilih minimal satu peran'); return; }
+    // check hard block
+    const hardRule = SOD_RULES.find(s => s[2]==='hard' && inviteSelectedRoles.includes(s[0]) && inviteSelectedRoles.includes(s[1]));
+    if(hardRule){ showToast('Perbaiki konflik SoD sebelum lanjut'); return; }
+    // fill confirm
+    const email = document.getElementById('invEmail').value.trim();
+    const name = document.getElementById('invName').value.trim();
+    document.getElementById('confEmail').textContent = email;
+    document.getElementById('confEmailRow').textContent = email;
+    document.getElementById('confName').textContent = name;
+    document.getElementById('confRoles').innerHTML = inviteSelectedRoles.map(r=>{const rr=getRoleConfig(r);return `<span class="rbadge ${rr.badgeClass}">${rr.label}</span>`;}).join(' ');
+    inviteStep = 3;
+    renderInviteStep();
+  } else {
+    // Send invite
+    const email = document.getElementById('invEmail').value.trim();
+    const name = document.getElementById('invName').value.trim();
+    const newId = Math.max(...members.map(m=>m.id)) + 1;
+    const rc = getRoleConfig(inviteSelectedRoles[0]);
+    members.push({
+      id: newId, name, email, roles: [...inviteSelectedRoles],
+      status: 'pending', lastActive: 'Belum login', joined: 'Menunggu',
+      audit: [{type:'invite', text:'Undangan terkirim', meta:'Baru saja · oleh Reza Purnama'}]
+    });
+    renderMembers(members);
+    updateStatusBar();
+    closeInvite();
+    showToast(`Undangan berhasil dikirim ke ${email}`);
+  }
+}
+
+function invBack(){
+  if(inviteStep > 1){ inviteStep--; renderInviteStep(); }
+}
+
+function updateInviteAccessPreview(){
+  const preview = document.getElementById('invAccessPreview');
+  if(inviteSelectedRoles.length === 0){ preview.style.display = 'none'; return; }
+  preview.style.display = 'block';
+  // merge access
+  const merged = {};
+  Object.keys(MODULE_LABELS).forEach(mod=>{
+    const levels = inviteSelectedRoles.map(r => ACCESS_MATRIX[r][mod] || '—');
+    const priority = ['full','post','approve','transact','view','—'];
+    merged[mod] = levels.sort((a,b)=>priority.indexOf(a)-priority.indexOf(b))[0];
+  });
+  const lvlClass = {full:'ap-full',post:'ap-post',approve:'ap-approve',transact:'ap-transact',view:'ap-view','—':'ap-none'};
+  document.getElementById('invAccessPreviewContent').innerHTML = `
+    <div class="ap-title">Preview Akses</div>
+    <div class="ap-grid">
+      ${Object.entries(merged).map(([mod,lvl])=>`
+        <div class="ap-row">
+          <span class="ap-mod">${MODULE_LABELS[mod]}</span>
+          <span class="ap-lvl ${lvlClass[lvl]}">${lvl==='—'?'Tidak ada':lvl.charAt(0).toUpperCase()+lvl.slice(1)}</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ════════════════════════════════════════
+// DEACTIVATE / REMOVE
+// ════════════════════════════════════════
+
+function triggerDeactivate(id){
+  const m = members.find(x=>x.id===id);
+  targetDeactivate = id;
+  document.getElementById('deactivateName').textContent = m.name;
+  document.getElementById('deactivateModal').classList.add('open');
+}
+
+function confirmDeactivate(){
+  const m = members.find(x=>x.id===targetDeactivate);
+  if(m){
+    m.status = 'inactive';
+    m.audit.unshift({type:'role-change',text:'Akses dinonaktifkan',meta:'Baru saja · oleh Reza Purnama'});
+    renderMembers(members);
+    updateStatusBar();
+    showToast(`${m.name} berhasil dinonaktifkan`);
+  }
+  closeModal('deactivateModal');
+}
+
+function reactivate(id){
+  const m = members.find(x=>x.id===id);
+  if(m){
+    m.status = 'active';
+    m.audit.unshift({type:'active',text:'Akses diaktifkan kembali',meta:'Baru saja · oleh Reza Purnama'});
+    renderMembers(members);
+    updateStatusBar();
+    showToast(`${m.name} berhasil diaktifkan kembali`);
+  }
+}
+
+function triggerRemove(id){
+  const m = members.find(x=>x.id===id);
+  targetRemove = id;
+  document.getElementById('removeName').textContent = m.name;
+  document.getElementById('removeModal').classList.add('open');
+}
+
+function confirmRemove(){
+  const m = members.find(x=>x.id===targetRemove);
+  if(m){
+    members = members.filter(x=>x.id!==targetRemove);
+    renderMembers(members);
+    updateStatusBar();
+    showToast(`${m.name} berhasil dihapus`);
+  }
+  closeModal('removeModal');
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+}
+
+// ════════════════════════════════════════
+// STATUS BAR
+// ════════════════════════════════════════
+
+function updateStatusBar(){
+  const total = members.length;
+  const active = members.filter(m=>m.status==='active').length;
+  const pending = members.filter(m=>m.status==='pending').length;
+  const inactive = members.filter(m=>m.status==='inactive').length;
+  document.querySelector('.sb-stat:nth-child(1) .sb-stat-val').textContent = total;
+  document.querySelector('.sb-stat:nth-child(3) .sb-stat-val').textContent = active;
+  document.querySelector('.sb-stat:nth-child(5) .sb-stat-val').textContent = pending;
+  document.querySelector('.sb-stat:nth-child(7) .sb-stat-val').textContent = inactive;
+  document.getElementById('memberCount').textContent = total;
+  document.getElementById('filterCount').textContent = total + ' pengguna';
+}
+
+// ════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════
+
+let toastTimer = null;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+
+renderMembers(members);
+</script>
+</body>
+</html>
