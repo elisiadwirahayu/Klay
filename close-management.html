@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Close Management — TradeOS</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Manrope:wght@300;400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-brand:#B83D08;--color-brand-hover:#A03206;
+  --color-action:#1A46C8;--color-action-hover:#1338A8;
+  --color-text-primary:#080706;--color-text-secondary:#2E2B27;--color-text-tertiary:#8C857C;
+  --color-surface-base:#FBF8F5;--color-surface-raised:#FFFFFF;--color-surface-sunken:#F4F0EB;--color-surface-deep:#080706;
+  --color-border-default:#E2DDD7;
+  --success-text:#166638;--success-border:#A8D9BC;--success-surface:#E8F5EE;
+  --warning-text:#7A4D00;--warning-border:#E8C870;--warning-surface:#FDF3E0;
+  --danger-text:#A02020;--danger-border:#EAB8B8;--danger-surface:#FBF0F0;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;--radius-full:9999px;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;
+  --transition-fast:0.1s ease;--transition-base:0.15s ease;--transition-slow:0.2s ease;
+  --font-display:'Playfair Display',serif;--font-sans:'Manrope',sans-serif;--font-mono:'Inconsolata',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-surface-base);color:var(--color-text-primary);-webkit-font-smoothing:antialiased;font-size:13px;height:100vh;overflow:hidden}
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sb{width:196px;flex-shrink:0;background:var(--color-surface-raised);border-right:1px solid var(--color-border-default);display:flex;flex-direction:column;overflow-y:auto}
+.sb-top{padding:0 16px;height:52px;display:flex;align-items:center;border-bottom:1px solid var(--color-border-default);gap:8px;flex-shrink:0}
+.sb-logomark{width:26px;height:26px;background:var(--color-brand);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logomark svg{width:12px;height:12px;fill:#fff}
+.sb-brand{font-size:14px;font-weight:700;letter-spacing:-.02em}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--color-border-default);padding:16px 16px 6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 12px;margin:1px 6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:400;color:var(--color-text-tertiary);transition:all var(--transition-fast)}
+.sb-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.sb-item:hover{background:var(--color-surface-base);color:var(--color-text-secondary)}
+.sb-item.active{background:var(--color-surface-sunken);color:var(--color-text-primary);font-weight:600;border-left:2px solid var(--color-brand);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-left:0;padding-left:14px}
+.sb-badge{font-size:9px;font-weight:700;background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border);border-radius:var(--radius-full);padding:1px 5px;margin-left:auto;flex-shrink:0;transition:all .3s ease}
+.sb-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--color-surface-sunken)}
+.sb-footer-item{display:flex;align-items:center;gap:8px;padding:6px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--color-text-tertiary)}
+.sb-footer-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* ── TOPBAR ── */
+.topbar{height:52px;flex-shrink:0;background:var(--color-surface-raised);border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;padding:0 20px;gap:12px}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--color-surface-sunken);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 12px;flex:1;max-width:400px}
+.tb-search svg{width:13px;height:13px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5;flex-shrink:0}
+.tb-search input{border:none;outline:none;font-family:var(--font-sans);font-size:12px;color:var(--color-text-primary);background:transparent;width:100%}
+.tb-search input::placeholder{color:var(--color-text-tertiary)}
+.tb-kbd{font-size:10px;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:4px;padding:1px 5px;font-family:var(--font-mono);flex-shrink:0}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-notif{width:30px;height:30px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.tb-notif svg{width:14px;height:14px;stroke:var(--color-text-tertiary);fill:none;stroke-width:1.5}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--color-brand);border-radius:50%;border:1.5px solid var(--color-surface-raised)}
+.tb-org{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);cursor:pointer}
+.tb-org-name{font-size:12px;font-weight:500;color:var(--color-text-secondary)}
+.tb-av{width:24px;height:24px;border-radius:var(--radius-sm);background:var(--color-action);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── SCROLL AREA ── */
+.scroll-area{flex:1;overflow-y:auto;padding:var(--space-5) var(--space-6) 52px;min-height:0}
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4)}
+.page-title{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.page-sub{font-size:12px;color:var(--color-text-tertiary);margin-top:2px}
+.head-right{display:flex;gap:8px;align-items:center}
+
+/* ── BUTTONS ── */
+.btn-ghost{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:7px 13px;cursor:pointer;transition:all var(--transition-fast)}
+.btn-ghost svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+.btn-ghost:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+
+/* Lock button states */
+.btn-lock{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:8px 18px;border:none;border-radius:var(--radius-md);cursor:not-allowed;transition:all var(--transition-slow);white-space:nowrap}
+.btn-lock svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5}
+/* state: blocked (red, can't click) */
+.btn-lock.state-blocked{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border);cursor:not-allowed;opacity:.8}
+/* state: warning (yellow, can override) */
+.btn-lock.state-warn{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border);cursor:pointer;opacity:1}
+/* state: ready (green, safe to lock) */
+.btn-lock.state-ready{background:var(--success-text);color:#fff;border:none;cursor:pointer;opacity:1}
+.btn-lock.state-ready:hover{background:#0f4f2a}
+
+/* ── PERIOD TABS ── */
+.period-row{display:flex;gap:var(--space-2);margin-bottom:var(--space-4);align-items:center}
+.period-tab{display:flex;align-items:center;gap:5px;padding:6px 13px;border-radius:var(--radius-md);border:1px solid var(--color-border-default);background:var(--color-surface-raised);cursor:pointer;font-size:12px;font-weight:500;color:var(--color-text-tertiary);transition:all var(--transition-fast);white-space:nowrap}
+.period-tab:hover{border-color:#c8c2ba;color:var(--color-text-secondary)}
+.period-tab.active{background:var(--color-surface-deep);color:#fff;border-color:var(--color-surface-deep);font-weight:600}
+.period-tab.locked{color:var(--color-text-tertiary)}
+.period-tab.future{opacity:.45;cursor:default;pointer-events:none}
+.tab-badge{font-size:9px;font-weight:700;padding:1px 6px;border-radius:var(--radius-full)}
+.tab-badge.locked{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.tab-badge.review{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.tab-badge.active-badge{background:rgba(255,255,255,.15);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.2)}
+.tab-badge.future{background:var(--color-surface-sunken);color:var(--color-text-tertiary);border:1px solid var(--color-border-default)}
+.tab-lock-icon{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+
+/* ── COMMAND CENTER (compact) ── */
+.command-center{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);margin-bottom:var(--space-4);display:flex;align-items:center;gap:var(--space-5)}
+
+.cc-ring-wrap{position:relative;width:56px;height:56px;flex-shrink:0}
+.cc-ring-svg{transform:rotate(-90deg);width:56px;height:56px}
+.cc-ring-track{fill:none;stroke:var(--color-surface-sunken);stroke-width:6}
+.cc-ring-fill{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dasharray 1s cubic-bezier(.4,0,.2,1),stroke .4s ease}
+.cc-ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.cc-ring-pct{font-family:var(--font-mono);font-size:13px;font-weight:700;line-height:1;color:var(--color-text-primary)}
+
+/* divider */
+.cc-div{width:1px;height:40px;background:var(--color-border-default);flex-shrink:0}
+
+/* period info */
+.cc-period{}
+.cc-period-label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:2px}
+.cc-period-name{font-size:16px;font-weight:700;letter-spacing:-.02em;color:var(--color-text-primary);line-height:1;margin-bottom:4px}
+.cc-status-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 9px;border-radius:var(--radius-full)}
+.cc-status-badge.review{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.cc-status-badge.ready{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.cc-status-badge.locked{background:var(--color-surface-deep);color:#fff}
+.cc-status-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+/* stats strip */
+.cc-stats{display:flex;align-items:center;gap:var(--space-4);flex:1}
+.cc-stat-item{text-align:center}
+.cc-stat-num{font-family:var(--font-mono);font-size:18px;font-weight:700;line-height:1;transition:all .4s ease}
+.cc-stat-num.cleared{color:var(--success-text)}
+.cc-stat-num.warn-num{color:var(--warning-text)}
+.cc-stat-num.danger-num{color:var(--danger-text)}
+.cc-stat-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--color-text-tertiary);margin-top:1px;white-space:nowrap}
+
+/* ai strip */
+.cc-ai{flex:1;background:var(--color-surface-sunken);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);display:flex;gap:8px;align-items:flex-start;min-width:0}
+.cc-ai-icon{width:18px;height:18px;border-radius:var(--radius-sm);background:linear-gradient(135deg,#EBF0FD,#EDE9FE);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.cc-ai-icon svg{width:9px;height:9px;fill:var(--color-action);stroke:none}
+.cc-ai-label{font-size:9px;font-weight:700;color:var(--color-action);letter-spacing:.04em;margin-bottom:2px}
+.cc-ai-text{font-size:11px;color:var(--color-text-secondary);line-height:1.5;transition:all .3s ease}
+.cc-ai-text strong{font-weight:700;color:var(--color-text-primary)}
+
+/* ── EXCEPTION SECTION ── */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-3)}
+.section-title{font-size:11px;font-weight:700;color:var(--color-text-secondary);letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.section-dot{width:6px;height:6px;border-radius:50%;background:var(--danger-border);flex-shrink:0;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.section-count{font-size:11px;color:var(--color-text-tertiary)}
+
+/* ── EXCEPTION CARDS ── */
+.exception-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-5)}
+.ex-card{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);padding:var(--space-4);display:flex;gap:10px;align-items:flex-start;cursor:pointer;transition:all .3s ease;position:relative;overflow:hidden}
+.ex-card:hover:not(.resolved){box-shadow:0 2px 12px rgba(8,7,6,.07);border-color:#c8c2ba}
+.ex-card.blocked-card{border-left:3px solid var(--danger-border)}
+.ex-card.review-card{border-left:3px solid var(--warning-border)}
+.ex-card.resolved{border-left:3px solid var(--success-border);background:var(--success-surface);cursor:default;opacity:.75}
+.ex-card.resolving{pointer-events:none}
+
+/* resolved overlay shimmer */
+.ex-card-resolved-overlay{position:absolute;inset:0;background:var(--success-surface);display:flex;align-items:center;justify-content:center;gap:8px;opacity:0;transition:opacity .3s ease;pointer-events:none;border-radius:calc(var(--radius-lg) - 1px)}
+.ex-card-resolved-overlay.show{opacity:1}
+.ex-res-icon{width:28px;height:28px;border-radius:50%;background:var(--success-text);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ex-res-icon svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5}
+.ex-res-label{font-size:12px;font-weight:700;color:var(--success-text)}
+
+.ex-icon{width:30px;height:30px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s ease}
+.ex-icon.blocked-icon{background:var(--danger-surface)}
+.ex-icon.review-icon{background:var(--warning-surface)}
+.ex-icon.resolved-icon{background:var(--success-surface)}
+.ex-icon svg{width:14px;height:14px;fill:none;stroke-width:1.5;transition:stroke .3s ease}
+.ex-icon.blocked-icon svg{stroke:var(--danger-text)}
+.ex-icon.review-icon svg{stroke:var(--warning-text)}
+.ex-icon.resolved-icon svg{stroke:var(--success-text)}
+
+.ex-body{flex:1;min-width:0}
+.ex-domain{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:2px}
+.ex-title{font-size:12px;font-weight:600;color:var(--color-text-primary);margin-bottom:3px;line-height:1.3}
+.ex-desc{font-size:11px;color:var(--color-text-secondary);line-height:1.4;margin-bottom:var(--space-3)}
+.ex-footer{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.ex-status-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--radius-full);flex-shrink:0;transition:all .3s ease}
+.ex-status-badge.blocked{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.ex-status-badge.needs-review{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.ex-status-badge.done{background:var(--success-surface);color:var(--success-text);border:1px solid var(--success-border)}
+.ex-action-btn{font-family:var(--font-sans);font-size:11px;font-weight:600;padding:4px 11px;border-radius:var(--radius-sm);cursor:pointer;transition:all var(--transition-fast);white-space:nowrap;border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-secondary)}
+.ex-action-btn:hover{border-color:#c8c2ba;background:var(--color-surface-sunken)}
+.ex-action-btn.primary{border:none;background:var(--color-action);color:#fff}
+.ex-action-btn.primary:hover{background:var(--color-action-hover)}
+.ex-action-btn.done{border:none;background:var(--success-surface);color:var(--success-text);cursor:default;pointer-events:none}
+
+/* no-issues state */
+.ex-empty{background:var(--success-surface);border:1px solid var(--success-border);border-radius:var(--radius-lg);padding:var(--space-5);display:none;align-items:center;justify-content:center;gap:10px;margin-bottom:var(--space-5)}
+.ex-empty.show{display:flex}
+.ex-empty-icon{width:32px;height:32px;border-radius:50%;background:var(--success-text);display:flex;align-items:center;justify-content:center}
+.ex-empty-icon svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2.5}
+.ex-empty-text{font-size:13px;font-weight:600;color:var(--success-text)}
+.ex-empty-sub{font-size:11px;color:var(--success-text);opacity:.8;margin-top:1px}
+
+/* ── CHECKLIST GROUPS ── */
+.cl-group{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);margin-bottom:var(--space-2);overflow:hidden;transition:border-color .3s ease}
+.cl-group.all-good{border-color:var(--success-border)}
+.cl-group-head{display:flex;align-items:center;gap:10px;padding:10px var(--space-5);cursor:pointer;transition:background var(--transition-fast);user-select:none}
+.cl-group-head:hover{background:var(--color-surface-sunken)}
+.cl-group-icon{width:26px;height:26px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s ease}
+.cl-group-icon.clear{background:var(--success-surface)}
+.cl-group-icon.warn{background:var(--warning-surface)}
+.cl-group-icon.err{background:var(--danger-surface)}
+.cl-group-icon svg{width:12px;height:12px;fill:none;stroke-width:1.5}
+.cl-group-icon.clear svg{stroke:var(--success-text)}
+.cl-group-icon.warn svg{stroke:var(--warning-text)}
+.cl-group-icon.err svg{stroke:var(--danger-text)}
+.cl-group-label{font-size:12px;font-weight:600;color:var(--color-text-primary);flex:1}
+.cl-group-progress{display:flex;align-items:center;gap:7px}
+.cl-prog-track{width:72px;height:3px;background:var(--color-surface-sunken);border-radius:var(--radius-full);overflow:hidden}
+.cl-prog-fill{height:100%;border-radius:var(--radius-full);transition:width .5s ease,background .4s ease}
+.cl-prog-fill.full{background:var(--success-text)}
+.cl-prog-fill.partial{background:var(--color-action)}
+.cl-prog-fill.danger{background:var(--danger-text)}
+.cl-prog-text{font-size:11px;font-weight:700;font-family:var(--font-mono);white-space:nowrap;transition:color .3s ease}
+.cl-chevron{width:13px;height:13px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2;transition:transform var(--transition-base);flex-shrink:0}
+.cl-chevron.open{transform:rotate(180deg)}
+.cl-body{border-top:1px solid var(--color-border-default)}
+.cl-body.collapsed{display:none}
+
+.cl-item{display:flex;align-items:flex-start;gap:9px;padding:10px var(--space-5);border-bottom:1px solid var(--color-border-default);transition:all .3s ease}
+.cl-item:last-child{border-bottom:none}
+.cl-item.clear{border-left:2px solid var(--success-border)}
+.cl-item.warn{border-left:2px solid var(--warning-border);background:#FFFDF5}
+.cl-item.err{border-left:2px solid var(--danger-border);background:#FFF8F8}
+.cl-item-check{width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .3s ease}
+.cl-item-check.c-ok{background:var(--success-surface);border:1px solid var(--success-border)}
+.cl-item-check.c-ok svg{width:8px;height:8px;stroke:var(--success-text);fill:none;stroke-width:2.5}
+.cl-item-check.c-warn{background:var(--warning-surface);border:1px solid var(--warning-border)}
+.cl-item-check.c-warn svg{width:8px;height:8px;stroke:var(--warning-text);fill:none;stroke-width:2}
+.cl-item-check.c-err{background:var(--danger-surface);border:1px solid var(--danger-border)}
+.cl-item-check.c-err svg{width:8px;height:8px;stroke:var(--danger-text);fill:none;stroke-width:2}
+.cl-item-body{flex:1;min-width:0}
+.cl-item-title{font-size:12px;font-weight:600;color:var(--color-text-primary);margin-bottom:1px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.ai-badge{display:inline-flex;align-items:center;gap:2px;font-size:9px;font-weight:700;padding:1px 5px;border-radius:var(--radius-full);background:#EBF0FD;color:var(--color-action);border:1px solid #C8D8FA;flex-shrink:0}
+.ai-badge svg{width:7px;height:7px;fill:var(--color-action)}
+.cl-item-desc{font-size:11px;color:var(--color-text-secondary);line-height:1.4}
+.cl-item-meta{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap}
+.cl-pill{font-family:var(--font-mono);font-size:10px;padding:1px 7px;border-radius:var(--radius-full);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);color:var(--color-text-tertiary)}
+.cl-pill.danger{border-color:var(--danger-border);color:var(--danger-text)}
+.cl-pill.warn{border-color:var(--warning-border);color:var(--warning-text)}
+.cl-item-right{flex-shrink:0;padding-top:1px}
+.cl-btn{font-family:var(--font-sans);font-size:10px;font-weight:600;padding:4px 10px;border-radius:var(--radius-sm);border:1px solid var(--color-border-default);background:var(--color-surface-raised);color:var(--color-text-secondary);cursor:pointer;transition:all var(--transition-fast)}
+.cl-btn:hover{border-color:#c8c2ba;background:var(--color-surface-sunken)}
+.cl-btn.blue{border:none;background:var(--color-action);color:#fff}
+.cl-btn.blue:hover{background:var(--color-action-hover)}
+
+/* ── ACTIVITY LOG ── */
+.activity-section{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);overflow:hidden;margin-top:var(--space-4)}
+.activity-head{display:flex;align-items:center;justify-content:space-between;padding:10px var(--space-5);cursor:pointer;transition:background var(--transition-fast);user-select:none}
+.activity-head:hover{background:var(--color-surface-sunken)}
+.activity-head-left{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--color-text-secondary)}
+.activity-head-left svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+.activity-body{border-top:1px solid var(--color-border-default);padding:var(--space-3) var(--space-5)}
+.activity-body.hidden{display:none}
+.act-item{display:flex;align-items:flex-start;gap:8px;padding:6px 9px;background:var(--color-surface-sunken);border-radius:var(--radius-sm);margin-bottom:4px}
+.act-item:last-child{margin-bottom:0}
+.act-dot{width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.act-dot.ok{background:var(--success-surface);border:1px solid var(--success-border)}
+.act-dot.ok svg{stroke:var(--success-text);fill:none;width:8px;height:8px;stroke-width:2.5}
+.act-dot.info{background:#EBF0FD;border:1px solid #C8D8FA}
+.act-dot.info svg{stroke:var(--color-action);fill:none;width:8px;height:8px;stroke-width:2}
+.act-dot.warn{background:var(--warning-surface);border:1px solid var(--warning-border)}
+.act-dot.warn svg{stroke:var(--warning-text);fill:none;width:8px;height:8px;stroke-width:2}
+.act-text{flex:1}
+.act-action{font-size:11px;font-weight:600;color:var(--color-text-primary)}
+.act-meta{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.act-count{font-size:11px;font-weight:600;color:var(--color-text-tertiary);font-family:var(--font-mono);align-self:center;flex-shrink:0}
+
+/* ── STICKY BAR ── */
+.sticky-bar{position:fixed;bottom:0;left:196px;right:0;background:var(--color-surface-deep);border-top:1px solid rgba(255,255,255,.08);padding:0 20px;display:flex;align-items:center;gap:var(--space-5);z-index:30;height:44px}
+.sb-stat{display:flex;align-items:center;gap:6px}
+.sb-stat-label{font-size:10px;font-weight:500;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.sb-stat-val{font-size:12px;font-weight:600;font-family:var(--font-mono);white-space:nowrap;transition:color .4s ease}
+.sb-stat-val.normal{color:rgba(255,255,255,.85)}
+.sb-stat-val.good{color:#6EE7A0}
+.sb-stat-val.caution{color:#F0C96C}
+.sb-stat-val.danger{color:#F08080}
+.sb-sep{width:1px;height:16px;background:rgba(255,255,255,.1);flex-shrink:0}
+.sb-right{margin-left:auto;display:flex;align-items:center;gap:var(--space-4)}
+.sb-readiness{font-size:12px;font-weight:700;font-family:var(--font-mono);transition:color .4s ease}
+
+/* ── OVERLAY ── */
+.overlay{position:fixed;inset:0;background:rgba(8,7,6,.5);z-index:100;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.overlay.open{opacity:1;pointer-events:auto}
+
+/* ── LOCK MODAL ── */
+.lock-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-56%);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-xl);box-shadow:0 24px 64px rgba(8,7,6,.2);width:460px;z-index:110;opacity:0;pointer-events:none;transition:opacity var(--transition-slow),transform var(--transition-slow)}
+.lock-modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
+.lm-head{padding:var(--space-5) var(--space-6) 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.lm-icon-wrap{width:40px;height:40px;border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .4s ease,border .4s ease}
+.lm-icon-wrap.warn{background:var(--warning-surface);border:1px solid var(--warning-border)}
+.lm-icon-wrap.warn svg{stroke:var(--warning-text)}
+.lm-icon-wrap.ready{background:var(--success-surface);border:1px solid var(--success-border)}
+.lm-icon-wrap.ready svg{stroke:var(--success-text)}
+.lm-icon-wrap svg{width:18px;height:18px;fill:none;stroke-width:1.5}
+.lm-head-text{flex:1}
+.lm-title{font-size:15px;font-weight:700;color:var(--color-text-primary);letter-spacing:-.01em;margin-bottom:2px}
+.lm-subtitle{font-size:11px;color:var(--color-text-tertiary);line-height:1.4}
+.lm-close{width:26px;height:26px;border-radius:var(--radius-sm);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.lm-close svg{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2}
+.lm-body{padding:var(--space-4) var(--space-6)}
+.lm-alert{border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);display:flex;gap:9px;align-items:flex-start;margin-bottom:var(--space-4);transition:all .4s ease}
+.lm-alert.warn{background:var(--warning-surface);border:1px solid var(--warning-border)}
+.lm-alert.ready{background:var(--success-surface);border:1px solid var(--success-border)}
+.lm-alert svg{width:13px;height:13px;fill:none;stroke-width:1.5;flex-shrink:0;margin-top:1px;transition:stroke .4s ease}
+.lm-alert.warn svg{stroke:var(--warning-text)}
+.lm-alert.ready svg{stroke:var(--success-text)}
+.lm-alert-text{font-size:11px;line-height:1.5;transition:color .4s ease}
+.lm-alert.warn .lm-alert-text{color:var(--warning-text)}
+.lm-alert.ready .lm-alert-text{color:var(--success-text)}
+.lm-checklist{background:var(--color-surface-sunken);border-radius:var(--radius-md);overflow:hidden;margin-bottom:var(--space-4)}
+.lm-check-row{display:flex;align-items:center;gap:8px;padding:7px 11px;border-bottom:1px solid var(--color-border-default)}
+.lm-check-row:last-child{border-bottom:none}
+.lm-check-dot{width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s ease}
+.lm-check-dot.ok{background:var(--success-surface);border:1px solid var(--success-border)}
+.lm-check-dot.ok svg{stroke:var(--success-text);fill:none;width:7px;height:7px;stroke-width:2.5}
+.lm-check-dot.warn{background:var(--warning-surface);border:1px solid var(--warning-border)}
+.lm-check-dot.warn svg{stroke:var(--warning-text);fill:none;width:7px;height:7px;stroke-width:2}
+.lm-check-dot.err{background:var(--danger-surface);border:1px solid var(--danger-border)}
+.lm-check-dot.err svg{stroke:var(--danger-text);fill:none;width:7px;height:7px;stroke-width:2}
+.lm-check-text{font-size:11px;color:var(--color-text-secondary);transition:color .3s ease}
+.lm-check-text.ok{color:var(--success-text)}
+.lm-check-text span{font-weight:600}
+.lm-confirm-label{font-size:11px;color:var(--color-text-tertiary);margin-bottom:5px}
+.lm-confirm-input{width:100%;padding:8px 11px;border:1px solid var(--color-border-default);border-radius:var(--radius-md);font-family:var(--font-mono);font-size:12px;background:var(--color-surface-raised);color:var(--color-text-primary);outline:none;transition:all var(--transition-fast)}
+.lm-confirm-input:focus{border-color:var(--color-action);box-shadow:0 0 0 3px rgba(26,70,200,.08)}
+.lm-confirm-input.match{border-color:var(--success-text);box-shadow:0 0 0 3px rgba(22,102,56,.08)}
+.lm-foot{padding:0 var(--space-6) var(--space-5);display:flex;gap:var(--space-2)}
+.lm-btn-cancel{flex:1;font-family:var(--font-sans);font-size:12px;font-weight:500;padding:9px;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);cursor:pointer;color:var(--color-text-secondary);transition:all var(--transition-fast)}
+.lm-btn-cancel:hover{background:var(--color-surface-sunken)}
+.lm-btn-confirm{flex:2;font-family:var(--font-sans);font-size:13px;font-weight:700;padding:9px;color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;transition:all var(--transition-fast);opacity:.4;pointer-events:none;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--success-text)}
+.lm-btn-confirm.ready{opacity:1;pointer-events:auto}
+.lm-btn-confirm svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.5}
+
+/* ── EXCEPTION DRAWER ── */
+.ex-overlay{position:fixed;inset:0;background:rgba(8,7,6,.35);z-index:90;opacity:0;pointer-events:none;transition:opacity var(--transition-slow)}
+.ex-overlay.open{opacity:1;pointer-events:auto}
+.ex-drawer{position:fixed;top:0;right:0;bottom:0;width:390px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);z-index:95;transform:translateX(100%);transition:transform var(--transition-slow);display:flex;flex-direction:column}
+.ex-drawer.open{transform:translateX(0)}
+.ex-dh{padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--color-border-default);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.ex-dh-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--radius-full);margin-bottom:5px}
+.ex-dh-badge.warn{background:var(--warning-surface);color:var(--warning-text);border:1px solid var(--warning-border)}
+.ex-dh-badge.err{background:var(--danger-surface);color:var(--danger-text);border:1px solid var(--danger-border)}
+.ex-dh-title{font-size:14px;font-weight:700;color:var(--color-text-primary);line-height:1.3;letter-spacing:-.01em}
+.ex-dh-close{width:26px;height:26px;border-radius:var(--radius-sm);background:var(--color-surface-sunken);border:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.ex-dh-close svg{width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2}
+.ex-db{flex:1;overflow-y:auto;padding:var(--space-5)}
+.ex-db-section{margin-bottom:var(--space-4)}
+.ex-db-label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:var(--space-2)}
+.ex-db-text{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.ex-db-text strong{font-weight:600;color:var(--color-text-primary)}
+.ex-db-kv{background:var(--color-surface-sunken);border-radius:var(--radius-md);overflow:hidden}
+.ex-db-row{display:flex;justify-content:space-between;align-items:center;padding:7px 11px;border-bottom:1px solid var(--color-border-default)}
+.ex-db-row:last-child{border-bottom:none}
+.ex-db-key{font-size:11px;color:var(--color-text-tertiary)}
+.ex-db-val{font-size:12px;font-weight:600;color:var(--color-text-primary);font-family:var(--font-mono)}
+.ex-df{padding:var(--space-3) var(--space-5) var(--space-5);display:flex;flex-direction:column;gap:var(--space-2)}
+.ex-df-btn{width:100%;font-family:var(--font-sans);font-size:13px;font-weight:600;padding:10px;border-radius:var(--radius-md);cursor:pointer;transition:all var(--transition-fast);display:flex;align-items:center;justify-content:center;gap:6px}
+.ex-df-btn.primary{background:var(--color-action);color:#fff;border:none}
+.ex-df-btn.primary:hover{background:var(--color-action-hover)}
+.ex-df-btn.ghost{background:var(--color-surface-raised);color:var(--color-text-secondary);border:1px solid var(--color-border-default)}
+.ex-df-btn.ghost:hover{background:var(--color-surface-sunken)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%) translateY(16px);padding:9px 18px;border-radius:var(--radius-full);font-size:12px;font-weight:600;display:flex;align-items:center;gap:7px;z-index:200;opacity:0;transition:all .3s ease;pointer-events:none;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.15)}
+.toast.ok{background:var(--success-text);color:#fff}
+.toast.info{background:var(--color-surface-deep);color:#fff}
+.toast svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── SUCCESS LOCKED VIEW ── */
+.locked-hero{background:var(--success-surface);border:1px solid var(--success-border);border-radius:var(--radius-xl);padding:var(--space-8);text-align:center;display:none;flex-direction:column;align-items:center;gap:var(--space-3)}
+.locked-hero.show{display:flex}
+.locked-hero-icon{width:56px;height:56px;border-radius:50%;background:var(--success-text);display:flex;align-items:center;justify-content:center;margin:0 auto}
+.locked-hero-icon svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:2}
+.locked-hero-title{font-family:var(--font-display);font-size:22px;font-weight:900;color:var(--success-text);letter-spacing:-.02em}
+.locked-hero-sub{font-size:13px;color:var(--success-text);opacity:.8}
+.locked-hero-meta{display:flex;gap:var(--space-3);flex-wrap:wrap;justify-content:center;margin-top:var(--space-2)}
+.locked-meta-pill{font-size:11px;font-weight:600;background:rgba(22,102,56,.12);color:var(--success-text);border:1px solid var(--success-border);border-radius:var(--radius-full);padding:3px 12px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sb">
+  <div class="sb-top">
+    <div class="sb-logomark"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <span class="sb-brand">TradeOS</span>
+  </div>
+  <div class="sb-section">Overview</div>
+  <div class="sb-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+  <div class="sb-section">Transaksi</div>
+  <div class="sb-item"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Invoice</div>
+  <div class="sb-item"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Bills</div>
+  <div class="sb-section">Akuntansi</div>
+  <div class="sb-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>General Ledger</div>
+  <div class="sb-item"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Journal Entry</div>
+  <div class="sb-item active"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Close Management<span class="sb-badge" id="sbBadge">4</span></div>
+  <div class="sb-item"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Chart of Accounts</div>
+  <div class="sb-section">Laporan</div>
+  <div class="sb-item"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Laporan Keuangan</div>
+  <div class="sb-footer">
+    <div class="sb-footer-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Pengaturan</div>
+    <div class="sb-footer-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Bantuan</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Cari atau ketik perintah…" autocomplete="off">
+      <span class="tb-kbd">⌘K</span>
+    </div>
+    <div class="tb-right">
+      <div class="tb-notif"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>
+      <div class="tb-org"><div class="tb-av">PT</div><span class="tb-org-name">PT Sejahtera Makmur</span><svg style="width:12px;height:12px;stroke:var(--color-text-tertiary);fill:none;stroke-width:2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+    </div>
+  </div>
+
+  <!-- SCROLL -->
+  <div class="scroll-area" id="scrollArea">
+
+    <!-- PAGE HEADER -->
+    <div class="page-head">
+      <div>
+        <div class="page-title">Close Management</div>
+        <div class="page-sub">PT Sejahtera Makmur · Tutup buku &amp; kunci periode akuntansi</div>
+      </div>
+      <div class="head-right">
+        <button class="btn-ghost"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Riwayat Periode</button>
+        <button class="btn-lock state-blocked" id="lockBtn" onclick="tryOpenLockModal()">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span id="lockBtnLabel">Kunci Maret 2025</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- PERIOD TABS -->
+    <div class="period-row">
+      <div class="period-tab locked"><svg class="tab-lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Jan 2025<span class="tab-badge locked">Terkunci</span></div>
+      <div class="period-tab locked"><svg class="tab-lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Feb 2025<span class="tab-badge locked">Terkunci</span></div>
+      <div class="period-tab active">Mar 2025<span class="tab-badge active-badge" id="periodTabBadge">Perlu Tinjauan</span></div>
+      <div class="period-tab future">Apr 2025<span class="tab-badge future">Belum Dibuka</span></div>
+    </div>
+
+    <!-- ══ COMMAND CENTER — compact ══ -->
+    <div class="command-center" id="commandCenter">
+      <!-- Ring -->
+      <div class="cc-ring-wrap">
+        <svg class="cc-ring-svg" viewBox="0 0 56 56">
+          <circle class="cc-ring-track" cx="28" cy="28" r="22"/>
+          <circle class="cc-ring-fill" id="ringFill" cx="28" cy="28" r="22"
+            stroke-dasharray="0 138.2" stroke-dashoffset="0" stroke="#E8C870"/>
+        </svg>
+        <div class="cc-ring-label"><span class="cc-ring-pct" id="ringPct">0%</span></div>
+      </div>
+
+      <div class="cc-div"></div>
+
+      <!-- Period -->
+      <div class="cc-period">
+        <div class="cc-period-label">Periode Aktif</div>
+        <div class="cc-period-name">Maret 2025</div>
+        <div class="cc-status-badge review" id="ccStatusBadge">
+          <span class="cc-status-dot"></span>
+          <span id="ccStatusLabel">Perlu Tinjauan</span>
+        </div>
+      </div>
+
+      <div class="cc-div"></div>
+
+      <!-- Stats -->
+      <div class="cc-stats">
+        <div class="cc-stat-item">
+          <div class="cc-stat-num cleared" id="statCleared">14</div>
+          <div class="cc-stat-label">Auto-cleared</div>
+        </div>
+        <div class="cc-stat-item">
+          <div class="cc-stat-num warn-num" id="statReview">3</div>
+          <div class="cc-stat-label">Perlu Review</div>
+        </div>
+        <div class="cc-stat-item">
+          <div class="cc-stat-num danger-num" id="statBlocked">1</div>
+          <div class="cc-stat-label">Blocked</div>
+        </div>
+      </div>
+
+      <div class="cc-div"></div>
+
+      <!-- AI strip -->
+      <div class="cc-ai">
+        <div class="cc-ai-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <div>
+          <div class="cc-ai-label">TradeOS AI</div>
+          <div class="cc-ai-text" id="ccAiText">AR &amp; AP sudah <strong>bersih</strong>. Selesaikan <strong>4 item</strong> — 12 unmatched bank dan 2 akrual — untuk kunci Maret 2025.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ EXCEPTION TRIAGE ══ -->
+    <div class="section-head" id="exSectionHead">
+      <div class="section-title"><span class="section-dot" id="sectionDot"></span><span id="exSectionTitle">4 Item Perlu Perhatian</span></div>
+      <span class="section-count" id="exSectionSub">Selesaikan sebelum kunci periode</span>
+    </div>
+
+    <!-- All resolved state -->
+    <div class="ex-empty" id="exEmpty">
+      <div class="ex-empty-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div><div class="ex-empty-text">Semua item terselesaikan!</div><div class="ex-empty-sub">Maret 2025 siap untuk dikunci.</div></div>
+    </div>
+
+    <!-- Exception grid -->
+    <div class="exception-grid" id="exGrid">
+
+      <!-- EX 1: Bank unmatched — BLOCKED -->
+      <div class="ex-card blocked-card" id="ex-bank" onclick="openExDrawer('bank')">
+        <div class="ex-icon blocked-icon" id="ex-bank-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-domain">Kas &amp; Bank</div>
+          <div class="ex-title">12 transaksi belum dicocokkan</div>
+          <div class="ex-desc">Rekonsiliasi bank BCA Maret belum selesai. 12 transaksi tidak ada padanannya di mutasi bank.</div>
+          <div class="ex-footer">
+            <span class="ex-status-badge blocked" id="ex-bank-badge">● Blocked</span>
+            <button class="ex-action-btn primary" id="ex-bank-btn" onclick="event.stopPropagation();resolveException('bank','Rekonsiliasi bank selesai — 12 transaksi berhasil dicocokkan')">Buka Rekonsiliasi</button>
+          </div>
+        </div>
+        <div class="ex-card-resolved-overlay" id="ex-bank-overlay">
+          <div class="ex-res-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="ex-res-label">Selesai</span>
+        </div>
+      </div>
+
+      <!-- EX 2: Saldo bank belum konfirmasi — REVIEW -->
+      <div class="ex-card review-card" id="ex-saldo" onclick="openExDrawer('saldo')">
+        <div class="ex-icon review-icon" id="ex-saldo-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-domain">Kas &amp; Bank</div>
+          <div class="ex-title">Saldo bank belum dikonfirmasi</div>
+          <div class="ex-desc">Statement BCA per 31 Maret belum diupload. Saldo akhir bulan di sistem belum terverifikasi.</div>
+          <div class="ex-footer">
+            <span class="ex-status-badge needs-review" id="ex-saldo-badge">● Perlu Review</span>
+            <button class="ex-action-btn" id="ex-saldo-btn" onclick="event.stopPropagation();resolveException('saldo','Statement bank BCA berhasil diupload dan saldo terkonfirmasi')">Upload Statement</button>
+          </div>
+        </div>
+        <div class="ex-card-resolved-overlay" id="ex-saldo-overlay">
+          <div class="ex-res-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="ex-res-label">Selesai</span>
+        </div>
+      </div>
+
+      <!-- EX 3: Akrual sewa — REVIEW -->
+      <div class="ex-card review-card" id="ex-sewa" onclick="openExDrawer('sewa')">
+        <div class="ex-icon review-icon" id="ex-sewa-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-domain">Akrual &amp; Prepaid</div>
+          <div class="ex-title">Akrual beban sewa belum dijurnal</div>
+          <div class="ex-desc">Beban sewa kantor Maret Rp 45.000.000 belum ada jurnalnya. Invoice dari landlord belum diterima.</div>
+          <div class="ex-footer">
+            <span class="ex-status-badge needs-review" id="ex-sewa-badge">● Perlu Review</span>
+            <button class="ex-action-btn primary" id="ex-sewa-btn" onclick="event.stopPropagation();openExDrawer('sewa')">Buat Jurnal AI ✦</button>
+          </div>
+        </div>
+        <div class="ex-card-resolved-overlay" id="ex-sewa-overlay">
+          <div class="ex-res-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="ex-res-label">Selesai</span>
+        </div>
+      </div>
+
+      <!-- EX 4: Prepaid asuransi — REVIEW -->
+      <div class="ex-card review-card" id="ex-asuransi" onclick="openExDrawer('asuransi')">
+        <div class="ex-icon review-icon" id="ex-asuransi-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-domain">Akrual &amp; Prepaid</div>
+          <div class="ex-title">Prepaid asuransi belum diamortisasi</div>
+          <div class="ex-desc">Premi asuransi tahunan belum diamortisasi bulan Maret. Nilai amortisasi: Rp 6.250.000.</div>
+          <div class="ex-footer">
+            <span class="ex-status-badge needs-review" id="ex-asuransi-badge">● Perlu Review</span>
+            <button class="ex-action-btn primary" id="ex-asuransi-btn" onclick="event.stopPropagation();openExDrawer('asuransi')">Buat Jurnal AI ✦</button>
+          </div>
+        </div>
+        <div class="ex-card-resolved-overlay" id="ex-asuransi-overlay">
+          <div class="ex-res-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="ex-res-label">Selesai</span>
+        </div>
+      </div>
+
+    </div><!-- /ex-grid -->
+
+    <!-- LOCKED HERO (shows after lock) -->
+    <div class="locked-hero" id="lockedHero">
+      <div class="locked-hero-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <div class="locked-hero-title">Maret 2025 Terkunci</div>
+      <div class="locked-hero-sub">Semua transaksi periode ini tidak dapat diubah.</div>
+      <div class="locked-hero-meta">
+        <span class="locked-meta-pill">18 item terverifikasi</span>
+        <span class="locked-meta-pill">Trial balance seimbang</span>
+        <span class="locked-meta-pill">Dikunci oleh: Andi Santoso</span>
+        <span class="locked-meta-pill" id="lockedTime"></span>
+      </div>
+    </div>
+
+    <!-- ══ CHECKLIST GROUPS ══ -->
+
+    <!-- AR -->
+    <div class="cl-group all-good">
+      <div class="cl-group-head" onclick="toggleGroup('ar')">
+        <div class="cl-group-icon clear"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+        <span class="cl-group-label">Piutang Usaha (AR)</span>
+        <div class="cl-group-progress"><div class="cl-prog-track"><div class="cl-prog-fill full" style="width:100%"></div></div><span class="cl-prog-text" style="color:var(--success-text)">4/4</span></div>
+        <svg class="cl-chevron" id="ar-chev" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+      </div>
+      <div class="cl-body collapsed" id="ar-body">
+        <div class="cl-item clear"><div class="cl-item-check c-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="cl-item-body"><div class="cl-item-title">Semua invoice sudah di-post<span class="ai-badge"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>AI</span></div><div class="cl-item-desc">47 invoice posted ke GL. Tidak ada draft tersisa.</div><div class="cl-item-meta"><span class="cl-pill">47 invoice</span><span class="cl-pill">Rp 892.500.000</span></div></div></div>
+        <div class="cl-item clear"><div class="cl-item-check c-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="cl-item-body"><div class="cl-item-title">AR aging bersih<span class="ai-badge"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>AI</span></div><div class="cl-item-desc">Tidak ada piutang lewat jatuh tempo di periode ini.</div></div></div>
+        <div class="cl-item clear"><div class="cl-item-check c-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="cl-item-body"><div class="cl-item-title">Pelunasan pelanggan terposting<span class="ai-badge"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>AI</span></div><div class="cl-item-desc">12 pembayaran sudah diaplikasikan ke invoice yang tepat.</div><div class="cl-item-meta"><span class="cl-pill">12 pembayaran</span><span class="cl-pill">Rp 674.200.000</span></div></div></div>
+        <div class="cl-item clear"><div class="cl-item-check c-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="cl-item-body"><div class="cl-item-title">Kredit memo diaplikasikan<span class="ai-badge"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>AI</span></div><div class="cl-item-desc">3 kredit memo sudah diaplikasikan ke invoice terkait.</div></div></div>
+      </div>
+    </div>
+
+    <!-- AP -->
+    <div class="cl-group all-good">
+      <div class="cl-group-head" onclick="toggleGroup('ap')">
+        <div class="cl-group-icon clear"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <span class="cl-group-label">Hutang Usaha (AP)</span>
+        <div class="cl-group-progress"><div class="cl-prog-track"><div class="cl-prog-fill full" style="width:100%"></div></div><span class="cl-prog-text" style="color:var(--success-text)">4/4</span></div>
+        <svg class="cl-chevron" id="ap-chev" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+      </div>
+      <div class="cl-body collapsed" id="ap-body">
+        <div class="cl-item clear"><div class="cl-item-check c-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="cl-item-body"><div class="cl-item-title">Semua bill sudah di-post<span class="ai-badge"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>AI</span></div><div class="cl-item-desc">23 bill dari vendor posted ke GL.</div><div class="cl-item-meta"><span class="cl-pill">23 bill</span><span class="cl-pill">Rp 412.300.000</span></div></div></div>
+        <div class="cl-item clear"><div class="cl-item-check c-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="cl-item-body"><div class="cl-item-title">Tidak ada GRN orphan<span class="ai-badge"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>AI</span></div><div class="cl-item-desc">Semua GRN sudah dicocokkan dengan bill yang masuk.</div></div></div>
+        <div class="cl-item clear"><div class="cl-item-check c-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="cl-item-body"><div class="cl-item-title">Pembayaran vendor terverifikasi<span class="ai-badge"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>AI</span></div><div class="cl-item-desc">18 pembayaran ke vendor sudah diaplikasikan ke bill yang tepat.</div></div></div>
+        <div class="cl-item clear"><div class="cl-item-check c-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="cl-item-body"><div class="cl-item-title">Hutang jatuh tempo bersih<span class="ai-badge"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>AI</span></div><div class="cl-item-desc">Tidak ada hutang jatuh tempo yang belum diselesaikan.</div></div></div>
+      </div>
+    </div>
+
+    <!-- KAS & BANK -->
+    <div class="cl-group" id="cl-bank-group">
+      <div class="cl-group-head" onclick="toggleGroup('clbank')">
+        <div class="cl-group-icon err" id="cl-bank-icon"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="8" y2="15"/></svg></div>
+        <span class="cl-group-label">Kas &amp; Bank</span>
+        <div class="cl-group-progress"><div class="cl-prog-track"><div class="cl-prog-fill danger" id="cl-bank-prog" style="width:50%"></div></div><span class="cl-prog-text danger-num" id="cl-bank-prog-text">2/4</span></div>
+        <svg class="cl-chevron open" id="clbank-chev" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+      </div>
+      <div class="cl-body" id="clbank-body">
+        <div class="cl-item clear"><div class="cl-item-check c-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="cl-item-body"><div class="cl-item-title">Saldo kas kecil diverifikasi<span class="ai-badge"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>AI</span></div><div class="cl-item-desc">Saldo petty cash per 31 Maret cocok dengan sistem. Selisih Rp 0.</div></div></div>
+        <div class="cl-item clear"><div class="cl-item-check c-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="cl-item-body"><div class="cl-item-title">Transfer antar rekening diposting<span class="ai-badge"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>AI</span></div><div class="cl-item-desc">5 transfer antar rekening internal sudah diposting.</div></div></div>
+        <div class="cl-item err" id="cl-bank-rekon">
+          <div class="cl-item-check c-err" id="cl-bank-rekon-check"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+          <div class="cl-item-body">
+            <div class="cl-item-title">Rekonsiliasi bank BCA — 12 unmatched</div>
+            <div class="cl-item-desc" id="cl-bank-rekon-desc">AI cocokkan 38/50 transaksi. 12 sisanya tidak ada padanan berdasarkan nominal + tanggal ±2 hari.</div>
+            <div class="cl-item-meta"><span class="cl-pill danger" id="cl-bank-pill">12 unmatched</span><span class="cl-pill">Est. Rp 87.400.000</span></div>
+          </div>
+          <div class="cl-item-right"><button class="cl-btn blue" onclick="resolveException('bank','Rekonsiliasi bank selesai')">Buka Rekonsiliasi</button></div>
+        </div>
+        <div class="cl-item warn" id="cl-bank-saldo">
+          <div class="cl-item-check c-warn" id="cl-bank-saldo-check"><svg viewBox="0 0 24 24"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/><circle cx="12" cy="12" r="10"/></svg></div>
+          <div class="cl-item-body">
+            <div class="cl-item-title">Saldo bank BCA belum dikonfirmasi</div>
+            <div class="cl-item-desc" id="cl-bank-saldo-desc">Statement bulan Maret belum diupload. Butuh konfirmasi manual saldo akhir bulan.</div>
+            <div class="cl-item-meta"><span class="cl-pill warn" id="cl-saldo-pill">Butuh konfirmasi</span></div>
+          </div>
+          <div class="cl-item-right"><button class="cl-btn" onclick="resolveException('saldo','Statement bank berhasil diupload')">Upload</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AKRUAL -->
+    <div class="cl-group" id="cl-akrual-group">
+      <div class="cl-group-head" onclick="toggleGroup('clakrual')">
+        <div class="cl-group-icon warn" id="cl-akrual-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <span class="cl-group-label">Akrual &amp; Prepaid</span>
+        <div class="cl-group-progress"><div class="cl-prog-track"><div class="cl-prog-fill partial" id="cl-akrual-prog" style="width:60%"></div></div><span class="cl-prog-text" style="color:var(--color-action)" id="cl-akrual-prog-text">3/5</span></div>
+        <svg class="cl-chevron open" id="clakrual-chev" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+      </div>
+      <div class="cl-body" id="clakrual-body">
+        <div class="cl-item clear"><div class="cl-item-check c-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="cl-item-body"><div class="cl-item-title">Amortisasi software dijurnal<span class="ai-badge"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>AI</span></div><div class="cl-item-desc">JE-2025-0044 · Rp 8.500.000 sudah terposting.</div></div></div>
+        <div class="cl-item clear"><div class="cl-item-check c-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="cl-item-body"><div class="cl-item-title">Depresiasi aset tetap dijurnal<span class="ai-badge"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>AI</span></div><div class="cl-item-desc">JE-2025-0043 · Rp 15.000.000 · 8 aset aktif.</div></div></div>
+        <div class="cl-item clear"><div class="cl-item-check c-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="cl-item-body"><div class="cl-item-title">PPh 21 karyawan diakui<span class="ai-badge"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>AI</span></div><div class="cl-item-desc">JE-2025-0041 · 32 karyawan terproses.</div></div></div>
+        <div class="cl-item warn" id="cl-sewa-item">
+          <div class="cl-item-check c-warn" id="cl-sewa-check"><svg viewBox="0 0 24 24"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/><circle cx="12" cy="12" r="10"/></svg></div>
+          <div class="cl-item-body">
+            <div class="cl-item-title">Akrual beban sewa belum dijurnal</div>
+            <div class="cl-item-desc" id="cl-sewa-desc">Invoice landlord belum diterima. AI menyarankan akrual Rp 45.000.000 ke akun 6110.</div>
+            <div class="cl-item-meta"><span class="cl-pill warn" id="cl-sewa-pill">Rp 45.000.000</span></div>
+          </div>
+          <div class="cl-item-right"><button class="cl-btn blue" onclick="openExDrawer('sewa')">Buat Jurnal ✦</button></div>
+        </div>
+        <div class="cl-item warn" id="cl-asuransi-item">
+          <div class="cl-item-check c-warn" id="cl-asuransi-check"><svg viewBox="0 0 24 24"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/><circle cx="12" cy="12" r="10"/></svg></div>
+          <div class="cl-item-body">
+            <div class="cl-item-title">Prepaid asuransi belum diamortisasi</div>
+            <div class="cl-item-desc" id="cl-asuransi-desc">Porsi Maret belum dijurnal. Nilai Rp 6.250.000 ke akun 1310.</div>
+            <div class="cl-item-meta"><span class="cl-pill warn" id="cl-asuransi-pill">Rp 6.250.000</span></div>
+          </div>
+          <div class="cl-item-right"><button class="cl-btn blue" onclick="openExDrawer('asuransi')">Buat Jurnal ✦</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAPORAN -->
+    <div class="cl-group all-good">
+      <div class="cl-group-head" onclick="toggleGroup('laporan')">
+        <div class="cl-group-icon clear"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+        <span class="cl-group-label">Laporan Keuangan</span>
+        <div class="cl-group-progress"><div class="cl-prog-track"><div class="cl-prog-fill full" style="width:100%"></div></div><span class="cl-prog-text" style="color:var(--success-text)">1/1</span></div>
+        <svg class="cl-chevron" id="laporan-chev" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+      </div>
+      <div class="cl-body collapsed" id="laporan-body">
+        <div class="cl-item clear"><div class="cl-item-check c-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="cl-item-body"><div class="cl-item-title">Trial balance seimbang<span class="ai-badge"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>AI</span></div><div class="cl-item-desc">Debit = Kredit = Rp 4.218.400.000 per 31 Maret 2025. 147 akun aktif.</div></div></div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY LOG -->
+    <div class="activity-section">
+      <div class="activity-head" onclick="toggleActivity()">
+        <div class="activity-head-left"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Yang sudah dilakukan sistem hari ini</div>
+        <span style="font-size:11px;color:var(--color-text-tertiary)" id="actToggle">Sembunyikan ↑</span>
+      </div>
+      <div class="activity-body" id="actBody">
+        <div class="act-item"><div class="act-dot ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="act-text"><div class="act-action">Verifikasi AR selesai</div><div class="act-meta">08:14 — 47 invoice, 12 pembayaran</div></div><span class="act-count">47 item</span></div>
+        <div class="act-item"><div class="act-dot ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="act-text"><div class="act-action">Verifikasi AP selesai</div><div class="act-meta">08:15 — 23 bill, 0 GRN orphan</div></div><span class="act-count">23 item</span></div>
+        <div class="act-item"><div class="act-dot ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="act-text"><div class="act-action">Auto-rekonsiliasi bank dijalankan</div><div class="act-meta">10:22 — 38/50 cocok berdasarkan nominal + tanggal ±2 hari</div></div><span class="act-count">38 matched</span></div>
+        <div class="act-item"><div class="act-dot ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="act-text"><div class="act-action">Jurnal depresiasi &amp; amortisasi dibuat</div><div class="act-meta">10:30 — JE-2025-0043 &amp; JE-2025-0044 terposting</div></div><span class="act-count">2 JE</span></div>
+        <div class="act-item" id="actLog" style="display:none"><div class="act-dot ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="act-text"><div class="act-action" id="actLogText">—</div><div class="act-meta" id="actLogMeta">—</div></div><span class="act-count" id="actLogCount">✓</span></div>
+      </div>
+    </div>
+
+  </div><!-- /scroll-area -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- STICKY BAR -->
+<div class="sticky-bar">
+  <div class="sb-stat"><span class="sb-stat-label">Periode</span><span class="sb-stat-val normal">Mar 2025</span></div>
+  <div class="sb-sep"></div>
+  <div class="sb-stat"><span class="sb-stat-label">Checklist</span><span class="sb-stat-val normal">18 item</span></div>
+  <div class="sb-sep"></div>
+  <div class="sb-stat"><span class="sb-stat-label">Auto-cleared</span><span class="sb-stat-val good" id="barCleared">14</span></div>
+  <div class="sb-sep"></div>
+  <div class="sb-stat"><span class="sb-stat-label">Review</span><span class="sb-stat-val caution" id="barReview">3</span></div>
+  <div class="sb-sep"></div>
+  <div class="sb-stat"><span class="sb-stat-label">Blocked</span><span class="sb-stat-val danger" id="barBlocked">1</span></div>
+  <div class="sb-sep"></div>
+  <div class="sb-stat"><span class="sb-stat-label">Trial Balance</span><span class="sb-stat-val good">Seimbang ✓</span></div>
+  <div class="sb-right">
+    <div class="sb-stat"><span class="sb-stat-label">Readiness</span><span class="sb-readiness caution" id="barReadiness">78%</span></div>
+  </div>
+</div>
+
+<!-- OVERLAY (lock modal) -->
+<div class="overlay" id="overlay" onclick="closeLockModal()"></div>
+
+<!-- LOCK MODAL -->
+<div class="lock-modal" id="lockModal">
+  <div class="lm-head">
+    <div class="lm-icon-wrap warn" id="lmIcon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <div class="lm-head-text">
+      <div class="lm-title">Kunci Periode Maret 2025?</div>
+      <div class="lm-subtitle" id="lmSubtitle">Tindakan ini tidak dapat dibatalkan tanpa persetujuan Finance Manager.</div>
+    </div>
+    <div class="lm-close" onclick="closeLockModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+  </div>
+  <div class="lm-body">
+    <div class="lm-alert warn" id="lmAlert">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div class="lm-alert-text" id="lmAlertText">Mengunci periode dengan item terbuka dapat menyebabkan laporan keuangan tidak akurat.</div>
+    </div>
+    <div class="lm-checklist" id="lmChecklist"></div>
+    <div class="lm-confirm-label">Ketik <strong>MARET 2025</strong> untuk konfirmasi:</div>
+    <input class="lm-confirm-input" id="lockConfirmInput" type="text" placeholder="MARET 2025" oninput="checkLockConfirm()">
+  </div>
+  <div class="lm-foot">
+    <button class="lm-btn-cancel" onclick="closeLockModal()">Batalkan</button>
+    <button class="lm-btn-confirm" id="lockConfirmBtn" onclick="doLock()"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Kunci Sekarang</button>
+  </div>
+</div>
+
+<!-- EX DRAWER OVERLAY -->
+<div class="ex-overlay" id="exOverlay" onclick="closeExDrawer()"></div>
+
+<!-- EX DRAWER -->
+<div class="ex-drawer" id="exDrawer">
+  <div class="ex-dh">
+    <div style="flex:1;min-width:0"><div class="ex-dh-badge" id="exBadge">—</div><div class="ex-dh-title" id="exTitle">—</div></div>
+    <div class="ex-dh-close" onclick="closeExDrawer()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+  </div>
+  <div class="ex-db" id="exDb"></div>
+  <div class="ex-df" id="exDf"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast ok" id="toast"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span id="toastMsg"></span></div>
+
+<script>
+/* ═══════════════════════════
+   STATE
+═══════════════════════════ */
+const STATE = {
+  resolved: { bank: false, saldo: false, sewa: false, asuransi: false },
+  locked: false
+};
+// cleared=14, review=3, blocked=1, total=18
+// each resolved item moves from review/blocked → cleared (+1 cleared, -1 from review/blocked)
+const BASE = { cleared: 14, review: 3, blocked: 1, total: 18 };
+// which exception reduces which counter
+const EX_TYPE = { bank: 'blocked', saldo: 'review', sewa: 'review', asuransi: 'review' };
+
+function getStats() {
+  let cleared = BASE.cleared, review = BASE.review, blocked = BASE.blocked;
+  Object.entries(STATE.resolved).forEach(([k, v]) => {
+    if (!v) return;
+    if (EX_TYPE[k] === 'blocked') { blocked--; cleared++; }
+    else { review--; cleared++; }
+  });
+  const pending = review + blocked;
+  const pct = Math.round((cleared / BASE.total) * 100);
+  return { cleared, review, blocked, pending, pct };
+}
+
+function resolvedCount() {
+  return Object.values(STATE.resolved).filter(Boolean).length;
+}
+
+/* ═══════════════════════════
+   RESOLVE EXCEPTION
+═══════════════════════════ */
+function resolveException(key, toastMsg) {
+  if (STATE.resolved[key] || STATE.locked) return;
+  closeExDrawer();
+
+  // Flash overlay on card
+  const overlay = document.getElementById('ex-' + key + '-overlay');
+  const card = document.getElementById('ex-' + key);
+  overlay && overlay.classList.add('show');
+  setTimeout(() => {
+    STATE.resolved[key] = true;
+    markCardResolved(key);
+    updateChecklist(key);
+    updateCommandCenter();
+    updateLockBtn();
+    updateStickyBar();
+    updateSidebar();
+    showToast(toastMsg || 'Item berhasil diselesaikan', 'ok');
+    addActivityLog(key);
+  }, 600);
+}
+
+function markCardResolved(key) {
+  const card = document.getElementById('ex-' + key);
+  if (!card) return;
+  card.classList.remove('blocked-card', 'review-card');
+  card.classList.add('resolved');
+  card.onclick = null;
+
+  const icon = document.getElementById('ex-' + key + '-icon');
+  if (icon) { icon.className = 'ex-icon resolved-icon'; }
+
+  const badge = document.getElementById('ex-' + key + '-badge');
+  if (badge) { badge.className = 'ex-status-badge done'; badge.textContent = '✓ Selesai'; }
+
+  const btn = document.getElementById('ex-' + key + '-btn');
+  if (btn) { btn.className = 'ex-action-btn done'; btn.textContent = 'Selesai ✓'; btn.onclick = null; }
+}
+
+function updateChecklist(key) {
+  if (key === 'bank') {
+    const item = document.getElementById('cl-bank-rekon');
+    item.className = 'cl-item clear';
+    const chk = document.getElementById('cl-bank-rekon-check');
+    chk.className = 'cl-item-check c-ok';
+    chk.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+    document.getElementById('cl-bank-rekon-desc').textContent = '50/50 transaksi berhasil dicocokkan. Rekonsiliasi selesai.';
+    document.getElementById('cl-bank-pill').className = 'cl-pill';
+    document.getElementById('cl-bank-pill').textContent = '50 matched ✓';
+    updateBankGroup();
+  }
+  if (key === 'saldo') {
+    const item = document.getElementById('cl-bank-saldo');
+    item.className = 'cl-item clear';
+    const chk = document.getElementById('cl-bank-saldo-check');
+    chk.className = 'cl-item-check c-ok';
+    chk.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+    document.getElementById('cl-bank-saldo-desc').textContent = 'Statement BCA Maret diupload. Saldo Rp 312.500.000 terkonfirmasi.';
+    document.getElementById('cl-saldo-pill').className = 'cl-pill';
+    document.getElementById('cl-saldo-pill').textContent = 'Terkonfirmasi ✓';
+    updateBankGroup();
+  }
+  if (key === 'sewa') {
+    const item = document.getElementById('cl-sewa-item');
+    item.className = 'cl-item clear';
+    const chk = document.getElementById('cl-sewa-check');
+    chk.className = 'cl-item-check c-ok';
+    chk.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+    document.getElementById('cl-sewa-desc').textContent = 'JE-2025-0047 dibuat · Beban Sewa Rp 45.000.000 terposting ke akun 6110.';
+    document.getElementById('cl-sewa-pill').className = 'cl-pill';
+    document.getElementById('cl-sewa-pill').textContent = 'JE-2025-0047 ✓';
+    updateAkrualGroup();
+  }
+  if (key === 'asuransi') {
+    const item = document.getElementById('cl-asuransi-item');
+    item.className = 'cl-item clear';
+    const chk = document.getElementById('cl-asuransi-check');
+    chk.className = 'cl-item-check c-ok';
+    chk.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+    document.getElementById('cl-asuransi-desc').textContent = 'JE-2025-0048 dibuat · Prepaid Asuransi Rp 6.250.000 diamortisasi.';
+    document.getElementById('cl-asuransi-pill').className = 'cl-pill';
+    document.getElementById('cl-asuransi-pill').textContent = 'JE-2025-0048 ✓';
+    updateAkrualGroup();
+  }
+}
+
+function updateBankGroup() {
+  const bankRes = STATE.resolved.bank ? 1 : 0;
+  const saldoRes = STATE.resolved.saldo ? 1 : 0;
+  const done = 2 + bankRes + saldoRes;
+  const pct = (done / 4) * 100;
+  document.getElementById('cl-bank-prog').style.width = pct + '%';
+  document.getElementById('cl-bank-prog-text').textContent = done + '/4';
+  if (done === 4) {
+    document.getElementById('cl-bank-prog').className = 'cl-prog-fill full';
+    document.getElementById('cl-bank-prog-text').style.color = 'var(--success-text)';
+    document.getElementById('cl-bank-icon').className = 'cl-group-icon clear';
+    document.getElementById('cl-bank-group').classList.add('all-good');
+  } else if (done < 4) {
+    document.getElementById('cl-bank-prog').className = 'cl-prog-fill danger';
+    document.getElementById('cl-bank-prog-text').style.color = 'var(--danger-text)';
+  }
+}
+
+function updateAkrualGroup() {
+  const sewaRes = STATE.resolved.sewa ? 1 : 0;
+  const asuransiRes = STATE.resolved.asuransi ? 1 : 0;
+  const done = 3 + sewaRes + asuransiRes;
+  const pct = (done / 5) * 100;
+  document.getElementById('cl-akrual-prog').style.width = pct + '%';
+  document.getElementById('cl-akrual-prog-text').textContent = done + '/5';
+  if (done === 5) {
+    document.getElementById('cl-akrual-prog').className = 'cl-prog-fill full';
+    document.getElementById('cl-akrual-prog-text').style.color = 'var(--success-text)';
+    document.getElementById('cl-akrual-icon').className = 'cl-group-icon clear';
+    document.getElementById('cl-akrual-group').classList.add('all-good');
+  }
+}
+
+/* ═══════════════════════════
+   COMMAND CENTER UPDATE
+═══════════════════════════ */
+function updateCommandCenter() {
+  const s = getStats();
+  // ring
+  const circumference = 2 * Math.PI * 22; // r=22
+  const filled = (s.pct / 100) * circumference;
+  const ring = document.getElementById('ringFill');
+  ring.setAttribute('stroke-dasharray', filled + ' ' + circumference);
+  if (s.pct === 100) ring.setAttribute('stroke', '#166638');
+  else if (s.pct >= 90) ring.setAttribute('stroke', '#A8D9BC');
+  else ring.setAttribute('stroke', '#E8C870');
+
+  document.getElementById('ringPct').textContent = s.pct + '%';
+  document.getElementById('statCleared').textContent = s.cleared;
+  document.getElementById('statReview').textContent = s.review;
+  document.getElementById('statBlocked').textContent = s.blocked;
+
+  // status badge
+  const badge = document.getElementById('ccStatusBadge');
+  const label = document.getElementById('ccStatusLabel');
+  if (s.pending === 0) {
+    badge.className = 'cc-status-badge ready';
+    label.textContent = 'Siap Dikunci';
+    document.getElementById('periodTabBadge').textContent = 'Siap Dikunci';
+    document.getElementById('periodTabBadge').style.background = 'rgba(166,235,190,.2)';
+    document.getElementById('periodTabBadge').style.color = '#6EE7A0';
+    document.getElementById('sectionDot').style.display = 'none';
+    document.getElementById('exSectionTitle').textContent = 'Semua Item Terselesaikan';
+    document.getElementById('exSectionTitle').style.color = 'var(--success-text)';
+    document.getElementById('exSectionSub').textContent = 'Periode siap dikunci';
+    document.getElementById('exEmpty').classList.add('show');
+    document.getElementById('exGrid').style.display = 'none';
+  } else {
+    badge.className = 'cc-status-badge review';
+    label.textContent = 'Perlu Tinjauan';
+    document.getElementById('exSectionTitle').textContent = s.pending + ' Item Perlu Perhatian';
+  }
+
+  // AI text
+  const ai = document.getElementById('ccAiText');
+  if (s.pending === 0) {
+    ai.innerHTML = 'Semua item <strong>terselesaikan</strong>. Maret 2025 <strong>siap untuk dikunci</strong> — klik tombol Kunci di kanan atas.';
+  } else {
+    const remaining = [];
+    if (!STATE.resolved.bank) remaining.push('rekonsiliasi bank');
+    if (!STATE.resolved.saldo) remaining.push('konfirmasi saldo');
+    if (!STATE.resolved.sewa) remaining.push('akrual sewa');
+    if (!STATE.resolved.asuransi) remaining.push('amortisasi asuransi');
+    ai.innerHTML = 'AR &amp; AP sudah <strong>bersih</strong>. Selesaikan: <strong>' + remaining.join(', ') + '</strong> untuk kunci Maret 2025.';
+  }
+}
+
+/* ═══════════════════════════
+   LOCK BUTTON STATE
+═══════════════════════════ */
+function updateLockBtn() {
+  const s = getStats();
+  const btn = document.getElementById('lockBtn');
+  if (s.blocked > 0) {
+    btn.className = 'btn-lock state-blocked';
+    btn.title = 'Ada item blocked — tidak dapat dikunci';
+  } else if (s.review > 0) {
+    btn.className = 'btn-lock state-warn';
+    btn.title = 'Ada item perlu review — bisa dikunci dengan risiko';
+  } else {
+    btn.className = 'btn-lock state-ready';
+    btn.title = 'Semua item selesai — siap dikunci!';
+  }
+}
+
+function updateStickyBar() {
+  const s = getStats();
+  document.getElementById('barCleared').textContent = s.cleared;
+  document.getElementById('barReview').textContent = s.review;
+  document.getElementById('barBlocked').textContent = s.blocked;
+  const readEl = document.getElementById('barReadiness');
+  readEl.textContent = s.pct + '%';
+  if (s.pct === 100) { readEl.style.color = '#6EE7A0'; }
+  else if (s.pct >= 90) { readEl.style.color = '#A8D9BC'; }
+
+  const reviewEl = document.getElementById('barReview');
+  reviewEl.className = 'sb-stat-val ' + (s.review > 0 ? 'caution' : 'good');
+  const blockedEl = document.getElementById('barBlocked');
+  blockedEl.className = 'sb-stat-val ' + (s.blocked > 0 ? 'danger' : 'good');
+}
+
+function updateSidebar() {
+  const s = getStats();
+  const badge = document.getElementById('sbBadge');
+  if (s.pending === 0) {
+    badge.style.background = 'var(--success-surface)';
+    badge.style.color = 'var(--success-text)';
+    badge.style.borderColor = 'var(--success-border)';
+    badge.textContent = '✓';
+  } else {
+    badge.textContent = s.pending;
+  }
+}
+
+/* ═══════════════════════════
+   LOCK MODAL
+═══════════════════════════ */
+function tryOpenLockModal() {
+  const s = getStats();
+  if (s.blocked > 0) {
+    showToast('Selesaikan item Blocked terlebih dahulu', 'info');
+    // shake the button
+    const btn = document.getElementById('lockBtn');
+    btn.style.transform = 'translateX(-4px)';
+    setTimeout(() => { btn.style.transform = 'translateX(4px)'; }, 80);
+    setTimeout(() => { btn.style.transform = 'translateX(-3px)'; }, 160);
+    setTimeout(() => { btn.style.transform = 'translateX(0)'; }, 240);
+    return;
+  }
+  openLockModal();
+}
+
+function openLockModal() {
+  const s = getStats();
+  // build checklist
+  const items = [
+    { label: 'Piutang Usaha (AR)', status: 'ok', text: '4 item selesai' },
+    { label: 'Hutang Usaha (AP)', status: 'ok', text: '4 item selesai' },
+    { label: 'Kas &amp; Bank', status: (STATE.resolved.bank && STATE.resolved.saldo) ? 'ok' : (STATE.resolved.bank || STATE.resolved.saldo) ? 'warn' : 'err',
+      text: (STATE.resolved.bank && STATE.resolved.saldo) ? '4 item selesai' : (!STATE.resolved.bank && !STATE.resolved.saldo) ? '2 item terbuka' : '1 item terbuka' },
+    { label: 'Akrual &amp; Prepaid', status: (STATE.resolved.sewa && STATE.resolved.asuransi) ? 'ok' : (STATE.resolved.sewa || STATE.resolved.asuransi) ? 'warn' : 'warn',
+      text: (STATE.resolved.sewa && STATE.resolved.asuransi) ? '5 item selesai' : (!STATE.resolved.sewa && !STATE.resolved.asuransi) ? '2 item belum dijurnal' : '1 item belum dijurnal' },
+    { label: 'Laporan Keuangan', status: 'ok', text: 'Trial balance seimbang' },
+  ];
+  const checkIcons = {
+    ok: '<polyline points="20 6 9 17 4 12"/>',
+    warn: '<line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/><circle cx="12" cy="12" r="10"/>',
+    err: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'
+  };
+  let html = items.map(it => `
+    <div class="lm-check-row">
+      <div class="lm-check-dot ${it.status}"><svg viewBox="0 0 24 24" fill="none" stroke-width="2">${checkIcons[it.status]}</svg></div>
+      <span class="lm-check-text ${it.status === 'ok' ? 'ok' : ''}">${it.label} — <span>${it.text}</span></span>
+    </div>`).join('');
+  document.getElementById('lmChecklist').innerHTML = html;
+
+  // alert style
+  const alert = document.getElementById('lmAlert');
+  const alertText = document.getElementById('lmAlertText');
+  const icon = document.getElementById('lmIcon');
+  if (s.pending === 0) {
+    alert.className = 'lm-alert ready';
+    alertText.textContent = 'Semua item selesai. Maret 2025 siap dikunci dengan aman.';
+    icon.className = 'lm-icon-wrap ready';
+    document.getElementById('lmSubtitle').textContent = 'Tindakan ini tidak dapat dibatalkan tanpa persetujuan Finance Manager.';
+  } else {
+    alert.className = 'lm-alert warn';
+    alertText.textContent = s.review + ' item masih perlu review. Mengunci periode dengan item terbuka dapat menyebabkan laporan tidak akurat.';
+    icon.className = 'lm-icon-wrap warn';
+  }
+
+  document.getElementById('lockConfirmInput').value = '';
+  document.getElementById('lockConfirmBtn').classList.remove('ready');
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('lockModal').classList.add('open');
+  setTimeout(() => document.getElementById('lockConfirmInput').focus(), 300);
+}
+
+function closeLockModal() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('lockModal').classList.remove('open');
+}
+
+function checkLockConfirm() {
+  const val = document.getElementById('lockConfirmInput').value.trim().toUpperCase();
+  const inp = document.getElementById('lockConfirmInput');
+  const btn = document.getElementById('lockConfirmBtn');
+  const match = val === 'MARET 2025';
+  inp.classList.toggle('match', match);
+  btn.classList.toggle('ready', match);
+}
+
+function doLock() {
+  STATE.locked = true;
+  closeLockModal();
+
+  // Update lock button
+  const lockBtn = document.getElementById('lockBtn');
+  lockBtn.className = 'btn-lock state-ready';
+  lockBtn.style.background = '#080706';
+  lockBtn.style.color = '#fff';
+  lockBtn.style.cursor = 'default';
+  lockBtn.style.pointerEvents = 'none';
+  document.getElementById('lockBtnLabel').textContent = '🔒 Maret 2025 Terkunci';
+
+  // Period tab
+  document.getElementById('periodTabBadge').textContent = 'Terkunci';
+  document.getElementById('periodTabBadge').style.background = 'rgba(255,255,255,.12)';
+  document.getElementById('periodTabBadge').style.color = 'rgba(255,255,255,.8)';
+
+  // Status badge
+  const badge = document.getElementById('ccStatusBadge');
+  badge.className = 'cc-status-badge locked';
+  document.getElementById('ccStatusLabel').textContent = 'Terkunci';
+
+  // Show locked hero
+  document.getElementById('lockedHero').classList.add('show');
+  const now = new Date();
+  document.getElementById('lockedTime').textContent = now.toLocaleString('id-ID', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+
+  // Sidebar badge
+  const sb = document.getElementById('sbBadge');
+  sb.textContent = '🔒';
+  sb.style.background = 'rgba(22,102,56,.15)';
+  sb.style.color = 'var(--success-text)';
+  sb.style.borderColor = 'var(--success-border)';
+
+  showToast('Periode Maret 2025 berhasil dikunci', 'ok');
+}
+
+/* ═══════════════════════════
+   ACTIVITY LOG
+═══════════════════════════ */
+const ACT_LOG_DATA = {
+  bank: { text: 'Rekonsiliasi bank BCA selesai', meta: 'Semua 50 transaksi berhasil dicocokkan', count: '50 matched' },
+  saldo: { text: 'Statement bank BCA diupload', meta: 'Saldo Rp 312.500.000 terkonfirmasi per 31 Maret', count: '✓ Confirmed' },
+  sewa: { text: 'JE akrual sewa dibuat (AI)', meta: 'JE-2025-0047 · Beban Sewa Rp 45.000.000 → Akun 6110', count: '1 JE' },
+  asuransi: { text: 'JE amortisasi asuransi dibuat (AI)', meta: 'JE-2025-0048 · Prepaid Asuransi Rp 6.250.000 → Akun 1310', count: '1 JE' },
+};
+let actLogQueue = [];
+function addActivityLog(key) {
+  const d = ACT_LOG_DATA[key];
+  if (!d) return;
+  actLogQueue.push(d);
+  // Show last action in the hidden log row
+  const el = document.getElementById('actLog');
+  el.style.display = 'flex';
+  document.getElementById('actLogText').textContent = actLogQueue[actLogQueue.length-1].text;
+  document.getElementById('actLogMeta').textContent = actLogQueue[actLogQueue.length-1].meta;
+  document.getElementById('actLogCount').textContent = actLogQueue[actLogQueue.length-1].count;
+}
+
+/* ═══════════════════════════
+   EXCEPTION DRAWER DATA
+═══════════════════════════ */
+const DRAWER_DATA = {
+  bank: {
+    badge: 'Blocked', badgeClass: 'err',
+    title: '12 Transaksi Bank BCA Belum Dicocokkan',
+    body: `<div class="ex-db-section"><div class="ex-db-label">Situasi</div><div class="ex-db-text">AI sudah mencocokkan <strong>38 dari 50 transaksi</strong> berdasarkan nominal dan toleransi tanggal ±2 hari. Sisa 12 tidak ada padanannya.</div></div>
+    <div class="ex-db-section"><div class="ex-db-label">Detail</div><div class="ex-db-kv">
+      <div class="ex-db-row"><span class="ex-db-key">Rekening</span><span class="ex-db-val">BCA — 1234-5678-90</span></div>
+      <div class="ex-db-row"><span class="ex-db-key">Total transaksi</span><span class="ex-db-val">50</span></div>
+      <div class="ex-db-row"><span class="ex-db-key">Sudah cocok</span><span class="ex-db-val" style="color:var(--success-text)">38</span></div>
+      <div class="ex-db-row"><span class="ex-db-key">Belum cocok</span><span class="ex-db-val" style="color:var(--danger-text)">12</span></div>
+      <div class="ex-db-row"><span class="ex-db-key">Estimasi nilai</span><span class="ex-db-val">Rp 87.400.000</span></div>
+    </div></div>
+    <div class="ex-db-section"><div class="ex-db-label">Kenapa ini memblokir close</div><div class="ex-db-text">Transaksi unmatched belum masuk ke GL, sehingga saldo kas di neraca belum akurat.</div></div>`,
+    primaryLabel: 'Buka Rekonsiliasi & Selesaikan',
+    primaryAction: "resolveException('bank','Rekonsiliasi bank selesai — 50 transaksi tercocokkan')",
+    ghostLabel: 'Tutup'
+  },
+  saldo: {
+    badge: 'Perlu Review', badgeClass: 'warn',
+    title: 'Saldo Bank BCA Belum Dikonfirmasi per 31 Maret',
+    body: `<div class="ex-db-section"><div class="ex-db-label">Situasi</div><div class="ex-db-text">Statement bank Maret 2025 belum diupload. Saldo akhir bulan di sistem <strong>belum terverifikasi</strong> dengan rekening koran resmi.</div></div>
+    <div class="ex-db-section"><div class="ex-db-label">Saldo di Sistem</div><div class="ex-db-kv">
+      <div class="ex-db-row"><span class="ex-db-key">Saldo per sistem</span><span class="ex-db-val">Rp 312.500.000</span></div>
+      <div class="ex-db-row"><span class="ex-db-key">Terakhir diperbarui</span><span class="ex-db-val">29 Mar 2025</span></div>
+      <div class="ex-db-row"><span class="ex-db-key">Statement diupload</span><span class="ex-db-val" style="color:var(--danger-text)">Belum</span></div>
+    </div></div>`,
+    primaryLabel: 'Upload Statement & Konfirmasi',
+    primaryAction: "resolveException('saldo','Statement bank BCA berhasil diupload dan saldo terkonfirmasi')",
+    ghostLabel: 'Tutup'
+  },
+  sewa: {
+    badge: 'Perlu Review', badgeClass: 'warn',
+    title: 'Akrual Beban Sewa Maret 2025',
+    body: `<div class="ex-db-section"><div class="ex-db-label">Draft Jurnal dari AI ✦</div><div class="ex-db-text">AI mendeteksi beban sewa Maret belum dijurnal. Berdasarkan histori Jan–Feb (Rp 45jt/bulan), berikut draft yang diusulkan:</div></div>
+    <div class="ex-db-section"><div class="ex-db-kv">
+      <div class="ex-db-row"><span class="ex-db-key">Akun Debit</span><span class="ex-db-val">6110 — Beban Sewa</span></div>
+      <div class="ex-db-row"><span class="ex-db-key">Akun Kredit</span><span class="ex-db-val">2110 — Hutang Akrual</span></div>
+      <div class="ex-db-row"><span class="ex-db-key">Nominal</span><span class="ex-db-val">Rp 45.000.000</span></div>
+      <div class="ex-db-row"><span class="ex-db-key">Tanggal Jurnal</span><span class="ex-db-val">31 Mar 2025</span></div>
+      <div class="ex-db-row"><span class="ex-db-key">Dasar AI</span><span class="ex-db-val">Histori Jan–Feb 2025</span></div>
+    </div></div>
+    <div class="ex-db-section"><div class="ex-db-label">Catatan</div><div class="ex-db-text">Jurnal ini akan dibalik otomatis saat invoice sewa diterima. Edit nominal jika ada perubahan dari landlord.</div></div>`,
+    primaryLabel: '✦ Post Jurnal AI Sekarang',
+    primaryAction: "resolveException('sewa','JE-2025-0047 berhasil dibuat — Akrual sewa Rp 45.000.000 terposting')",
+    ghostLabel: 'Edit Manual di JE'
+  },
+  asuransi: {
+    badge: 'Perlu Review', badgeClass: 'warn',
+    title: 'Amortisasi Prepaid Asuransi Maret 2025',
+    body: `<div class="ex-db-section"><div class="ex-db-label">Draft Jurnal dari AI ✦</div><div class="ex-db-text">Premi asuransi gedung Rp 75.000.000 dibayar sekaligus untuk 12 bulan. AI menghitung porsi Maret:</div></div>
+    <div class="ex-db-section"><div class="ex-db-kv">
+      <div class="ex-db-row"><span class="ex-db-key">Akun Debit</span><span class="ex-db-val">6320 — Beban Asuransi</span></div>
+      <div class="ex-db-row"><span class="ex-db-key">Akun Kredit</span><span class="ex-db-val">1310 — Prepaid Asuransi</span></div>
+      <div class="ex-db-row"><span class="ex-db-key">Nominal</span><span class="ex-db-val">Rp 6.250.000</span></div>
+      <div class="ex-db-row"><span class="ex-db-key">Dasar Hitung</span><span class="ex-db-val">Rp 75jt ÷ 12 bulan</span></div>
+      <div class="ex-db-row"><span class="ex-db-key">Sisa Prepaid</span><span class="ex-db-val">Rp 56.250.000</span></div>
+    </div></div>
+    <div class="ex-db-section"><div class="ex-db-label">Progress Amortisasi</div><div class="ex-db-text">Jan ✓ &nbsp; Feb ✓ &nbsp; <strong style="color:var(--warning-text)">Mar — belum</strong> &nbsp; Apr–Des (pending)</div></div>`,
+    primaryLabel: '✦ Post Jurnal AI Sekarang',
+    primaryAction: "resolveException('asuransi','JE-2025-0048 berhasil dibuat — Amortisasi asuransi Rp 6.250.000 terposting')",
+    ghostLabel: 'Tutup'
+  }
+};
+
+function openExDrawer(key) {
+  if (STATE.resolved[key]) { showToast('Item ini sudah diselesaikan', 'info'); return; }
+  const d = DRAWER_DATA[key];
+  const badge = document.getElementById('exBadge');
+  badge.textContent = d.badge;
+  badge.className = 'ex-dh-badge ' + d.badgeClass;
+  document.getElementById('exTitle').textContent = d.title;
+  document.getElementById('exDb').innerHTML = d.body;
+  document.getElementById('exDf').innerHTML = `
+    <button class="ex-df-btn primary" onclick="${d.primaryAction};closeExDrawer()">${d.primaryLabel}</button>
+    <button class="ex-df-btn ghost" onclick="closeExDrawer()">${d.ghostLabel}</button>`;
+  document.getElementById('exOverlay').classList.add('open');
+  document.getElementById('exDrawer').classList.add('open');
+}
+
+function closeExDrawer() {
+  document.getElementById('exOverlay').classList.remove('open');
+  document.getElementById('exDrawer').classList.remove('open');
+}
+
+/* ═══════════════════════════
+   CHECKLIST TOGGLE
+═══════════════════════════ */
+function toggleGroup(id) {
+  const body = document.getElementById(id + '-body');
+  const chev = document.getElementById(id + '-chev');
+  body.classList.toggle('collapsed');
+  chev.classList.toggle('open', !body.classList.contains('collapsed'));
+}
+
+/* ═══════════════════════════
+   ACTIVITY LOG TOGGLE
+═══════════════════════════ */
+function toggleActivity() {
+  const body = document.getElementById('actBody');
+  const toggle = document.getElementById('actToggle');
+  body.classList.toggle('hidden');
+  toggle.textContent = body.classList.contains('hidden') ? 'Tampilkan ↓' : 'Sembunyikan ↑';
+}
+
+/* ═══════════════════════════
+   TOAST
+═══════════════════════════ */
+let toastTimer;
+function showToast(msg, type = 'ok') {
+  const toast = document.getElementById('toast');
+  const toastMsg = document.getElementById('toastMsg');
+  toast.className = 'toast ' + type;
+  toastMsg.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+/* ═══════════════════════════
+   INIT
+═══════════════════════════ */
+window.addEventListener('load', () => {
+  // Animate ring on load
+  const ring = document.getElementById('ringFill');
+  const circumference = 2 * Math.PI * 22;
+  const pct = 78;
+  ring.setAttribute('stroke-dasharray', '0 ' + circumference);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    ring.style.transition = 'stroke-dasharray 1.2s cubic-bezier(.4,0,.2,1)';
+    ring.setAttribute('stroke-dasharray', (pct / 100 * circumference) + ' ' + circumference);
+    // Animate pct counter
+    let cur = 0;
+    const interval = setInterval(() => {
+      cur = Math.min(cur + 2, pct);
+      document.getElementById('ringPct').textContent = cur + '%';
+      if (cur >= pct) clearInterval(interval);
+    }, 24);
+  }));
+});
+</script>
+</body>
+</html>
