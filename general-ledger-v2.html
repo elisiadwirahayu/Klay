@@ -68,6 +68,18 @@ body{font-family:var(--font-sans);background:var(--color-surface-base);color:var
 .btn-klay-ai{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-sans);font-size:12px;font-weight:700;padding:7px 13px;background:#fff;color:var(--color-brand);border:none;border-radius:var(--radius-md);cursor:pointer;transition:all var(--transition-base);position:relative}
 .btn-klay-ai:hover{background:rgba(255,255,255,.92);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
 .btn-klay-ai svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+
+/* Floating AI tooltip */
+.ai-float-tip{position:absolute;top:calc(100% + 10px);left:0;z-index:100;width:236px;background:var(--color-text-primary);border-radius:var(--radius-md);padding:11px 12px 10px;box-shadow:0 8px 24px rgba(8,7,6,.22);pointer-events:all}
+.ai-float-tip::before{content:'';position:absolute;top:-5px;left:16px;width:10px;height:10px;background:var(--color-text-primary);transform:rotate(45deg);border-radius:2px}
+.ai-float-tip-body{font-size:11px;color:rgba(255,255,255,.75);line-height:1.55;margin-bottom:7px}
+.ai-float-tip-cta{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#fff;background:var(--color-action);border-radius:var(--radius-sm);padding:4px 9px;cursor:pointer;transition:background var(--transition-fast)}
+.ai-float-tip-cta:hover{background:var(--color-action-hover)}
+.ai-float-tip-cta svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:2.5}
+.ai-float-tip-close{position:absolute;top:7px;right:8px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.4);border-radius:var(--radius-sm);transition:all var(--transition-fast)}
+.ai-float-tip-close:hover{color:#fff;background:rgba(255,255,255,.1)}
+.ai-float-tip-close svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2}
+.ai-float-tip.hidden{display:none}
 .ai-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;background:var(--color-brand);color:#fff;font-size:10px;font-weight:700;border-radius:var(--radius-full);position:relative}
 .ai-badge::before{content:'';position:absolute;inset:-3px;border-radius:var(--radius-full);background:rgba(255,255,255,.4);animation:badgePulse 1.8s ease-in-out infinite}
 .ai-badge::after{content:'';position:absolute;inset:-6px;border-radius:var(--radius-full);background:rgba(255,255,255,.15);animation:badgePulse 1.8s ease-in-out infinite .3s}
@@ -86,19 +98,26 @@ body{font-family:var(--font-sans);background:var(--color-surface-base);color:var
 .period-balance-chip-label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.45)}
 .period-balance-chip-val{font-size:13px;font-weight:700;color:#fff;font-family:var(--font-mono);letter-spacing:-.01em}
 .period-balance-chip-delta{font-size:10px;font-weight:600;color:rgba(160,235,190,.85);letter-spacing:.01em}
-.period-tabs-row{display:flex;align-items:center;padding:0 14px 0 20px;gap:3px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid rgba(255,255,255,.1)}
+.period-tabs-row{display:flex;align-items:center;padding:0 8px 0 20px;gap:0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid rgba(255,255,255,.1)}
 .period-tabs-row::-webkit-scrollbar{display:none}
 .pt-prev,.pt-next{width:22px;height:22px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.5);flex-shrink:0;transition:all var(--transition-fast)}
 .pt-prev:hover,.pt-next:hover{color:#fff;background:rgba(255,255,255,.1)}
 .pt-prev svg,.pt-next svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
-.pt-tab{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;font-size:11px;font-weight:500;color:rgba(255,255,255,.55);border-radius:var(--radius-sm) var(--radius-sm) 0 0;cursor:pointer;transition:all var(--transition-fast);white-space:nowrap;position:relative;border-bottom:2px solid transparent;margin-bottom:-1px}
+.pt-tab{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 14px;font-size:11px;font-weight:500;color:rgba(255,255,255,.55);cursor:pointer;transition:all var(--transition-fast);white-space:nowrap;position:relative;border-bottom:2px solid transparent;margin-bottom:-1px;flex:none}
 .pt-tab:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.08)}
 .pt-tab.active{color:#fff;font-weight:700;background:rgba(255,255,255,.12);border-bottom-color:#fff}
-.pt-tab.locked{color:rgba(255,255,255,.4)}
-.pt-tab svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:1.5;opacity:.7}
+.pt-tab.locked{color:rgba(255,255,255,.35);cursor:default}
+.pt-tab.locked:hover{color:rgba(255,255,255,.55);background:rgba(255,255,255,.06)}
+.pt-tab.future{color:rgba(255,255,255,.3);cursor:default}
+.pt-tab.future:hover{color:rgba(255,255,255,.45);background:rgba(255,255,255,.05)}
+.pt-tab svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:1.5;opacity:.6;flex-shrink:0}
 .pt-spacer{flex:1;min-width:8px}
-/* Buka command center pill — inline in period-tabs-row, right side */
-.open-center-pill{display:none;align-items:center;gap:5px;background:rgba(0,0,0,.2);color:rgba(255,255,255,.75);font-size:10px;font-weight:600;padding:4px 11px;border-radius:var(--radius-full);cursor:pointer;white-space:nowrap;transition:all var(--transition-fast);border:1px solid rgba(255,255,255,.15);flex-shrink:0;margin-bottom:0}
+/* Tab tooltip — rendered at body level via JS to avoid overflow clipping */
+.pt-tab-tooltip{display:none} /* hide inline versions, JS handles it */
+#ptTooltip{position:fixed;background:var(--color-text-primary);color:rgba(255,255,255,.92);font-size:10px;font-weight:500;white-space:nowrap;padding:5px 10px;border-radius:var(--radius-sm);pointer-events:none;z-index:9999;opacity:0;transition:opacity .12s ease;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#ptTooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:var(--color-text-primary)}
+/* Buka command center pill */
+.open-center-pill{display:none;align-items:center;gap:5px;background:rgba(0,0,0,.2);color:rgba(255,255,255,.75);font-size:10px;font-weight:600;padding:5px 11px;border-radius:var(--radius-full);cursor:pointer;white-space:nowrap;transition:all var(--transition-fast);border:1px solid rgba(255,255,255,.15);flex-shrink:0;align-self:center;margin-left:4px}
 .open-center-pill:hover{background:rgba(0,0,0,.3);color:#fff}
 .open-center-pill.visible{display:inline-flex}
 .orange-zone-bar{display:none}
@@ -690,11 +709,24 @@ td{padding:10px 14px;vertical-align:middle}
     </div>
     <div class="period-ctas">
       <!-- Klay AI CTA -->
-      <button class="btn-klay-ai" onclick="openAI('manual')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--color-brand)" style="flex-shrink:0"><path d="M12 2 L13.8 8.5 L20.5 8.5 L15.2 12.5 L17.1 19 L12 15.2 L6.9 19 L8.8 12.5 L3.5 8.5 L10.2 8.5 Z"/><circle cx="19" cy="4" r="2"/><circle cx="5" cy="5" r="1.3"/><circle cx="20" cy="16" r="1.3"/></svg>
-        Klay AI
-        <span class="ai-badge" id="aiBadge">4</span>
-      </button>
+      <div style="position:relative">
+        <button class="btn-klay-ai" onclick="openAI('manual')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--color-brand)" style="flex-shrink:0"><path d="M12 2 L13.8 8.5 L20.5 8.5 L15.2 12.5 L17.1 19 L12 15.2 L6.9 19 L8.8 12.5 L3.5 8.5 L10.2 8.5 Z"/><circle cx="19" cy="4" r="2"/><circle cx="5" cy="5" r="1.3"/><circle cx="20" cy="16" r="1.3"/></svg>
+          Klay AI
+          <span class="ai-badge" id="aiBadge">4</span>
+        </button>
+        <!-- Floating tip -->
+        <div class="ai-float-tip" id="aiFloatTip">
+          <div class="ai-float-tip-close" onclick="closeFloatTip(event)">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </div>
+          <div class="ai-float-tip-body">7 hari lagi closing. GL seimbang tapi <strong style="color:#fff">3 JE pending</strong> &amp; <strong style="color:#fff">1 anomali</strong> masih belum selesai — rekon <strong style="color:#fff">76%</strong>.</div>
+          <div class="ai-float-tip-cta" onclick="openAI('manual')">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#fff" stroke="none"/></svg>
+            Klik untuk tanya Klay AI
+          </div>
+        </div>
+      </div>
       <!-- Export -->
       <div style="position:relative">
         <button class="btn-export-top" onclick="toggleExp(event)">
@@ -723,16 +755,33 @@ td{padding:10px 14px;vertical-align:middle}
 
   <!-- Period tabs -->
   <div class="period-tabs-row" id="periodTabsRow">
-    <div class="pt-prev"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
-    <div class="pt-tab locked"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Okt 2024</div>
-    <div class="pt-tab locked"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Nov 2024</div>
-    <div class="pt-tab locked"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Des 2024</div>
+    <div class="pt-prev" onclick="scrollTabs(-1)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="pt-tab locked">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Okt 2024
+      <div class="pt-tab-tooltip">Periode terkunci</div>
+    </div>
+    <div class="pt-tab locked">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Nov 2024
+      <div class="pt-tab-tooltip">Periode terkunci</div>
+    </div>
+    <div class="pt-tab locked">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Des 2024
+      <div class="pt-tab-tooltip">Periode terkunci</div>
+    </div>
     <div class="pt-tab active">Jan 2025</div>
-    <div class="pt-tab">Feb 2025</div>
-    <div class="pt-tab">Mar 2025</div>
-    <div class="pt-tab">Apr 2025</div>
-    <div class="pt-tab">Mei 2025</div>
-    <div class="pt-next"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+    <div class="pt-tab future">Feb 2025
+      <div class="pt-tab-tooltip">Periode belum dimulai</div>
+    </div>
+    <div class="pt-tab future">Mar 2025
+      <div class="pt-tab-tooltip">Periode belum dimulai</div>
+    </div>
+    <div class="pt-tab future">Apr 2025
+      <div class="pt-tab-tooltip">Periode belum dimulai</div>
+    </div>
+    <div class="pt-tab future">Mei 2025
+      <div class="pt-tab-tooltip">Periode belum dimulai</div>
+    </div>
+    <div class="pt-next" onclick="scrollTabs(1)"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
     <div class="pt-spacer"></div>
     <div class="open-center-pill" id="openCenterPill" onclick="expandCommandCenter()">
       <svg viewBox="0 0 24 24" width="10" height="10" style="stroke:currentColor;fill:none;stroke-width:2.5"><polyline points="18 15 12 9 6 15"/></svg>
@@ -2213,6 +2262,8 @@ let aiMsgCount = 0;
 
 function openAI(context){
   const panel=document.getElementById('aiPanel');
+  // Hide float tip whenever panel opens
+  document.getElementById('aiFloatTip')?.classList.add('hidden');
   if(!aiOpen){
     aiOpen=true;
     panel.classList.add('open');
@@ -2278,15 +2329,65 @@ function sendAIMessage(){
   },1200+Math.random()*600);
 }
 
+/* ── FLOAT TIP ── */
+function closeFloatTip(e){
+  e.stopPropagation();
+  document.getElementById('aiFloatTip')?.classList.add('hidden');
+}
+// Also hide tip when AI panel opens
+const _origOpenAI = typeof openAI === 'function' ? openAI : null;
+
+/* ── SUGGESTION CHIP RESPONSES ── */
+const SUGGESTION_RESPONSES = {
+  'Apa yang perlu dilakukan hari ini? ↗': `Berdasarkan status GL Jan 2025 hari ini, ada <strong>3 hal mendesak</strong> yang perlu diselesaikan sebelum closing:<br><br>
+<strong>1. Resolve anomali JE-2025-0001</strong><br>Beban Gaji Rp 85,5jt — naik 16.9% dari rata-rata 3 bulan (Rp 73,1jt). Perlu konfirmasi apakah ada kenaikan gaji atau pembayaran non-rutin. Tandai valid jika memang wajar, atau minta koreksi dari tim HR/Payroll.<br><br>
+<strong>2. Dorong approval 3 JE pending</strong><br>JE ini belum bisa dipost karena menunggu persetujuan Finance Manager. Hubungi approver atau eskalasi — tanpa ini, GL tidak bisa dikunci.<br><br>
+<strong>3. Selesaikan rekonsiliasi bank (76% → 100%)</strong><br>12 transaksi belum matched. AI sudah auto-match 38 transaksi — sisanya kemungkinan butuh manual review karena selisih tanggal atau nominal yang tidak persis.<br><br>
+Closing window tinggal <strong>7 hari</strong>. Prioritas hari ini: anomali + approval.`,
+
+  'Bandingkan dengan bulan lalu ↗': `Perbandingan <strong>Jan 2025 vs Des 2024</strong>:<br><br>
+<table style="width:100%;font-size:11px;border-collapse:collapse">
+  <tr style="border-bottom:1px solid var(--color-border-default)">
+    <td style="padding:4px 0;color:var(--color-text-tertiary)">Running balance</td>
+    <td style="padding:4px 0;text-align:right;font-family:var(--font-mono);font-weight:700;color:var(--color-text-primary)">Rp 616,6jt</td>
+    <td style="padding:4px 0 4px 8px;text-align:right;color:#16A34A;font-size:10px;font-weight:600">↑ +28%</td>
+  </tr>
+  <tr style="border-bottom:1px solid var(--color-border-default)">
+    <td style="padding:4px 0;color:var(--color-text-tertiary)">Total transaksi</td>
+    <td style="padding:4px 0;text-align:right;font-family:var(--font-mono);font-weight:700">54 entri</td>
+    <td style="padding:4px 0 4px 8px;text-align:right;color:#16A34A;font-size:10px;font-weight:600">↑ +12 entri</td>
+  </tr>
+  <tr style="border-bottom:1px solid var(--color-border-default)">
+    <td style="padding:4px 0;color:var(--color-text-tertiary)">Beban operasional</td>
+    <td style="padding:4px 0;text-align:right;font-family:var(--font-mono);font-weight:700">Rp 127,3jt</td>
+    <td style="padding:4px 0 4px 8px;text-align:right;color:#DC2626;font-size:10px;font-weight:600">↑ +19%</td>
+  </tr>
+  <tr style="border-bottom:1px solid var(--color-border-default)">
+    <td style="padding:4px 0;color:var(--color-text-tertiary)">Rekonsiliasi</td>
+    <td style="padding:4px 0;text-align:right;font-family:var(--font-mono);font-weight:700">76%</td>
+    <td style="padding:4px 0 4px 8px;text-align:right;color:#D97706;font-size:10px;font-weight:600">↓ Des: 100%</td>
+  </tr>
+  <tr>
+    <td style="padding:4px 0;color:var(--color-text-tertiary)">Anomali</td>
+    <td style="padding:4px 0;text-align:right;font-family:var(--font-mono);font-weight:700">1</td>
+    <td style="padding:4px 0 4px 8px;text-align:right;color:#D97706;font-size:10px;font-weight:600">Des: 0</td>
+  </tr>
+</table><br>
+Kenaikan saldo signifikan didorong pendapatan yang lebih tinggi, tapi beban operasional juga naik — terutama dari komponen gaji yang perlu dikonfirmasi. Des 2024 closing bersih tanpa anomali.`
+};
+
 function sendAISuggestion(el){
-  const txt=el.textContent;
+  const txt = el.textContent.trim();
   openAI('manual');
-  addAIBubble('user',txt);
-  const typing=showTyping();
+  // Hide float tip
+  document.getElementById('aiFloatTip')?.classList.add('hidden');
+  addAIBubble('user', txt);
+  const typing = showTyping();
+  const response = SUGGESTION_RESPONSES[txt] || AI_RESPONSES[aiMsgCount % AI_RESPONSES.length];
   setTimeout(()=>{
     typing.remove();
-    addAIBubble('ai', AI_RESPONSES[aiMsgCount % AI_RESPONSES.length]);
-  },1000+Math.random()*800);
+    addAIBubble('ai', response);
+  }, 900 + Math.random() * 600);
 }
 
 function aiInputKey(e){
@@ -2401,6 +2502,38 @@ function doExportNew(){
   const data=getSorted(scope==='visible'?filteredRows:[...ALL_ROWS]);
   doExport(fmt_,data);
 }
+
+function scrollTabs(dir){
+  const row = document.getElementById('periodTabsRow');
+  if(row) row.scrollBy({left: dir * 120, behavior: 'smooth'});
+}
+
+/* ── PERIOD TAB TOOLTIPS (body-level to escape overflow) ── */
+(function setupTabTooltips(){
+  const tip = document.createElement('div');
+  tip.id = 'ptTooltip';
+  document.body.appendChild(tip);
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    document.querySelectorAll('.pt-tab.locked, .pt-tab.future').forEach(tab => {
+      const msg = tab.classList.contains('locked') ? 'Periode terkunci' : 'Periode belum dimulai';
+      tab.addEventListener('mouseenter', e => {
+        const r = tab.getBoundingClientRect();
+        tip.textContent = msg;
+        tip.style.opacity = '0';
+        tip.style.display = 'block';
+        const tw = tip.offsetWidth;
+        tip.style.left = (r.left + r.width / 2 - tw / 2) + 'px';
+        tip.style.top = (r.top - tip.offsetHeight - 8) + 'px';
+        tip.style.opacity = '1';
+      });
+      tab.addEventListener('mouseleave', () => {
+        tip.style.opacity = '0';
+        setTimeout(() => { if(tip.style.opacity === '0') tip.style.display = 'none'; }, 120);
+      });
+    });
+  });
+})();
 
 /* ── COMMAND CENTER SCROLL BEHAVIOR ── */
 let commandCenterCollapsed = false;
